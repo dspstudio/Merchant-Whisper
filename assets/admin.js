@@ -2353,10 +2353,55 @@
 		requestedTab = '';
 	}
 
+	var FOLD_OPEN_KEY = 'mw_st_fold_open';
+	var FOLD_CARD_SELECTOR =
+		'#mwst-panel-general details.mwst-fold--card, #mwst-panel-message details.mwst-fold--card, #mwst-panel-design details.mwst-fold--card, #mwst-panel-timing details.mwst-fold--card, #mwst-panel-statistics details.mwst-fold--card';
+
+	function loadFoldOpenMap() {
+		try {
+			var raw = window.localStorage.getItem(FOLD_OPEN_KEY);
+			var saved = raw ? JSON.parse(raw) : null;
+			if (!saved || typeof saved !== 'object' || Array.isArray(saved)) {
+				return {};
+			}
+			return saved;
+		} catch (e) {
+			return {};
+		}
+	}
+
+	function saveFoldOpen(id, open) {
+		if (!id) {
+			return;
+		}
+		var saved = loadFoldOpenMap();
+		saved[id] = !!open;
+		try {
+			window.localStorage.setItem(FOLD_OPEN_KEY, JSON.stringify(saved));
+		} catch (e) {
+			/* ignore */
+		}
+	}
+
+	function restoreFoldOpen() {
+		var saved = loadFoldOpenMap();
+		root.querySelectorAll(FOLD_CARD_SELECTOR).forEach(function (card) {
+			var id = card.id;
+			if (!id || !Object.prototype.hasOwnProperty.call(saved, id)) {
+				return;
+			}
+			if (typeof saved[id] === 'boolean') {
+				card.open = saved[id];
+			}
+		});
+	}
+
+	restoreFoldOpen();
 	activateTab(tabFromUrl());
 	refreshProductSelects();
-	root.querySelectorAll('#mwst-panel-general details.mwst-fold--card, #mwst-panel-message details.mwst-fold--card, #mwst-panel-design details.mwst-fold--card, #mwst-panel-timing details.mwst-fold--card').forEach(function (card) {
+	root.querySelectorAll(FOLD_CARD_SELECTOR).forEach(function (card) {
 		card.addEventListener('toggle', function () {
+			saveFoldOpen(card.id, card.open);
 			if (card.open) {
 				refreshProductSelects();
 			}
