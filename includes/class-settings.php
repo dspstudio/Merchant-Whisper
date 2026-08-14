@@ -95,6 +95,8 @@ class MW_Sales_Toast_Settings {
 			'mobile_breakpoint'      => 768,
 			'sound_enabled'          => 0,
 			'newsletter'             => 0,
+			'analytics_enabled'      => 1,
+			'analytics_attr_minutes' => 30,
 			'when_style'             => 'natural',
 			'event_delivery'         => 'rest',
 			'stock_display'          => 'soft',
@@ -1120,6 +1122,7 @@ class MW_Sales_Toast_Settings {
 			'type_cta',
 			'review_excerpt',
 			'cta_once',
+			'analytics_enabled',
 		);
 		foreach ( $checks as $key ) {
 			$out[ $key ] = empty( $input[ $key ] ) ? 0 : 1;
@@ -1153,6 +1156,16 @@ class MW_Sales_Toast_Settings {
 
 		// Disabled inputs are omitted from POST — keep previously saved values.
 		$saved_opts = get_option( MW_SALES_TOAST_OPTION, array() );
+
+		$attr_allowed = array( 15, 30, 60, 120 );
+		if ( array_key_exists( 'analytics_attr_minutes', $input ) ) {
+			$attr_min = (int) $input['analytics_attr_minutes'];
+		} else {
+			$attr_min = ( is_array( $saved_opts ) && isset( $saved_opts['analytics_attr_minutes'] ) )
+				? (int) $saved_opts['analytics_attr_minutes']
+				: (int) $defaults['analytics_attr_minutes'];
+		}
+		$out['analytics_attr_minutes'] = in_array( $attr_min, $attr_allowed, true ) ? $attr_min : 30;
 
 		$out['mobile_breakpoint'] = max(
 			320,
@@ -1529,7 +1542,15 @@ class MW_Sales_Toast_Settings {
 			true
 		);
 
-		$admin_deps = array( 'jquery', 'wp-color-picker', 'mw-sales-toast-pop' );
+		wp_enqueue_script(
+			'mw-sales-toast-chart',
+			MW_SALES_TOAST_URL . 'assets/vendor/chart.umd.min.js',
+			array(),
+			'4.4.8',
+			true
+		);
+
+		$admin_deps = array( 'jquery', 'wp-color-picker', 'mw-sales-toast-pop', 'mw-sales-toast-chart' );
 		if ( class_exists( 'WooCommerce' ) ) {
 			$admin_deps[] = 'wc-enhanced-select';
 		}
@@ -1586,6 +1607,19 @@ class MW_Sales_Toast_Settings {
 				'analytics'      => class_exists( 'MW_Sales_Toast_Analytics' )
 					? MW_Sales_Toast_Analytics::dashboard_payload()
 					: null,
+				'analyticsUi'    => array(
+					'enabled'     => class_exists( 'MW_Sales_Toast_Analytics' )
+						? MW_Sales_Toast_Analytics::is_enabled()
+						: true,
+					'ajaxUrl'     => admin_url( 'admin-ajax.php' ),
+					'nonce'       => wp_create_nonce( 'mw_st_analytics' ),
+					'actionReset' => 'mw_st_analytics_reset',
+					'actionSet'   => 'mw_st_analytics_set',
+					'actionSetAttr' => 'mw_st_analytics_set_attr',
+					'currency'      => class_exists( 'WooCommerce' ) && function_exists( 'get_woocommerce_currency_symbol' )
+						? html_entity_decode( wp_strip_all_tags( (string) get_woocommerce_currency_symbol() ), ENT_QUOTES | ENT_HTML5, 'UTF-8' )
+						: '',
+				),
 				'optionName'     => MW_SALES_TOAST_OPTION,
 				'i18n'           => array(
 					/* translators: %s: relative time */
@@ -1610,6 +1644,21 @@ class MW_Sales_Toast_Settings {
 					'supportError'     => __( 'Something went wrong. Please try again.', 'mw-sales-toast' ),
 					'statsEmpty'       => __( 'No product data yet.', 'mw-sales-toast' ),
 					'statsMinutes'     => __( 'minutes', 'mw-sales-toast' ),
+					'statsExport'      => __( 'Download CSV', 'mw-sales-toast' ),
+					'statsSearch'      => __( 'Search products', 'mw-sales-toast' ),
+					'statsShowMore'    => __( 'Show more', 'mw-sales-toast' ),
+					'statsShowLess'    => __( 'Show fewer', 'mw-sales-toast' ),
+					'statsResetConfirm' => __( 'Delete all stored toast statistics? This cannot be undone.', 'mw-sales-toast' ),
+					'statsResetting'   => __( 'Clearing…', 'mw-sales-toast' ),
+					'statsReset'       => __( 'Reset statistics', 'mw-sales-toast' ),
+					'statsResetError'  => __( 'Could not reset statistics. Please try again.', 'mw-sales-toast' ),
+					'statsImpressions' => __( 'Impressions', 'mw-sales-toast' ),
+					'statsClicks'      => __( 'Clicks', 'mw-sales-toast' ),
+					'statsAutoHide'    => __( 'Auto-hid', 'mw-sales-toast' ),
+					'statsDismissed'   => __( 'Dismissed', 'mw-sales-toast' ),
+					'statsCarts'       => __( 'Carts', 'mw-sales-toast' ),
+					'statsOrders'      => __( 'Orders', 'mw-sales-toast' ),
+					'statsRevenue'     => __( 'Revenue', 'mw-sales-toast' ),
 					'transferNoFile'   => __( 'Choose a JSON file first.', 'mw-sales-toast' ),
 					'transferImporting' => __( 'Importing…', 'mw-sales-toast' ),
 					/* translators: %s: duration label */
@@ -1938,6 +1987,71 @@ class MW_Sales_Toast_Settings {
 			esc_attr( $tab ),
 			esc_html( $label )
 		);
+	}
+
+	/**
+	 * CSS class for a vs-prior delta chip.
+	 *
+	 * @param array|null $delta Delta payload.
+	 * @return string
+	 */
+	private static function stats_delta_class( $delta ) {
+		$dir = is_array( $delta ) && ! empty( $delta['dir'] ) ? (string) $delta['dir'] : 'flat';
+		if ( 'up' === $dir ) {
+			return 'is-up';
+		}
+		if ( 'down' === $dir ) {
+			return 'is-down';
+		}
+		return 'is-flat';
+	}
+
+	/**
+	 * Impression / click breakdown table.
+	 *
+	 * @param string            $tbody_id    Tbody id.
+	 * @param array<int, array> $rows        Rows.
+	 * @param string            $first       First column heading.
+	 * @param string            $third       Last numeric heading.
+	 * @param bool              $clicks_only Hide impressions; treat ctr as share of clicks.
+	 */
+	private static function stats_metric_table( $tbody_id, $rows, $first, $third, $clicks_only = false ) {
+		$rows = is_array( $rows ) ? $rows : array();
+		$cols = $clicks_only ? 3 : 4;
+		?>
+		<div class="mwst-stats-table-wrap">
+			<table class="mwst-stats-table">
+				<thead>
+					<tr>
+						<th scope="col"><?php echo esc_html( $first ); ?></th>
+						<?php if ( ! $clicks_only ) : ?>
+							<th scope="col" class="is-num"><?php esc_html_e( 'Impressions', 'mw-sales-toast' ); ?></th>
+						<?php endif; ?>
+						<th scope="col" class="is-num"><?php esc_html_e( 'Clicks', 'mw-sales-toast' ); ?></th>
+						<th scope="col" class="is-num"><?php echo esc_html( $third ); ?></th>
+					</tr>
+				</thead>
+				<tbody id="<?php echo esc_attr( $tbody_id ); ?>"<?php echo $clicks_only ? ' data-metric="clicks-share"' : ''; ?>>
+					<?php if ( empty( $rows ) ) : ?>
+						<tr class="mwst-stats-empty">
+							<td colspan="<?php echo (int) $cols; ?>"><?php esc_html_e( 'No data yet.', 'mw-sales-toast' ); ?></td>
+						</tr>
+					<?php else : ?>
+						<?php foreach ( $rows as $row ) : ?>
+							<tr>
+								<th scope="row"><?php echo esc_html( (string) ( $row['label'] ?? $row['id'] ?? '' ) ); ?></th>
+								<?php if ( ! $clicks_only ) : ?>
+									<td class="is-num"><?php echo esc_html( number_format_i18n( (int) ( $row['impressions'] ?? 0 ) ) ); ?></td>
+								<?php endif; ?>
+								<td class="is-num"><?php echo esc_html( number_format_i18n( (int) ( $row['clicks'] ?? 0 ) ) ); ?></td>
+								<td class="is-num"><?php echo esc_html( (string) ( $row['ctr'] ?? 0 ) ); ?>%</td>
+							</tr>
+						<?php endforeach; ?>
+					<?php endif; ?>
+				</tbody>
+			</table>
+		</div>
+		<?php
 	}
 
 	/**
@@ -3263,19 +3377,35 @@ class MW_Sales_Toast_Settings {
 							? MW_Sales_Toast_Analytics::dashboard_payload()
 							: array();
 						$stats_seed = ! empty( $stats_payload['7'] ) ? $stats_payload['7'] : array(
-							'impressions' => 0,
-							'clicks'      => 0,
-							'ctr'         => 0,
-							'dismissed'   => 0,
-							'muted'       => 0,
-							'atc'         => 0,
-							'purchases'   => 0,
-							'delta'       => array(),
-							'products'    => array(),
-							'types'       => array(),
-							'hasData'     => false,
-							'attrWindow'  => 30,
+							'impressions'          => 0,
+							'clicks'               => 0,
+							'ctr'                  => 0,
+							'convRate'             => 0,
+							'dismissed'            => 0,
+							'autoHide'             => 0,
+							'muted'                => 0,
+							'atc'                  => 0,
+							'purchases'            => 0,
+							'revenue'              => 0,
+							'revenueLabel'         => '',
+							'skippedMute'          => 0,
+							'skippedSessionCap'    => 0,
+							'skippedReducedMotion' => 0,
+							'skippedMobile'        => 0,
+							'dwellDismiss'         => '—',
+							'dwellAutoHide'        => '—',
+							'delta'                => array(),
+							'products'             => array(),
+							'types'                => array(),
+							'sources'              => array(),
+							'pages'                => array(),
+							'triggers'             => array(),
+							'clickTargets'         => array(),
+							'series'               => array(),
+							'hasData'              => false,
+							'attrWindow'           => (int) ( $s['analytics_attr_minutes'] ?? 30 ),
 						);
+						$stats_delta = isset( $stats_seed['delta'] ) && is_array( $stats_seed['delta'] ) ? $stats_seed['delta'] : array();
 						?>
 						<div class="mwst-panel<?php echo 'statistics' === $current_tab ? ' is-active' : ''; ?>" id="mwst-panel-statistics" role="tabpanel">
 							<div class="mwst-stats-toolbar">
@@ -3285,59 +3415,99 @@ class MW_Sales_Toast_Settings {
 										<p><?php esc_html_e( 'Aggregate engagement only — no names, emails, or IPs.', 'mw-sales-toast' ); ?></p>
 									</div>
 								</div>
-								<div class="mwst-stats-range" role="group" aria-label="<?php esc_attr_e( 'Date range', 'mw-sales-toast' ); ?>">
-									<button type="button" class="mwst-stats-range__btn is-active" data-range="7" aria-pressed="true"><?php esc_html_e( '7 days', 'mw-sales-toast' ); ?></button>
-									<button type="button" class="mwst-stats-range__btn" data-range="30" aria-pressed="false"><?php esc_html_e( '30 days', 'mw-sales-toast' ); ?></button>
-									<button type="button" class="mwst-stats-range__btn" data-range="90" aria-pressed="false"><?php esc_html_e( '90 days', 'mw-sales-toast' ); ?></button>
+								<div class="mwst-stats-toolbar__actions">
+									<div class="mwst-stats-range" role="group" aria-label="<?php esc_attr_e( 'Date range', 'mw-sales-toast' ); ?>">
+										<button type="button" class="mwst-stats-range__btn is-active" data-range="7" aria-pressed="true"><?php esc_html_e( '7 days', 'mw-sales-toast' ); ?></button>
+										<button type="button" class="mwst-stats-range__btn" data-range="30" aria-pressed="false"><?php esc_html_e( '30 days', 'mw-sales-toast' ); ?></button>
+										<button type="button" class="mwst-stats-range__btn" data-range="90" aria-pressed="false"><?php esc_html_e( '90 days', 'mw-sales-toast' ); ?></button>
+									</div>
+									<button type="button" class="button mwst-stats-export" id="mwst-stats-export"><?php esc_html_e( 'Download CSV', 'mw-sales-toast' ); ?></button>
 								</div>
 							</div>
 
-							<?php if ( empty( $stats_seed['hasData'] ) ) : ?>
-								<div class="mwst-notice mwst-notice--warn" role="status">
-									<span class="mwst-notice__icon" aria-hidden="true">!</span>
-									<div class="mwst-notice__body">
-										<strong><?php esc_html_e( 'Waiting for data', 'mw-sales-toast' ); ?></strong>
-										<p><?php esc_html_e( 'Numbers appear after visitors see toasts on the storefront. Keep toasts enabled and browse the shop in a private window to generate the first events.', 'mw-sales-toast' ); ?></p>
-									</div>
+							<div class="mwst-notice mwst-notice--warn" id="mwst-stats-disabled" role="status"<?php echo ! empty( $s['analytics_enabled'] ) ? ' hidden' : ''; ?>>
+								<span class="mwst-notice__icon" aria-hidden="true">!</span>
+								<div class="mwst-notice__body">
+									<strong><?php esc_html_e( 'Collection is off', 'mw-sales-toast' ); ?></strong>
+									<p><?php esc_html_e( 'Existing totals stay on this tab. New storefront events are not recorded until you turn collection back on below.', 'mw-sales-toast' ); ?></p>
 								</div>
-							<?php endif; ?>
+							</div>
 
-							<div class="mwst-card" id="mwst-stats-overview">
-								<div class="mwst-card__head">
-									<h2><?php esc_html_e( 'Overview', 'mw-sales-toast' ); ?></h2>
-									<p><?php esc_html_e( 'Core funnel for toast visibility and product link engagement.', 'mw-sales-toast' ); ?></p>
+							<div class="mwst-notice mwst-notice--warn" id="mwst-stats-empty" role="status"<?php echo empty( $stats_seed['hasData'] ) ? '' : ' hidden'; ?>>
+								<span class="mwst-notice__icon" aria-hidden="true">!</span>
+								<div class="mwst-notice__body">
+									<strong><?php esc_html_e( 'Waiting for data', 'mw-sales-toast' ); ?></strong>
+									<p><?php esc_html_e( 'Numbers appear after visitors see toasts on the storefront. Keep toasts enabled and browse the shop in a private window to generate the first events.', 'mw-sales-toast' ); ?></p>
 								</div>
+							</div>
+
+							<details class="mwst-card mwst-fold mwst-fold--card" id="mwst-stats-overview" open>
+								<summary class="mwst-card__head">
+									<h2><?php echo self::dashicon_html( 'dashicons-chart-area' ); ?><?php esc_html_e( 'Overview', 'mw-sales-toast' ); ?></h2>
+									<p><?php esc_html_e( 'Visibility, clicks, and soft-attributed carts and orders in the selected range.', 'mw-sales-toast' ); ?></p>
+								</summary>
 								<div class="mwst-card__body">
 									<div class="mwst-stats-kpis" aria-label="<?php esc_attr_e( 'Key metrics', 'mw-sales-toast' ); ?>">
 										<div class="mwst-stats-kpi">
 											<span class="mwst-stats-kpi__label"><?php esc_html_e( 'Impressions', 'mw-sales-toast' ); ?></span>
 											<span class="mwst-stats-kpi__value" data-stat="impressions"><?php echo esc_html( number_format_i18n( (int) $stats_seed['impressions'] ) ); ?></span>
-											<span class="mwst-stats-kpi__delta" data-stat-delta="impressions"><?php echo esc_html( $stats_seed['delta']['impressions']['label'] ?? __( 'vs prior', 'mw-sales-toast' ) ); ?></span>
+											<span class="mwst-stats-kpi__delta <?php echo esc_attr( self::stats_delta_class( $stats_delta['impressions'] ?? null ) ); ?>" data-stat-delta="impressions"><?php echo esc_html( $stats_delta['impressions']['label'] ?? __( 'vs prior', 'mw-sales-toast' ) ); ?></span>
 										</div>
 										<div class="mwst-stats-kpi">
 											<span class="mwst-stats-kpi__label"><?php esc_html_e( 'Clicks', 'mw-sales-toast' ); ?></span>
 											<span class="mwst-stats-kpi__value" data-stat="clicks"><?php echo esc_html( number_format_i18n( (int) $stats_seed['clicks'] ) ); ?></span>
-											<span class="mwst-stats-kpi__delta" data-stat-delta="clicks"><?php echo esc_html( $stats_seed['delta']['clicks']['label'] ?? __( 'vs prior', 'mw-sales-toast' ) ); ?></span>
+											<span class="mwst-stats-kpi__delta <?php echo esc_attr( self::stats_delta_class( $stats_delta['clicks'] ?? null ) ); ?>" data-stat-delta="clicks"><?php echo esc_html( $stats_delta['clicks']['label'] ?? __( 'vs prior', 'mw-sales-toast' ) ); ?></span>
 										</div>
 										<div class="mwst-stats-kpi">
 											<span class="mwst-stats-kpi__label"><?php esc_html_e( 'CTR', 'mw-sales-toast' ); ?></span>
 											<span class="mwst-stats-kpi__value" data-stat="ctr"><?php echo esc_html( (string) $stats_seed['ctr'] ); ?>%</span>
-											<span class="mwst-stats-kpi__delta" data-stat-delta="ctr"><?php echo esc_html( $stats_seed['delta']['ctr']['label'] ?? __( 'vs prior', 'mw-sales-toast' ) ); ?></span>
+											<span class="mwst-stats-kpi__delta <?php echo esc_attr( self::stats_delta_class( $stats_delta['ctr'] ?? null ) ); ?>" data-stat-delta="ctr"><?php echo esc_html( $stats_delta['ctr']['label'] ?? __( 'vs prior', 'mw-sales-toast' ) ); ?></span>
 										</div>
 										<div class="mwst-stats-kpi">
 											<span class="mwst-stats-kpi__label"><?php esc_html_e( 'Attributed carts', 'mw-sales-toast' ); ?></span>
 											<span class="mwst-stats-kpi__value" data-stat="atc"><?php echo esc_html( number_format_i18n( (int) $stats_seed['atc'] ) ); ?></span>
-											<span class="mwst-stats-kpi__delta" data-stat-delta="atc"><?php echo esc_html( $stats_seed['delta']['atc']['label'] ?? __( 'vs prior', 'mw-sales-toast' ) ); ?></span>
+											<span class="mwst-stats-kpi__delta <?php echo esc_attr( self::stats_delta_class( $stats_delta['atc'] ?? null ) ); ?>" data-stat-delta="atc"><?php echo esc_html( $stats_delta['atc']['label'] ?? __( 'vs prior', 'mw-sales-toast' ) ); ?></span>
+										</div>
+										<div class="mwst-stats-kpi">
+											<span class="mwst-stats-kpi__label"><?php esc_html_e( 'Attributed purchases', 'mw-sales-toast' ); ?></span>
+											<span class="mwst-stats-kpi__value" data-stat="purchases"><?php echo esc_html( number_format_i18n( (int) $stats_seed['purchases'] ) ); ?></span>
+											<span class="mwst-stats-kpi__delta <?php echo esc_attr( self::stats_delta_class( $stats_delta['purchases'] ?? null ) ); ?>" data-stat-delta="purchases"><?php echo esc_html( $stats_delta['purchases']['label'] ?? __( 'vs prior', 'mw-sales-toast' ) ); ?></span>
+										</div>
+										<div class="mwst-stats-kpi">
+											<span class="mwst-stats-kpi__label"><?php esc_html_e( 'Click → order', 'mw-sales-toast' ); ?></span>
+											<span class="mwst-stats-kpi__value" data-stat="convRate"><?php echo esc_html( (string) $stats_seed['convRate'] ); ?>%</span>
+											<span class="mwst-stats-kpi__delta <?php echo esc_attr( self::stats_delta_class( $stats_delta['convRate'] ?? null ) ); ?>" data-stat-delta="convRate"><?php echo esc_html( $stats_delta['convRate']['label'] ?? __( 'vs prior', 'mw-sales-toast' ) ); ?></span>
+										</div>
+										<div class="mwst-stats-kpi mwst-stats-kpi--wide">
+											<span class="mwst-stats-kpi__label"><?php esc_html_e( 'Attributed revenue', 'mw-sales-toast' ); ?></span>
+											<span class="mwst-stats-kpi__end">
+												<span class="mwst-stats-kpi__value" data-stat="revenueLabel"><?php echo esc_html( (string) ( $stats_seed['revenueLabel'] ?? '' ) ); ?></span>
+												<span class="mwst-stats-kpi__delta <?php echo esc_attr( self::stats_delta_class( $stats_delta['revenue'] ?? null ) ); ?>" data-stat-delta="revenue"><?php echo esc_html( $stats_delta['revenue']['label'] ?? __( 'vs prior', 'mw-sales-toast' ) ); ?></span>
+											</span>
+										</div>
+									</div>
+									<div class="mwst-stats-spark" id="mwst-stats-spark">
+										<div class="mwst-stats-spark__chart" id="mwst-stats-spark-chart">
+											<canvas id="mwst-stats-spark-canvas" aria-label="<?php esc_attr_e( 'Daily toast metrics', 'mw-sales-toast' ); ?>"></canvas>
+										</div>
+										<div class="mwst-stats-spark__legend" id="mwst-stats-spark-legend" role="group" aria-label="<?php esc_attr_e( 'Chart series', 'mw-sales-toast' ); ?>">
+											<button type="button" class="mwst-stats-spark__swatch mwst-stats-spark__swatch--imp is-on" data-series="impressions" aria-pressed="true"><?php esc_html_e( 'Impressions', 'mw-sales-toast' ); ?></button>
+											<button type="button" class="mwst-stats-spark__swatch mwst-stats-spark__swatch--clk is-on" data-series="clicks" aria-pressed="true"><?php esc_html_e( 'Clicks', 'mw-sales-toast' ); ?></button>
+											<button type="button" class="mwst-stats-spark__swatch mwst-stats-spark__swatch--hide" data-series="autoHide" aria-pressed="false"><?php esc_html_e( 'Auto-hid', 'mw-sales-toast' ); ?></button>
+											<button type="button" class="mwst-stats-spark__swatch mwst-stats-spark__swatch--dismiss" data-series="dismissed" aria-pressed="false"><?php esc_html_e( 'Dismissed', 'mw-sales-toast' ); ?></button>
+											<button type="button" class="mwst-stats-spark__swatch mwst-stats-spark__swatch--cart" data-series="atc" aria-pressed="false"><?php esc_html_e( 'Carts', 'mw-sales-toast' ); ?></button>
+											<button type="button" class="mwst-stats-spark__swatch mwst-stats-spark__swatch--order" data-series="purchases" aria-pressed="false"><?php esc_html_e( 'Orders', 'mw-sales-toast' ); ?></button>
+											<button type="button" class="mwst-stats-spark__swatch mwst-stats-spark__swatch--rev" data-series="revenue" aria-pressed="false"><?php esc_html_e( 'Revenue', 'mw-sales-toast' ); ?></button>
 										</div>
 									</div>
 								</div>
-							</div>
+							</details>
 
-							<div class="mwst-card" id="mwst-stats-types">
-								<div class="mwst-card__head">
-									<h2><?php esc_html_e( 'By toast type', 'mw-sales-toast' ); ?></h2>
-									<p><?php esc_html_e( 'Impressions and clicks for each type in the same range. Carts and purchases stay in Overview.', 'mw-sales-toast' ); ?></p>
-								</div>
+							<details class="mwst-card mwst-fold mwst-fold--card" id="mwst-stats-types" open>
+								<summary class="mwst-card__head">
+									<h2><?php echo self::dashicon_html( 'dashicons-screenoptions' ); ?><?php esc_html_e( 'By toast type', 'mw-sales-toast' ); ?></h2>
+									<p><?php esc_html_e( 'Impressions, clicks, and last-click attributed carts, orders, and revenue per type.', 'mw-sales-toast' ); ?></p>
+								</summary>
 								<div class="mwst-card__body">
 									<div class="mwst-stats-table-wrap">
 										<table class="mwst-stats-table">
@@ -3347,19 +3517,25 @@ class MW_Sales_Toast_Settings {
 													<th scope="col" class="is-num"><?php esc_html_e( 'Impressions', 'mw-sales-toast' ); ?></th>
 													<th scope="col" class="is-num"><?php esc_html_e( 'Clicks', 'mw-sales-toast' ); ?></th>
 													<th scope="col" class="is-num"><?php esc_html_e( 'CTR', 'mw-sales-toast' ); ?></th>
+													<th scope="col" class="is-num"><?php esc_html_e( 'Carts', 'mw-sales-toast' ); ?></th>
+													<th scope="col" class="is-num"><?php esc_html_e( 'Orders', 'mw-sales-toast' ); ?></th>
+													<th scope="col" class="is-num"><?php esc_html_e( 'Revenue', 'mw-sales-toast' ); ?></th>
 												</tr>
 											</thead>
-											<tbody id="mwst-stats-types-body">
+											<tbody id="mwst-stats-types-body" data-metric="types">
 												<?php
 												$stats_types = isset( $stats_seed['types'] ) && is_array( $stats_seed['types'] ) ? $stats_seed['types'] : array();
 												if ( empty( $stats_types ) && class_exists( 'MW_Sales_Toast_Settings' ) ) {
 													foreach ( MW_Sales_Toast_Settings::type_defs() as $type_id => $type_def ) {
 														$stats_types[] = array(
-															'id'          => $type_id,
-															'label'       => $type_def['label'],
-															'impressions' => 0,
-															'clicks'      => 0,
-															'ctr'         => 0,
+															'id'           => $type_id,
+															'label'        => $type_def['label'],
+															'impressions'  => 0,
+															'clicks'       => 0,
+															'ctr'          => 0,
+															'carts'        => 0,
+															'orders'       => 0,
+															'revenueLabel' => '',
 														);
 													}
 												}
@@ -3370,20 +3546,63 @@ class MW_Sales_Toast_Settings {
 														<td class="is-num"><?php echo esc_html( number_format_i18n( (int) ( $row['impressions'] ?? 0 ) ) ); ?></td>
 														<td class="is-num"><?php echo esc_html( number_format_i18n( (int) ( $row['clicks'] ?? 0 ) ) ); ?></td>
 														<td class="is-num"><?php echo esc_html( (string) ( $row['ctr'] ?? 0 ) ); ?>%</td>
+														<td class="is-num"><?php echo esc_html( number_format_i18n( (int) ( $row['carts'] ?? 0 ) ) ); ?></td>
+														<td class="is-num"><?php echo esc_html( number_format_i18n( (int) ( $row['orders'] ?? 0 ) ) ); ?></td>
+														<td class="is-num"><?php echo esc_html( (string) ( $row['revenueLabel'] ?? '' ) ); ?></td>
 													</tr>
 												<?php endforeach; ?>
 											</tbody>
 										</table>
 									</div>
-									<p class="description"><?php esc_html_e( 'Type split is recorded on new storefront visits. Older totals stay in Overview only.', 'mw-sales-toast' ); ?></p>
+									<p class="description"><?php esc_html_e( 'Carts, orders, and revenue use the last product-link click in the attribution window. Coupon copy does not count. Older attributed totals stay in Overview only.', 'mw-sales-toast' ); ?></p>
 								</div>
-							</div>
+							</details>
 
-							<div class="mwst-card" id="mwst-stats-engagement">
-								<div class="mwst-card__head">
-									<h2><?php esc_html_e( 'Engagement breakdown', 'mw-sales-toast' ); ?></h2>
-									<p><?php esc_html_e( 'How visitors interact after a toast appears.', 'mw-sales-toast' ); ?></p>
+							<details class="mwst-card mwst-fold mwst-fold--card" id="mwst-stats-sources" open>
+								<summary class="mwst-card__head">
+									<h2><?php echo self::dashicon_html( 'dashicons-admin-site-alt3' ); ?><?php esc_html_e( 'By source', 'mw-sales-toast' ); ?></h2>
+									<p><?php esc_html_e( 'Real-order toasts versus demo fill in the selected range.', 'mw-sales-toast' ); ?></p>
+								</summary>
+								<div class="mwst-card__body">
+									<?php self::stats_metric_table( 'mwst-stats-sources-body', $stats_seed['sources'] ?? array(), __( 'Source', 'mw-sales-toast' ), __( 'CTR', 'mw-sales-toast' ) ); ?>
 								</div>
+							</details>
+
+							<details class="mwst-card mwst-fold mwst-fold--card" id="mwst-stats-pages" open>
+								<summary class="mwst-card__head">
+									<h2><?php echo self::dashicon_html( 'dashicons-admin-page' ); ?><?php esc_html_e( 'By page', 'mw-sales-toast' ); ?></h2>
+									<p><?php esc_html_e( 'Where the toast was shown. Page kinds only — never URLs.', 'mw-sales-toast' ); ?></p>
+								</summary>
+								<div class="mwst-card__body">
+									<?php self::stats_metric_table( 'mwst-stats-pages-body', $stats_seed['pages'] ?? array(), __( 'Page', 'mw-sales-toast' ), __( 'CTR', 'mw-sales-toast' ) ); ?>
+								</div>
+							</details>
+
+							<details class="mwst-card mwst-fold mwst-fold--card" id="mwst-stats-triggers" open>
+								<summary class="mwst-card__head">
+									<h2><?php echo self::dashicon_html( 'dashicons-controls-play' ); ?><?php esc_html_e( 'By trigger', 'mw-sales-toast' ); ?></h2>
+									<p><?php esc_html_e( 'Which storefront trigger started the toast loop.', 'mw-sales-toast' ); ?></p>
+								</summary>
+								<div class="mwst-card__body">
+									<?php self::stats_metric_table( 'mwst-stats-triggers-body', $stats_seed['triggers'] ?? array(), __( 'Trigger', 'mw-sales-toast' ), __( 'CTR', 'mw-sales-toast' ) ); ?>
+								</div>
+							</details>
+
+							<details class="mwst-card mwst-fold mwst-fold--card" id="mwst-stats-clicks" open>
+								<summary class="mwst-card__head">
+									<h2><?php echo self::dashicon_html( 'dashicons-admin-links' ); ?><?php esc_html_e( 'Click target', 'mw-sales-toast' ); ?></h2>
+									<p><?php esc_html_e( 'Product links versus coupon copy. Coupon clicks do not start attribution.', 'mw-sales-toast' ); ?></p>
+								</summary>
+								<div class="mwst-card__body">
+									<?php self::stats_metric_table( 'mwst-stats-clicks-body', $stats_seed['clickTargets'] ?? array(), __( 'Target', 'mw-sales-toast' ), __( 'Share', 'mw-sales-toast' ), true ); ?>
+								</div>
+							</details>
+
+							<details class="mwst-card mwst-fold mwst-fold--card" id="mwst-stats-engagement" open>
+								<summary class="mwst-card__head">
+									<h2><?php echo self::dashicon_html( 'dashicons-chart-bar' ); ?><?php esc_html_e( 'Completion funnel', 'mw-sales-toast' ); ?></h2>
+									<p><?php esc_html_e( 'What happened after a toast was shown, as a share of impressions. Click and auto-hide can both count for the same toast.', 'mw-sales-toast' ); ?></p>
+								</summary>
 								<div class="mwst-card__body">
 									<div class="mwst-stats-bars" aria-hidden="true">
 										<div class="mwst-stats-bar">
@@ -3392,6 +3611,13 @@ class MW_Sales_Toast_Settings {
 												<span data-stat="impressions"><?php echo esc_html( number_format_i18n( (int) $stats_seed['impressions'] ) ); ?></span>
 											</div>
 											<div class="mwst-stats-bar__track"><span class="mwst-stats-bar__fill" data-stat-bar="impressions" style="width:100%"></span></div>
+										</div>
+										<div class="mwst-stats-bar">
+											<div class="mwst-stats-bar__meta">
+												<span><?php esc_html_e( 'Auto-hid', 'mw-sales-toast' ); ?></span>
+												<span data-stat="autoHide"><?php echo esc_html( number_format_i18n( (int) $stats_seed['autoHide'] ) ); ?></span>
+											</div>
+											<div class="mwst-stats-bar__track"><span class="mwst-stats-bar__fill mwst-stats-bar__fill--soft" data-stat-bar="autoHide" style="width:0%"></span></div>
 										</div>
 										<div class="mwst-stats-bar">
 											<div class="mwst-stats-bar__meta">
@@ -3409,26 +3635,133 @@ class MW_Sales_Toast_Settings {
 										</div>
 										<div class="mwst-stats-bar">
 											<div class="mwst-stats-bar__meta">
-												<span><?php esc_html_e( 'Product link click-through', 'mw-sales-toast' ); ?></span>
+												<span><?php esc_html_e( 'Clicked', 'mw-sales-toast' ); ?></span>
 												<span data-stat="clicks"><?php echo esc_html( number_format_i18n( (int) $stats_seed['clicks'] ) ); ?></span>
 											</div>
 											<div class="mwst-stats-bar__track"><span class="mwst-stats-bar__fill mwst-stats-bar__fill--accent" data-stat-bar="clicks" style="width:0%"></span></div>
 										</div>
+										<div class="mwst-stats-bar">
+											<div class="mwst-stats-bar__meta">
+												<span><?php esc_html_e( 'Attributed carts', 'mw-sales-toast' ); ?></span>
+												<span data-stat="atc"><?php echo esc_html( number_format_i18n( (int) $stats_seed['atc'] ) ); ?></span>
+											</div>
+											<div class="mwst-stats-bar__track"><span class="mwst-stats-bar__fill mwst-stats-bar__fill--cart" data-stat-bar="atc" style="width:0%"></span></div>
+										</div>
+										<div class="mwst-stats-bar">
+											<div class="mwst-stats-bar__meta">
+												<span><?php esc_html_e( 'Attributed purchases', 'mw-sales-toast' ); ?></span>
+												<span data-stat="purchases"><?php echo esc_html( number_format_i18n( (int) $stats_seed['purchases'] ) ); ?></span>
+											</div>
+											<div class="mwst-stats-bar__track"><span class="mwst-stats-bar__fill mwst-stats-bar__fill--success" data-stat-bar="purchases" style="width:0%"></span></div>
+										</div>
 									</div>
 									<ul class="mwst-stats-legend">
 										<li><strong><?php esc_html_e( 'Shown', 'mw-sales-toast' ); ?></strong> — <?php esc_html_e( 'Toast rendered on the storefront.', 'mw-sales-toast' ); ?></li>
+										<li><strong><?php esc_html_e( 'Auto-hid', 'mw-sales-toast' ); ?></strong> — <?php esc_html_e( 'Visible duration ended without a dismiss.', 'mw-sales-toast' ); ?></li>
 										<li><strong><?php esc_html_e( 'Dismissed', 'mw-sales-toast' ); ?></strong> — <?php esc_html_e( 'Visitor closed the toast.', 'mw-sales-toast' ); ?></li>
-										<li><strong><?php esc_html_e( 'Muted', 'mw-sales-toast' ); ?></strong> — <?php esc_html_e( 'Mute-after-dismiss applied.', 'mw-sales-toast' ); ?></li>
-										<li><strong><?php esc_html_e( 'Click-through', 'mw-sales-toast' ); ?></strong> — <?php esc_html_e( 'Product (or toast) link opened.', 'mw-sales-toast' ); ?></li>
+										<li><strong><?php esc_html_e( 'Muted', 'mw-sales-toast' ); ?></strong> — <?php esc_html_e( 'Mute-after-dismiss applied in that browser.', 'mw-sales-toast' ); ?></li>
+										<li><strong><?php esc_html_e( 'Clicked', 'mw-sales-toast' ); ?></strong> — <?php esc_html_e( 'Product (or toast) link opened.', 'mw-sales-toast' ); ?></li>
+										<li><strong><?php esc_html_e( 'Carts / purchases', 'mw-sales-toast' ); ?></strong> — <?php esc_html_e( 'Soft-attributed after a toast click in the attribution window.', 'mw-sales-toast' ); ?></li>
+										<li>
+											<strong><?php esc_html_e( 'Time visible (dismiss)', 'mw-sales-toast' ); ?></strong> —
+											<span data-stat="dwellDismiss"><?php echo esc_html( (string) ( $stats_seed['dwellDismiss'] ?? '—' ) ); ?></span>
+											— <?php esc_html_e( 'Average until close.', 'mw-sales-toast' ); ?>
+										</li>
+										<li>
+											<strong><?php esc_html_e( 'Time visible (auto-hide)', 'mw-sales-toast' ); ?></strong> —
+											<span data-stat="dwellAutoHide"><?php echo esc_html( (string) ( $stats_seed['dwellAutoHide'] ?? '—' ) ); ?></span>
+											— <?php esc_html_e( 'Average until the duration ended.', 'mw-sales-toast' ); ?>
+										</li>
 									</ul>
 								</div>
-							</div>
+							</details>
 
-							<div class="mwst-card" id="mwst-stats-attribution">
-								<div class="mwst-card__head">
-									<h2><?php esc_html_e( 'Soft attribution', 'mw-sales-toast' ); ?></h2>
-									<p><?php esc_html_e( 'Window after a toast click — product ID only.', 'mw-sales-toast' ); ?></p>
+							<details class="mwst-card mwst-fold mwst-fold--card" id="mwst-stats-skips" open>
+								<summary class="mwst-card__head">
+									<h2><?php echo self::dashicon_html( 'dashicons-hidden' ); ?><?php esc_html_e( 'Why toasts did not show', 'mw-sales-toast' ); ?></h2>
+									<p><?php esc_html_e( 'Storefront loads that skipped the toast loop. Bars are a share of shown + skipped in this range.', 'mw-sales-toast' ); ?></p>
+								</summary>
+								<div class="mwst-card__body">
+									<div class="mwst-stats-bars" aria-hidden="true">
+										<div class="mwst-stats-bar">
+											<div class="mwst-stats-bar__meta">
+												<span><?php esc_html_e( 'Muted already', 'mw-sales-toast' ); ?></span>
+												<span data-stat="skippedMute"><?php echo esc_html( number_format_i18n( (int) $stats_seed['skippedMute'] ) ); ?></span>
+											</div>
+											<div class="mwst-stats-bar__track"><span class="mwst-stats-bar__fill mwst-stats-bar__fill--muted" data-stat-bar="skippedMute" data-stat-bar-base="attempts" style="width:0%"></span></div>
+										</div>
+										<div class="mwst-stats-bar">
+											<div class="mwst-stats-bar__meta">
+												<span><?php esc_html_e( 'Session cap', 'mw-sales-toast' ); ?></span>
+												<span data-stat="skippedSessionCap"><?php echo esc_html( number_format_i18n( (int) $stats_seed['skippedSessionCap'] ) ); ?></span>
+											</div>
+											<div class="mwst-stats-bar__track"><span class="mwst-stats-bar__fill mwst-stats-bar__fill--soft" data-stat-bar="skippedSessionCap" data-stat-bar-base="attempts" style="width:0%"></span></div>
+										</div>
+										<div class="mwst-stats-bar">
+											<div class="mwst-stats-bar__meta">
+												<span><?php esc_html_e( 'Reduced motion', 'mw-sales-toast' ); ?></span>
+												<span data-stat="skippedReducedMotion"><?php echo esc_html( number_format_i18n( (int) $stats_seed['skippedReducedMotion'] ) ); ?></span>
+											</div>
+											<div class="mwst-stats-bar__track"><span class="mwst-stats-bar__fill mwst-stats-bar__fill--warn" data-stat-bar="skippedReducedMotion" data-stat-bar-base="attempts" style="width:0%"></span></div>
+										</div>
+										<div class="mwst-stats-bar">
+											<div class="mwst-stats-bar__meta">
+												<span><?php esc_html_e( 'Mobile gate', 'mw-sales-toast' ); ?></span>
+												<span data-stat="skippedMobile"><?php echo esc_html( number_format_i18n( (int) $stats_seed['skippedMobile'] ) ); ?></span>
+											</div>
+											<div class="mwst-stats-bar__track"><span class="mwst-stats-bar__fill mwst-stats-bar__fill--accent" data-stat-bar="skippedMobile" data-stat-bar-base="attempts" style="width:0%"></span></div>
+										</div>
+									</div>
+									<ul class="mwst-stats-legend">
+										<li>
+											<strong><?php esc_html_e( 'Muted already', 'mw-sales-toast' ); ?></strong> —
+											<?php
+											printf(
+												/* translators: %s: Message & privacy tab link */
+												esc_html__( 'Browser still in mute-after-dismiss. Lower mute hours in %s.', 'mw-sales-toast' ),
+												self::tab_link( 'message', __( 'Message & privacy', 'mw-sales-toast' ) )
+											);
+											?>
+										</li>
+										<li>
+											<strong><?php esc_html_e( 'Session cap', 'mw-sales-toast' ); ?></strong> —
+											<?php
+											printf(
+												/* translators: %s: Timing & cache tab link */
+												esc_html__( 'Toasts per visit already reached. Raise the cap in %s.', 'mw-sales-toast' ),
+												self::tab_link( 'timing', __( 'Timing & cache', 'mw-sales-toast' ) )
+											);
+											?>
+										</li>
+										<li>
+											<strong><?php esc_html_e( 'Reduced motion', 'mw-sales-toast' ); ?></strong> —
+											<?php
+											printf(
+												/* translators: %s: General tab link */
+												esc_html__( 'Visitor prefers reduced motion and the setting is on in %s.', 'mw-sales-toast' ),
+												self::tab_link( 'general', __( 'General', 'mw-sales-toast' ) )
+											);
+											?>
+										</li>
+										<li>
+											<strong><?php esc_html_e( 'Mobile gate', 'mw-sales-toast' ); ?></strong> —
+											<?php
+											printf(
+												/* translators: %s: General tab link */
+												esc_html__( 'Viewport below 768px with Disable on mobile on in %s.', 'mw-sales-toast' ),
+												self::tab_link( 'general', __( 'General', 'mw-sales-toast' ) )
+											);
+											?>
+										</li>
+									</ul>
 								</div>
+							</details>
+
+							<details class="mwst-card mwst-fold mwst-fold--card" id="mwst-stats-attribution" open>
+								<summary class="mwst-card__head">
+									<h2><?php echo self::dashicon_html( 'dashicons-randomize' ); ?><?php esc_html_e( 'Soft attribution', 'mw-sales-toast' ); ?></h2>
+									<p><?php esc_html_e( 'Window after a product-link toast click — product ID only. Coupon copy does not start this window.', 'mw-sales-toast' ); ?></p>
+								</summary>
 								<div class="mwst-card__body">
 									<div class="mwst-stats-attr">
 										<div class="mwst-stats-attr__card">
@@ -3449,24 +3782,34 @@ class MW_Sales_Toast_Settings {
 									</div>
 									<p class="description"><?php esc_html_e( 'Soft attribution is correlation, not proven causation. Stored counts never include customer PII.', 'mw-sales-toast' ); ?></p>
 								</div>
-							</div>
+							</details>
 
-							<div class="mwst-card" id="mwst-stats-products">
-								<div class="mwst-card__head">
-									<h2><?php esc_html_e( 'Per-product performance', 'mw-sales-toast' ); ?></h2>
-									<p><?php esc_html_e( 'Top products by toast impressions in the selected range (all types combined).', 'mw-sales-toast' ); ?></p>
-								</div>
+							<details class="mwst-card mwst-fold mwst-fold--card" id="mwst-stats-products" open>
+								<summary class="mwst-card__head">
+									<h2><?php echo self::dashicon_html( 'dashicons-products' ); ?><?php esc_html_e( 'Per-product performance', 'mw-sales-toast' ); ?></h2>
+									<p><?php esc_html_e( 'Products with toast activity in the selected range (all types combined). Click a column to sort.', 'mw-sales-toast' ); ?></p>
+								</summary>
 								<div class="mwst-card__body">
+									<div class="mwst-stats-products-tools">
+										<label class="screen-reader-text" for="mwst-stats-product-search"><?php esc_html_e( 'Search products', 'mw-sales-toast' ); ?></label>
+										<input
+											type="search"
+											class="mwst-stats-search"
+											id="mwst-stats-product-search"
+											placeholder="<?php esc_attr_e( 'Search products', 'mw-sales-toast' ); ?>"
+											autocomplete="off"
+										/>
+									</div>
 									<div class="mwst-stats-table-wrap">
-										<table class="mwst-stats-table">
+										<table class="mwst-stats-table" id="mwst-stats-products-table">
 											<thead>
 												<tr>
-													<th scope="col"><?php esc_html_e( 'Product', 'mw-sales-toast' ); ?></th>
-													<th scope="col" class="is-num"><?php esc_html_e( 'Impressions', 'mw-sales-toast' ); ?></th>
-													<th scope="col" class="is-num"><?php esc_html_e( 'Clicks', 'mw-sales-toast' ); ?></th>
-													<th scope="col" class="is-num"><?php esc_html_e( 'CTR', 'mw-sales-toast' ); ?></th>
-													<th scope="col" class="is-num"><?php esc_html_e( 'Carts', 'mw-sales-toast' ); ?></th>
-													<th scope="col" class="is-num"><?php esc_html_e( 'Orders', 'mw-sales-toast' ); ?></th>
+													<th scope="col" class="is-sortable" data-sort="name"><?php esc_html_e( 'Product', 'mw-sales-toast' ); ?></th>
+													<th scope="col" class="is-num is-sortable is-sorted" data-sort="impressions" aria-sort="descending"><?php esc_html_e( 'Impressions', 'mw-sales-toast' ); ?></th>
+													<th scope="col" class="is-num is-sortable" data-sort="clicks"><?php esc_html_e( 'Clicks', 'mw-sales-toast' ); ?></th>
+													<th scope="col" class="is-num is-sortable" data-sort="ctr"><?php esc_html_e( 'CTR', 'mw-sales-toast' ); ?></th>
+													<th scope="col" class="is-num is-sortable" data-sort="carts"><?php esc_html_e( 'Carts', 'mw-sales-toast' ); ?></th>
+													<th scope="col" class="is-num is-sortable" data-sort="orders"><?php esc_html_e( 'Orders', 'mw-sales-toast' ); ?></th>
 												</tr>
 											</thead>
 											<tbody id="mwst-stats-products-body">
@@ -3476,23 +3819,74 @@ class MW_Sales_Toast_Settings {
 											</tbody>
 										</table>
 									</div>
-									<p class="description"><?php esc_html_e( 'Product names link to the WooCommerce edit screen when available.', 'mw-sales-toast' ); ?></p>
+									<p class="mwst-stats-more-wrap">
+										<button type="button" class="button-link mwst-stats-more" id="mwst-stats-products-more" hidden><?php esc_html_e( 'Show more', 'mw-sales-toast' ); ?></button>
+									</p>
+									<p class="description"><?php esc_html_e( 'Product names link to the WooCommerce edit screen when available. The table shows 20 rows at a time.', 'mw-sales-toast' ); ?></p>
 								</div>
-							</div>
+							</details>
 
-							<div class="mwst-card" id="mwst-stats-privacy">
-								<div class="mwst-card__head">
-									<h2><?php esc_html_e( 'Privacy', 'mw-sales-toast' ); ?></h2>
-									<p><?php esc_html_e( 'What this dashboard stores.', 'mw-sales-toast' ); ?></p>
+							<details class="mwst-card mwst-fold mwst-fold--card" id="mwst-stats-collection" open>
+								<summary class="mwst-card__head">
+									<h2><?php echo self::dashicon_html( 'dashicons-cloud' ); ?><?php esc_html_e( 'Collection', 'mw-sales-toast' ); ?></h2>
+									<p><?php esc_html_e( 'Control recording and clear stored totals. This tab is not saved with the main settings bar.', 'mw-sales-toast' ); ?></p>
+								</summary>
+								<div class="mwst-card__body">
+									<div class="mwst-field">
+										<div class="mwst-field__label"><?php esc_html_e( 'Record events', 'mw-sales-toast' ); ?></div>
+										<div class="mwst-field__control">
+											<?php self::toggle( $opt, 'analytics_enabled', $s, 'mwst-analytics-enabled', __( 'Collect toast impressions, clicks, and skip reasons', 'mw-sales-toast' ) ); ?>
+											<p class="description"><?php esc_html_e( 'Off stops new beacons. Historical numbers remain until you reset.', 'mw-sales-toast' ); ?></p>
+										</div>
+									</div>
+									<div class="mwst-field">
+										<div class="mwst-field__label"><?php esc_html_e( 'Attribution window', 'mw-sales-toast' ); ?></div>
+										<div class="mwst-field__control">
+											<select id="mwst-analytics-attr" name="<?php echo esc_attr( $opt ); ?>[analytics_attr_minutes]">
+												<?php
+												$attr_now = (int) ( $s['analytics_attr_minutes'] ?? 30 );
+												if ( ! in_array( $attr_now, array( 15, 30, 60, 120 ), true ) ) {
+													$attr_now = 30;
+												}
+												foreach ( array( 15, 30, 60, 120 ) as $mins ) :
+													?>
+													<option value="<?php echo esc_attr( (string) $mins ); ?>" <?php selected( $attr_now, $mins ); ?>>
+														<?php
+														echo esc_html(
+															sprintf(
+																/* translators: %d: minutes */
+																__( '%d minutes', 'mw-sales-toast' ),
+																$mins
+															)
+														);
+														?>
+													</option>
+												<?php endforeach; ?>
+											</select>
+											<p class="description"><?php esc_html_e( 'How long a product-link click can count toward a cart or order. Saved immediately.', 'mw-sales-toast' ); ?></p>
+										</div>
+									</div>
+									<div class="mwst-stats-collection-actions">
+										<button type="button" class="button mwst-stats-reset" id="mwst-stats-reset"><?php esc_html_e( 'Reset statistics', 'mw-sales-toast' ); ?></button>
+										<span class="mwst-stats-collection-status" id="mwst-stats-collection-status" role="status"></span>
+									</div>
 								</div>
+							</details>
+
+							<details class="mwst-card mwst-fold mwst-fold--card" id="mwst-stats-privacy" open>
+								<summary class="mwst-card__head">
+									<h2><?php echo self::dashicon_html( 'dashicons-shield' ); ?><?php esc_html_e( 'Privacy', 'mw-sales-toast' ); ?></h2>
+									<p><?php esc_html_e( 'What this dashboard stores.', 'mw-sales-toast' ); ?></p>
+								</summary>
 								<div class="mwst-card__body">
 									<ul class="mwst-stats-privacy">
-										<li><?php esc_html_e( 'Counts only: impressions, dismissals, mutes, clicks, toast type, soft-attributed carts/orders.', 'mw-sales-toast' ); ?></li>
-										<li><?php esc_html_e( 'Product IDs only — never customer names, emails, or cities.', 'mw-sales-toast' ); ?></li>
-										<li><?php esc_html_e( 'No cross-site tracking pixels; data stays on your WordPress site (90 days).', 'mw-sales-toast' ); ?></li>
+										<li><?php esc_html_e( 'Counts only: impressions, auto-hides, dismissals, mutes, skips, clicks, toast type, source, page kind, trigger, click target, dwell averages, soft-attributed carts/orders, and order totals as revenue.', 'mw-sales-toast' ); ?></li>
+										<li><?php esc_html_e( 'Product IDs only — never customer names, emails, IPs, or page URLs.', 'mw-sales-toast' ); ?></li>
+										<li><?php esc_html_e( 'No cross-site tracking pixels; daily totals stay in a table on your WordPress site (90 days).', 'mw-sales-toast' ); ?></li>
+										<li><?php esc_html_e( 'You can turn collection off or reset totals from this tab. Export is a CSV of aggregates only.', 'mw-sales-toast' ); ?></li>
 									</ul>
 								</div>
-							</div>
+							</details>
 						</div>
 
 						<!-- Support (FAQ + documentation + contact) -->
@@ -3785,7 +4179,7 @@ class MW_Sales_Toast_Settings {
 													<?php
 													printf(
 														/* translators: %s: Statistics tab link */
-														esc_html__( '%s — toast impressions, clicks, CTR, by type, and per-product performance.', 'mw-sales-toast' ),
+														esc_html__( '%s — toast impressions, clicks, CTR, funnel, skip reasons, CSV export, and per-product performance.', 'mw-sales-toast' ),
 														self::tab_link( 'statistics', __( 'Statistics', 'mw-sales-toast' ) )
 													);
 													?>

@@ -64,6 +64,9 @@ add_filter( 'cron_schedules', 'mw_sales_toast_cron_schedules' );
 function mw_sales_toast_activate() {
 	MW_Sales_Toast_Cache::ensure_cron();
 	MW_Sales_Toast_Cache::rebuild();
+	if ( class_exists( 'MW_Sales_Toast_Analytics' ) ) {
+		MW_Sales_Toast_Analytics::maybe_install();
+	}
 }
 register_activation_hook( __FILE__, 'mw_sales_toast_activate' );
 

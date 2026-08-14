@@ -576,6 +576,13 @@
 		if (id === 'message' || id === 'general') {
 			refreshProductSelects();
 		}
+		if (id === 'statistics' && statsChart) {
+			window.setTimeout(function () {
+				if (statsChart) {
+					statsChart.resize();
+				}
+			}, 0);
+		}
 	}
 
 	tabs.forEach(function (btn) {
@@ -2418,6 +2425,14 @@
 
 	/* Statistics date range — live aggregates when analytics payload exists. */
 	var analyticsData = cfg.analytics || null;
+	var analyticsUi = cfg.analyticsUi || {};
+	var statsChart = null;
+	var statsRange = '7';
+	var productSort = { key: 'impressions', dir: 'desc' };
+	var productQuery = '';
+	var productVisible = 20;
+	var PRODUCT_PAGE = 20;
+
 	function formatStatNumber(n) {
 		n = Number(n) || 0;
 		try {
@@ -2425,6 +2440,473 @@
 		} catch (e) {
 			return String(n);
 		}
+	}
+
+	function emptyStatsSummary() {
+		return {
+			impressions: 0,
+			clicks: 0,
+			ctr: 0,
+			convRate: 0,
+			dismissed: 0,
+			autoHide: 0,
+			muted: 0,
+			atc: 0,
+			purchases: 0,
+			revenue: 0,
+			revenueLabel: '—',
+			skippedMute: 0,
+			skippedSessionCap: 0,
+			skippedReducedMotion: 0,
+			skippedMobile: 0,
+			dwellDismiss: '—',
+			dwellAutoHide: '—',
+			delta: {},
+			products: [],
+			types: [],
+			sources: [],
+			pages: [],
+			triggers: [],
+			clickTargets: [],
+			series: [],
+			hasData: false,
+			attrWindow: 30
+		};
+	}
+
+	function currentStatsSummary() {
+		if (!analyticsData) {
+			return emptyStatsSummary();
+		}
+		return analyticsData[statsRange] || analyticsData['7'] || emptyStatsSummary();
+	}
+
+	function escapeStatText(value) {
+		return String(value == null ? '' : value)
+			.replace(/&/g, '&amp;')
+			.replace(/</g, '&lt;')
+			.replace(/"/g, '&quot;');
+	}
+
+	function csvCell(value) {
+		var s = String(value == null ? '' : value);
+		if (/[",\n\r]/.test(s)) {
+			return '"' + s.replace(/"/g, '""') + '"';
+		}
+		return s;
+	}
+
+	function decodeStatText(value) {
+		var raw = String(value == null ? '' : value);
+		if (raw.indexOf('&') === -1) {
+			return raw.replace(/\u00a0/g, ' ');
+		}
+		var el = document.createElement('textarea');
+		el.innerHTML = raw;
+		return String(el.value || '').replace(/\u00a0/g, ' ');
+	}
+
+	var CHART_SERIES_KEY = 'mw_st_chart_series';
+	var chartSeriesOn = {
+		impressions: true,
+		clicks: true,
+		autoHide: false,
+		dismissed: false,
+		atc: false,
+		purchases: false,
+		revenue: false
+	};
+
+	function loadChartSeriesOn() {
+		try {
+			var raw = window.localStorage.getItem(CHART_SERIES_KEY);
+			var saved = raw ? JSON.parse(raw) : null;
+			if (!saved || typeof saved !== 'object') {
+				return;
+			}
+			Object.keys(chartSeriesOn).forEach(function (key) {
+				if (typeof saved[key] === 'boolean') {
+					chartSeriesOn[key] = saved[key];
+				}
+			});
+		} catch (e) {
+			/* ignore */
+		}
+	}
+
+	function saveChartSeriesOn() {
+		try {
+			window.localStorage.setItem(CHART_SERIES_KEY, JSON.stringify(chartSeriesOn));
+		} catch (e) {
+			/* ignore */
+		}
+	}
+
+	function syncChartLegend() {
+		root.querySelectorAll('#mwst-stats-spark-legend [data-series]').forEach(function (btn) {
+			var key = btn.getAttribute('data-series');
+			var on = !!chartSeriesOn[key];
+			btn.classList.toggle('is-on', on);
+			btn.classList.toggle('is-off', !on);
+			btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+		});
+	}
+
+	function formatChartMoney(cents) {
+		var major = (Number(cents) || 0) / 100;
+		var num;
+		try {
+			num = major.toLocaleString(undefined, {
+				minimumFractionDigits: 2,
+				maximumFractionDigits: 2
+			});
+		} catch (e) {
+			num = major.toFixed(2);
+		}
+		var sym = String(analyticsUi.currency || '').replace(/\u00a0/g, ' ').trim();
+		return sym ? num + ' ' + sym : num;
+	}
+
+	function seriesValues(series, key) {
+		return series.map(function (p) {
+			return Number(p[key]) || 0;
+		});
+	}
+
+	function renderSparkline(series) {
+		var canvas = root.querySelector('#mwst-stats-spark-canvas');
+		if (!canvas || typeof window.Chart === 'undefined') {
+			return;
+		}
+		series = Array.isArray(series) ? series : [];
+		if (statsChart) {
+			statsChart.destroy();
+			statsChart = null;
+		}
+		if (!series.length) {
+			return;
+		}
+		var labels = series.map(function (p) {
+			return p.day || '';
+		});
+		var many = series.length > 21;
+		var point = many ? 0 : 3;
+		function lineDs(cfg) {
+			return {
+				type: 'line',
+				label: cfg.label,
+				data: cfg.data,
+				borderColor: cfg.color,
+				backgroundColor: cfg.fill || 'transparent',
+				fill: !!cfg.fill,
+				tension: 0.3,
+				borderWidth: 2,
+				pointRadius: point,
+				pointHoverRadius: 5,
+				pointBackgroundColor: cfg.color,
+				hidden: !chartSeriesOn[cfg.key],
+				yAxisID: cfg.axis || 'y',
+				order: cfg.order || 1,
+				mwstKey: cfg.key
+			};
+		}
+		statsChart = new window.Chart(canvas.getContext('2d'), {
+			type: 'bar',
+			data: {
+				labels: labels,
+				datasets: [
+					{
+						type: 'bar',
+						label: i18n.statsImpressions || 'Impressions',
+						data: seriesValues(series, 'impressions'),
+						backgroundColor: 'rgba(51, 65, 85, 0.22)',
+						hoverBackgroundColor: 'rgba(51, 65, 85, 0.38)',
+						borderRadius: 3,
+						maxBarThickness: 28,
+						hidden: !chartSeriesOn.impressions,
+						yAxisID: 'y',
+						order: 8,
+						mwstKey: 'impressions'
+					},
+					lineDs({
+						key: 'clicks',
+						label: i18n.statsClicks || 'Clicks',
+						data: seriesValues(series, 'clicks'),
+						color: '#c4a35a',
+						fill: 'rgba(196, 163, 90, 0.14)',
+						order: 1
+					}),
+					lineDs({
+						key: 'autoHide',
+						label: i18n.statsAutoHide || 'Auto-hid',
+						data: seriesValues(series, 'autoHide'),
+						color: '#94a3b8',
+						order: 2
+					}),
+					lineDs({
+						key: 'dismissed',
+						label: i18n.statsDismissed || 'Dismissed',
+						data: seriesValues(series, 'dismissed'),
+						color: '#64748b',
+						order: 3
+					}),
+					lineDs({
+						key: 'atc',
+						label: i18n.statsCarts || 'Carts',
+						data: seriesValues(series, 'atc'),
+						color: '#0f766e',
+						order: 4
+					}),
+					lineDs({
+						key: 'purchases',
+						label: i18n.statsOrders || 'Orders',
+						data: seriesValues(series, 'purchases'),
+						color: '#16a34a',
+						order: 5
+					}),
+					lineDs({
+						key: 'revenue',
+						label: i18n.statsRevenue || 'Revenue',
+						data: seriesValues(series, 'revenue'),
+						color: '#7c3aed',
+						axis: 'y2',
+						order: 6
+					})
+				]
+			},
+			options: {
+				responsive: true,
+				maintainAspectRatio: false,
+				animation: false,
+				animations: false,
+				interaction: { mode: 'index', intersect: false },
+				plugins: {
+					legend: { display: false },
+					tooltip: {
+						backgroundColor: '#0f172a',
+						titleFont: { size: 12, weight: '600' },
+						bodyFont: { size: 12 },
+						padding: 10,
+						displayColors: true,
+						filter: function (item) {
+							var chart = item && item.chart;
+							return !!(
+								chart &&
+								typeof item.datasetIndex === 'number' &&
+								chart.isDatasetVisible(item.datasetIndex)
+							);
+						},
+						callbacks: {
+							label: function (ctx) {
+								var n = ctx.parsed && typeof ctx.parsed.y === 'number' ? ctx.parsed.y : 0;
+								var key = ctx.dataset && ctx.dataset.mwstKey;
+								var value =
+									key === 'revenue' ? formatChartMoney(n) : formatStatNumber(n);
+								return ' ' + (ctx.dataset.label || key || '') + ': ' + value;
+							}
+						}
+					}
+				},
+				scales: {
+					x: {
+						grid: { display: false },
+						ticks: {
+							maxRotation: 0,
+							autoSkip: true,
+							maxTicksLimit: many ? 8 : 12,
+							font: { size: 11 },
+							color: '#64748b'
+						}
+					},
+					y: {
+						beginAtZero: true,
+						ticks: {
+							precision: 0,
+							font: { size: 11 },
+							color: '#64748b'
+						},
+						grid: { color: 'rgba(15, 23, 42, 0.06)' },
+						border: { display: false }
+					},
+					y2: {
+						beginAtZero: true,
+						position: 'right',
+						display: function (ctx) {
+							return !!(ctx && ctx.chart && chartSeriesOn.revenue);
+						},
+						grid: { drawOnChartArea: false },
+						border: { display: false },
+						ticks: {
+							font: { size: 11 },
+							color: '#7c3aed',
+							callback: function (value) {
+								return formatChartMoney(value);
+							}
+						}
+					}
+				}
+			}
+		});
+		syncChartLegend();
+	}
+
+	function productSortValue(p, key) {
+		if (key === 'name') {
+			return String(p.name || '').toLowerCase();
+		}
+		return Number(p[key]) || 0;
+	}
+
+	function renderProductRows(summary) {
+		var panel = root.querySelector('#mwst-panel-statistics');
+		if (!panel) {
+			return;
+		}
+		var tbody = panel.querySelector('#mwst-stats-products-body');
+		var moreBtn = panel.querySelector('#mwst-stats-products-more');
+		if (!tbody) {
+			return;
+		}
+		var products = (summary && summary.products) || [];
+		var q = productQuery.trim().toLowerCase();
+		var filtered = q
+			? products.filter(function (p) {
+					return String(p.name || '').toLowerCase().indexOf(q) !== -1;
+			  })
+			: products.slice();
+		var key = productSort.key;
+		var dir = productSort.dir === 'asc' ? 1 : -1;
+		filtered.sort(function (a, b) {
+			var av = productSortValue(a, key);
+			var bv = productSortValue(b, key);
+			if (typeof av === 'string' || typeof bv === 'string') {
+				return String(av).localeCompare(String(bv)) * dir;
+			}
+			if (av === bv) {
+				return (Number(b.impressions) || 0) - (Number(a.impressions) || 0);
+			}
+			return av > bv ? dir : -dir;
+		});
+		var table = panel.querySelector('#mwst-stats-products-table');
+		if (table) {
+			table.querySelectorAll('th[data-sort]').forEach(function (th) {
+				var on = th.getAttribute('data-sort') === key;
+				th.classList.toggle('is-sorted', on);
+				if (on) {
+					th.setAttribute('aria-sort', productSort.dir === 'asc' ? 'ascending' : 'descending');
+				} else {
+					th.removeAttribute('aria-sort');
+				}
+			});
+		}
+		if (!filtered.length) {
+			tbody.innerHTML =
+				'<tr class="mwst-stats-empty"><td colspan="6">' +
+				(i18n.statsEmpty || 'No product data yet.') +
+				'</td></tr>';
+			if (moreBtn) {
+				moreBtn.hidden = true;
+			}
+			return;
+		}
+		var shown = filtered.slice(0, productVisible);
+		tbody.innerHTML = shown
+			.map(function (p) {
+				var name = p.name || '#' + p.id;
+				var nameHtml = p.editUrl
+					? '<a href="' + escapeStatText(p.editUrl) + '">' + escapeStatText(name) + '</a>'
+					: escapeStatText(name);
+				var thumb = p.thumb
+					? '<img src="' + escapeStatText(p.thumb) + '" alt="" width="32" height="32" />'
+					: '';
+				return (
+					'<tr><td><span class="mwst-stats-product"><span class="mwst-stats-product__thumb">' +
+					thumb +
+					'</span><span class="mwst-stats-product__name">' +
+					nameHtml +
+					'</span></span></td>' +
+					'<td class="is-num">' +
+					formatStatNumber(p.impressions) +
+					'</td>' +
+					'<td class="is-num">' +
+					formatStatNumber(p.clicks) +
+					'</td>' +
+					'<td class="is-num">' +
+					(Number(p.ctr) || 0) +
+					'%</td>' +
+					'<td class="is-num">' +
+					formatStatNumber(p.carts) +
+					'</td>' +
+					'<td class="is-num">' +
+					formatStatNumber(p.orders) +
+					'</td></tr>'
+				);
+			})
+			.join('');
+		if (moreBtn) {
+			if (filtered.length <= PRODUCT_PAGE && productVisible <= PRODUCT_PAGE) {
+				moreBtn.hidden = true;
+			} else if (productVisible < filtered.length) {
+				moreBtn.hidden = false;
+				moreBtn.textContent = i18n.statsShowMore || 'Show more';
+			} else {
+				moreBtn.hidden = false;
+				moreBtn.textContent = i18n.statsShowLess || 'Show fewer';
+			}
+		}
+	}
+
+	function renderMetricRows(tbody, rows) {
+		if (!tbody) {
+			return;
+		}
+		rows = Array.isArray(rows) ? rows : [];
+		var clicksOnly = tbody.getAttribute('data-metric') === 'clicks-share';
+		var typesTable = tbody.getAttribute('data-metric') === 'types';
+		var cols = typesTable ? 7 : clicksOnly ? 3 : 4;
+		if (!rows.length) {
+			tbody.innerHTML =
+				'<tr class="mwst-stats-empty"><td colspan="' +
+				cols +
+				'">' +
+				(i18n.statsEmpty || 'No product data yet.') +
+				'</td></tr>';
+			return;
+		}
+		tbody.innerHTML = rows
+			.map(function (row) {
+				var label = escapeStatText(row.label || row.id || '');
+				var html =
+					'<tr><th scope="row">' +
+					label +
+					'</th>';
+				if (!clicksOnly) {
+					html +=
+						'<td class="is-num">' + formatStatNumber(row.impressions) + '</td>';
+				}
+				html +=
+					'<td class="is-num">' +
+					formatStatNumber(row.clicks) +
+					'</td>' +
+					'<td class="is-num">' +
+					(Number(row.ctr) || 0) +
+					'%</td>';
+				if (typesTable) {
+					html +=
+						'<td class="is-num">' +
+						formatStatNumber(row.carts) +
+						'</td>' +
+						'<td class="is-num">' +
+						formatStatNumber(row.orders) +
+						'</td>' +
+						'<td class="is-num">' +
+						escapeStatText(decodeStatText(row.revenueLabel) || '—') +
+						'</td>';
+				}
+				html += '</tr>';
+				return html;
+			})
+			.join('');
 	}
 
 	function applyStats(summary) {
@@ -2436,14 +2918,32 @@
 			return;
 		}
 		var impressions = Number(summary.impressions) || 0;
+		var skipTotal =
+			(Number(summary.skippedMute) || 0) +
+			(Number(summary.skippedSessionCap) || 0) +
+			(Number(summary.skippedReducedMotion) || 0) +
+			(Number(summary.skippedMobile) || 0);
+		var empty = panel.querySelector('#mwst-stats-empty');
+		if (empty) {
+			empty.hidden = !!summary.hasData;
+		}
 		var map = {
 			impressions: formatStatNumber(impressions),
 			clicks: formatStatNumber(summary.clicks),
 			ctr: (Number(summary.ctr) || 0) + '%',
+			convRate: (Number(summary.convRate) || 0) + '%',
 			atc: formatStatNumber(summary.atc),
 			dismissed: formatStatNumber(summary.dismissed),
+			autoHide: formatStatNumber(summary.autoHide),
 			muted: formatStatNumber(summary.muted),
 			purchases: formatStatNumber(summary.purchases),
+			skippedMute: formatStatNumber(summary.skippedMute),
+			skippedSessionCap: formatStatNumber(summary.skippedSessionCap),
+			skippedReducedMotion: formatStatNumber(summary.skippedReducedMotion),
+			skippedMobile: formatStatNumber(summary.skippedMobile),
+			revenueLabel: decodeStatText(summary.revenueLabel) || '—',
+			dwellDismiss: summary.dwellDismiss || '—',
+			dwellAutoHide: summary.dwellAutoHide || '—',
 			attrWindow:
 				String(Number(summary.attrWindow) || 30) +
 				' ' +
@@ -2455,110 +2955,160 @@
 			});
 		});
 		var deltas = summary.delta || {};
-		['impressions', 'clicks', 'ctr', 'atc'].forEach(function (key) {
+		['impressions', 'clicks', 'ctr', 'atc', 'purchases', 'convRate', 'revenue'].forEach(function (key) {
 			var d = deltas[key] || {};
 			panel.querySelectorAll('[data-stat-delta="' + key + '"]').forEach(function (el) {
 				el.textContent = d.label || 'vs prior';
-				el.classList.remove('is-up', 'is-flat');
-				el.classList.add(d.dir === 'up' ? 'is-up' : 'is-flat');
+				el.classList.remove('is-up', 'is-flat', 'is-down');
+				el.classList.add(d.dir === 'up' ? 'is-up' : d.dir === 'down' ? 'is-down' : 'is-flat');
 			});
 		});
-		var denom = Math.max(impressions, 1);
+		var funnelDenom = Math.max(impressions, 1);
+		var attemptDenom = Math.max(impressions + skipTotal, 1);
 		panel.querySelectorAll('[data-stat-bar]').forEach(function (el) {
 			var key = el.getAttribute('data-stat-bar');
 			var val = Number(summary[key]) || 0;
-			if (key === 'impressions') {
+			var base = el.getAttribute('data-stat-bar-base');
+			var denom = base === 'attempts' ? attemptDenom : funnelDenom;
+			if (key === 'impressions' && base !== 'attempts') {
 				el.style.width = '100%';
 			} else {
 				el.style.width = Math.min(100, Math.round((val / denom) * 1000) / 10) + '%';
 			}
 		});
-		var tbody = panel.querySelector('#mwst-stats-products-body');
-		if (tbody) {
-			var products = summary.products || [];
-			if (!products.length) {
-				tbody.innerHTML =
-					'<tr class="mwst-stats-empty"><td colspan="6">' +
-					(i18n.statsEmpty || 'No product data yet.') +
-					'</td></tr>';
-			} else {
-				tbody.innerHTML = products
-					.map(function (p) {
-						var name = p.name || '#' + p.id;
-						var nameHtml = p.editUrl
-							? '<a href="' +
-							  String(p.editUrl).replace(/"/g, '&quot;') +
-							  '">' +
-							  String(name)
-									.replace(/&/g, '&amp;')
-									.replace(/</g, '&lt;') +
-							  '</a>'
-							: String(name)
-									.replace(/&/g, '&amp;')
-									.replace(/</g, '&lt;');
-						var thumb = p.thumb
-							? '<img src="' +
-							  String(p.thumb).replace(/"/g, '&quot;') +
-							  '" alt="" width="32" height="32" />'
-							: '';
-						return (
-							'<tr><td><span class="mwst-stats-product"><span class="mwst-stats-product__thumb">' +
-							thumb +
-							'</span><span class="mwst-stats-product__name">' +
-							nameHtml +
-							'</span></span></td>' +
-							'<td class="is-num">' +
-							formatStatNumber(p.impressions) +
-							'</td>' +
-							'<td class="is-num">' +
-							formatStatNumber(p.clicks) +
-							'</td>' +
-							'<td class="is-num">' +
-							(Number(p.ctr) || 0) +
-							'%</td>' +
-							'<td class="is-num">' +
-							formatStatNumber(p.carts) +
-							'</td>' +
-							'<td class="is-num">' +
-							formatStatNumber(p.orders) +
-							'</td></tr>'
-						);
-					})
-					.join('');
-			}
+		renderProductRows(summary);
+		renderMetricRows(panel.querySelector('#mwst-stats-types-body'), summary.types);
+		renderMetricRows(panel.querySelector('#mwst-stats-sources-body'), summary.sources);
+		renderMetricRows(panel.querySelector('#mwst-stats-pages-body'), summary.pages);
+		renderMetricRows(panel.querySelector('#mwst-stats-triggers-body'), summary.triggers);
+		renderMetricRows(panel.querySelector('#mwst-stats-clicks-body'), summary.clickTargets);
+		renderSparkline(summary.series || []);
+	}
+
+	function downloadStatsCsv() {
+		var summary = currentStatsSummary();
+		var lines = [];
+		lines.push(['section', 'key', 'value'].map(csvCell).join(','));
+		[
+			['overview', 'days', summary.days || statsRange],
+			['overview', 'impressions', summary.impressions],
+			['overview', 'clicks', summary.clicks],
+			['overview', 'ctr', summary.ctr],
+			['overview', 'conv_rate', summary.convRate],
+			['overview', 'auto_hide', summary.autoHide],
+			['overview', 'dismissed', summary.dismissed],
+			['overview', 'muted', summary.muted],
+			['overview', 'atc', summary.atc],
+			['overview', 'purchases', summary.purchases],
+			['overview', 'revenue', decodeStatText(summary.revenueLabel) || summary.revenue],
+			['overview', 'dwell_dismiss', summary.dwellDismiss],
+			['overview', 'dwell_auto_hide', summary.dwellAutoHide],
+			['overview', 'skipped_mute', summary.skippedMute],
+			['overview', 'skipped_session_cap', summary.skippedSessionCap],
+			['overview', 'skipped_reduced_motion', summary.skippedReducedMotion],
+			['overview', 'skipped_mobile', summary.skippedMobile]
+		].forEach(function (row) {
+			lines.push(row.map(csvCell).join(','));
+		});
+		lines.push('');
+		lines.push(['type', 'impressions', 'clicks', 'ctr', 'carts', 'orders', 'revenue'].map(csvCell).join(','));
+		(summary.types || []).forEach(function (row) {
+			lines.push(
+				[
+					row.label || row.id,
+					row.impressions,
+					row.clicks,
+					row.ctr,
+					row.carts,
+					row.orders,
+					decodeStatText(row.revenueLabel) || row.revenue
+				].map(csvCell).join(',')
+			);
+		});
+		[
+			['source', summary.sources],
+			['page', summary.pages],
+			['trigger', summary.triggers],
+			['click_target', summary.clickTargets]
+		].forEach(function (pair) {
+			lines.push('');
+			lines.push([pair[0], 'impressions', 'clicks', 'ctr'].map(csvCell).join(','));
+			(pair[1] || []).forEach(function (row) {
+				lines.push(
+					[row.label || row.id, row.impressions, row.clicks, row.ctr]
+						.map(csvCell)
+						.join(',')
+				);
+			});
+		});
+		lines.push('');
+		lines.push(
+			['product', 'product_id', 'impressions', 'clicks', 'ctr', 'carts', 'orders']
+				.map(csvCell)
+				.join(',')
+		);
+		(summary.products || []).forEach(function (p) {
+			lines.push(
+				[p.name, p.id, p.impressions, p.clicks, p.ctr, p.carts, p.orders]
+					.map(csvCell)
+					.join(',')
+			);
+		});
+		lines.push('');
+		lines.push(
+			['day', 'impressions', 'clicks', 'auto_hide', 'dismissed', 'atc', 'purchases', 'revenue_cents']
+				.map(csvCell)
+				.join(',')
+		);
+		(summary.series || []).forEach(function (p) {
+			lines.push(
+				[
+					p.day,
+					p.impressions,
+					p.clicks,
+					p.autoHide,
+					p.dismissed,
+					p.atc,
+					p.purchases,
+					p.revenue
+				]
+					.map(csvCell)
+					.join(',')
+			);
+		});
+		var blob = new Blob([lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+		var url = URL.createObjectURL(blob);
+		var a = document.createElement('a');
+		a.href = url;
+		a.download = 'mw-proof-stats-' + statsRange + 'd.csv';
+		document.body.appendChild(a);
+		a.click();
+		a.remove();
+		window.setTimeout(function () {
+			URL.revokeObjectURL(url);
+		}, 1000);
+	}
+
+	function setCollectionStatus(msg, ok) {
+		var el = root.querySelector('#mwst-stats-collection-status');
+		if (!el) {
+			return;
 		}
-		var typesBody = panel.querySelector('#mwst-stats-types-body');
-		if (typesBody) {
-			var types = summary.types || [];
-			if (!types.length) {
-				typesBody.innerHTML =
-					'<tr class="mwst-stats-empty"><td colspan="4">' +
-					(i18n.statsEmpty || 'No product data yet.') +
-					'</td></tr>';
-			} else {
-				typesBody.innerHTML = types
-					.map(function (row) {
-						var label = String(row.label || row.id || '')
-							.replace(/&/g, '&amp;')
-							.replace(/</g, '&lt;');
-						return (
-							'<tr><th scope="row">' +
-							label +
-							'</th>' +
-							'<td class="is-num">' +
-							formatStatNumber(row.impressions) +
-							'</td>' +
-							'<td class="is-num">' +
-							formatStatNumber(row.clicks) +
-							'</td>' +
-							'<td class="is-num">' +
-							(Number(row.ctr) || 0) +
-							'%</td></tr>'
-						);
-					})
-					.join('');
-			}
+		el.textContent = msg || '';
+		el.classList.toggle('is-ok', !!ok);
+		el.classList.toggle('is-error', !ok && !!msg);
+	}
+
+	function setAnalyticsEnabledUi(on) {
+		var disabled = root.querySelector('#mwst-stats-disabled');
+		if (disabled) {
+			disabled.hidden = !!on;
 		}
+		var box = root.querySelector('#mwst-analytics-enabled');
+		if (box) {
+			box.checked = !!on;
+		}
+		analyticsUi.enabled = !!on;
 	}
 
 	root.querySelectorAll('.mwst-stats-range').forEach(function (group) {
@@ -2569,16 +3119,270 @@
 					other.classList.toggle('is-active', on);
 					other.setAttribute('aria-pressed', on ? 'true' : 'false');
 				});
-				if (analyticsData) {
-					var range = btn.getAttribute('data-range') || '7';
-					applyStats(analyticsData[range] || analyticsData['7']);
-				}
+				statsRange = btn.getAttribute('data-range') || '7';
+				productVisible = PRODUCT_PAGE;
+				applyStats(currentStatsSummary());
 			});
 		});
 	});
+
+	var productTable = root.querySelector('#mwst-stats-products-table');
+	if (productTable) {
+		productTable.querySelectorAll('th[data-sort]').forEach(function (th) {
+			th.setAttribute('tabindex', '0');
+			function toggleSort() {
+				var key = th.getAttribute('data-sort') || 'impressions';
+				if (productSort.key === key) {
+					productSort.dir = productSort.dir === 'desc' ? 'asc' : 'desc';
+				} else {
+					productSort.key = key;
+					productSort.dir = key === 'name' ? 'asc' : 'desc';
+				}
+				renderProductRows(currentStatsSummary());
+			}
+			th.addEventListener('click', toggleSort);
+			th.addEventListener('keydown', function (ev) {
+				if (ev.key === 'Enter' || ev.key === ' ') {
+					ev.preventDefault();
+					toggleSort();
+				}
+			});
+		});
+	}
+
+	var productSearch = root.querySelector('#mwst-stats-product-search');
+	if (productSearch) {
+		productSearch.addEventListener('input', function () {
+			productQuery = productSearch.value || '';
+			productVisible = PRODUCT_PAGE;
+			renderProductRows(currentStatsSummary());
+		});
+	}
+
+	var moreBtn = root.querySelector('#mwst-stats-products-more');
+	if (moreBtn) {
+		moreBtn.addEventListener('click', function () {
+			var summary = currentStatsSummary();
+			var products = summary.products || [];
+			var q = productQuery.trim().toLowerCase();
+			var total = q
+				? products.filter(function (p) {
+						return String(p.name || '').toLowerCase().indexOf(q) !== -1;
+				  }).length
+				: products.length;
+			if (productVisible < total) {
+				productVisible += PRODUCT_PAGE;
+			} else {
+				productVisible = PRODUCT_PAGE;
+			}
+			renderProductRows(summary);
+		});
+	}
+
+	var exportBtn = root.querySelector('#mwst-stats-export');
+	if (exportBtn) {
+		exportBtn.addEventListener('click', downloadStatsCsv);
+	}
+
+	var chartLegend = root.querySelector('#mwst-stats-spark-legend');
+	if (chartLegend) {
+		chartLegend.addEventListener('click', function (ev) {
+			var btn = ev.target && ev.target.closest ? ev.target.closest('[data-series]') : null;
+			if (!btn || !chartLegend.contains(btn)) {
+				return;
+			}
+			var key = btn.getAttribute('data-series');
+			if (!key || typeof chartSeriesOn[key] === 'undefined') {
+				return;
+			}
+			chartSeriesOn[key] = !chartSeriesOn[key];
+			saveChartSeriesOn();
+			syncChartLegend();
+			if (!statsChart) {
+				return;
+			}
+			statsChart.data.datasets.forEach(function (ds, i) {
+				if (ds.mwstKey === key) {
+					var on = !!chartSeriesOn[key];
+					ds.hidden = !on;
+					statsChart.setDatasetVisibility(i, on);
+				}
+			});
+			statsChart.update('none');
+		});
+	}
+
+	var analyticsToggle = root.querySelector('#mwst-analytics-enabled');
+	if (analyticsToggle) {
+		analyticsToggle.addEventListener('change', function () {
+			var on = analyticsToggle.checked;
+			var body = new window.FormData();
+			body.append('action', analyticsUi.actionSet || 'mw_st_analytics_set');
+			body.append('nonce', analyticsUi.nonce || '');
+			body.append('enabled', on ? '1' : '0');
+			analyticsToggle.disabled = true;
+			window
+				.fetch(analyticsUi.ajaxUrl || (cfg.cache && cfg.cache.ajaxUrl) || '', {
+					method: 'POST',
+					credentials: 'same-origin',
+					body: body
+				})
+				.then(function (res) {
+					return res.json().then(function (data) {
+						return { ok: res.ok, data: data };
+					});
+				})
+				.then(function (result) {
+					var payload = result.data || {};
+					var inner = payload.data || {};
+					if (payload.success) {
+						setAnalyticsEnabledUi(
+							typeof inner.enabled !== 'undefined' ? !!inner.enabled : on
+						);
+						setCollectionStatus(inner.message || '', true);
+						userTouchedForm = false;
+						captureSaveSnapshot(true);
+					} else {
+						analyticsToggle.checked = !on;
+						setCollectionStatus(
+							inner.message || payload.message || i18n.statsResetError,
+							false
+						);
+					}
+				})
+				.catch(function () {
+					analyticsToggle.checked = !on;
+					setCollectionStatus(i18n.statsResetError || 'Could not save.', false);
+				})
+				.then(function () {
+					analyticsToggle.disabled = false;
+				});
+		});
+	}
+
+	var attrSelect = root.querySelector('#mwst-analytics-attr');
+	if (attrSelect) {
+		attrSelect.addEventListener('change', function () {
+			var minutes = String(attrSelect.value || '30');
+			var body = new window.FormData();
+			body.append('action', analyticsUi.actionSetAttr || 'mw_st_analytics_set_attr');
+			body.append('nonce', analyticsUi.nonce || '');
+			body.append('minutes', minutes);
+			attrSelect.disabled = true;
+			window
+				.fetch(analyticsUi.ajaxUrl || (cfg.cache && cfg.cache.ajaxUrl) || '', {
+					method: 'POST',
+					credentials: 'same-origin',
+					body: body
+				})
+				.then(function (res) {
+					return res.json().then(function (data) {
+						return { ok: res.ok, data: data };
+					});
+				})
+				.then(function (result) {
+					var payload = result.data || {};
+					var inner = payload.data || {};
+					if (payload.success) {
+						var saved = Number(inner.minutes) || Number(minutes) || 30;
+						attrSelect.value = String(saved);
+						if (analyticsData) {
+							['7', '30', '90'].forEach(function (key) {
+								if (analyticsData[key]) {
+									analyticsData[key].attrWindow = saved;
+								}
+							});
+						}
+						applyStats(currentStatsSummary());
+						setCollectionStatus(inner.message || '', true);
+						userTouchedForm = false;
+						captureSaveSnapshot(true);
+					} else {
+						setCollectionStatus(
+							inner.message || payload.message || i18n.statsResetError,
+							false
+						);
+					}
+				})
+				.catch(function () {
+					setCollectionStatus(i18n.statsResetError || 'Could not save.', false);
+				})
+				.then(function () {
+					attrSelect.disabled = false;
+				});
+		});
+	}
+
+	var resetBtn = root.querySelector('#mwst-stats-reset');
+	if (resetBtn) {
+		resetBtn.addEventListener('click', function () {
+			if (
+				!window.confirm(
+					i18n.statsResetConfirm ||
+						'Delete all stored toast statistics? This cannot be undone.'
+				)
+			) {
+				return;
+			}
+			var idle = resetBtn.textContent;
+			resetBtn.disabled = true;
+			resetBtn.textContent = i18n.statsResetting || 'Clearing…';
+			var body = new window.FormData();
+			body.append('action', analyticsUi.actionReset || 'mw_st_analytics_reset');
+			body.append('nonce', analyticsUi.nonce || '');
+			window
+				.fetch(analyticsUi.ajaxUrl || (cfg.cache && cfg.cache.ajaxUrl) || '', {
+					method: 'POST',
+					credentials: 'same-origin',
+					body: body
+				})
+				.then(function (res) {
+					return res.json().then(function (data) {
+						return { ok: res.ok, data: data };
+					});
+				})
+				.then(function (result) {
+					var payload = result.data || {};
+					var inner = payload.data || {};
+					if (payload.success) {
+						analyticsData = {
+							'7': emptyStatsSummary(),
+							'30': emptyStatsSummary(),
+							'90': emptyStatsSummary()
+						};
+						productQuery = '';
+						productVisible = PRODUCT_PAGE;
+						if (productSearch) {
+							productSearch.value = '';
+						}
+						applyStats(currentStatsSummary());
+						setCollectionStatus(inner.message || '', true);
+					} else {
+						setCollectionStatus(
+							inner.message || payload.message || i18n.statsResetError,
+							false
+						);
+					}
+				})
+				.catch(function () {
+					setCollectionStatus(
+						i18n.statsResetError || 'Could not reset statistics. Please try again.',
+						false
+					);
+				})
+				.then(function () {
+					resetBtn.disabled = false;
+					resetBtn.textContent = idle || i18n.statsReset || 'Reset statistics';
+				});
+		});
+	}
+
+	loadChartSeriesOn();
+	syncChartLegend();
 	if (analyticsData) {
 		applyStats(analyticsData['7'] || analyticsData[7]);
 	}
+	setAnalyticsEnabledUi(analyticsUi.enabled !== false);
 
 	root.querySelectorAll('.mwst-transfer__submit').forEach(function (btn) {
 		var fileId = btn.getAttribute('data-mwst-file') || '';

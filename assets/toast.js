@@ -22,6 +22,8 @@
       if (payload.type) body.type = String(payload.type);
       if (payload.reason) body.reason = String(payload.reason);
       if (payload.dwellMs != null) body.dwellMs = Number(payload.dwellMs) || 0;
+      if (payload.trigger) body.trigger = String(payload.trigger);
+      if (payload.clickTarget) body.clickTarget = String(payload.clickTarget);
     }
     var url = analyticsCfg.endpoint;
     var headers = {
@@ -33,7 +35,9 @@
     try {
       if (navigator.sendBeacon) {
         var blob = new Blob([json], { type: 'application/json' });
-        // sendBeacon cannot set custom headers — fall through to fetch.
+        if (navigator.sendBeacon(url, blob)) {
+          return;
+        }
       }
     } catch (e) {
       /* ignore */
@@ -51,17 +55,19 @@
     }
   }
 
-  function setAttrCookie(productId) {
+  function setAttrCookie(productId, type) {
     var id = Number(productId) || 0;
     if (id < 1) return;
     try {
-      var maxAge = 1800;
+      var maxAge = Math.max(60, Number(analyticsCfg.attrWindowSec) || 1800);
       var secure = location.protocol === 'https:' ? '; Secure' : '';
+      var t = String(type || '').toLowerCase().replace(/[^a-z0-9_]/g, '');
       document.cookie =
         'mw_st_attr=' +
         id +
         '.' +
         Math.floor(Date.now() / 1000) +
+        (t ? '.' + t : '') +
         '; path=/; max-age=' +
         maxAge +
         '; SameSite=Lax' +
@@ -176,7 +182,8 @@
     return {
       productId: event.productId || 0,
       source: event.demo ? 'demo' : 'real',
-      type: eventType(event)
+      type: eventType(event),
+      trigger: loopTrigger || ''
     };
   }
 
@@ -538,16 +545,19 @@
         ev.preventDefault();
         copyCoupon(couponBtn);
         if (currentEvent) {
-          track('click', eventPayload(currentEvent));
+          var couponPayload = eventPayload(currentEvent);
+          couponPayload.clickTarget = 'coupon';
+          track('click', couponPayload);
         }
         return;
       }
       var link = ev.target && ev.target.closest ? ev.target.closest('a') : null;
       if (!link || !currentEvent) return;
       var payload = eventPayload(currentEvent);
+      payload.clickTarget = 'product';
       track('click', payload);
       if (payload.productId) {
-        setAttrCookie(payload.productId);
+        setAttrCookie(payload.productId, payload.type);
       }
     });
 
@@ -831,6 +841,7 @@
   }
 
   var loopStarted = false;
+  var loopTrigger = '';
   var pageLoadTimer = null;
   var triggerCleanups = [];
 
@@ -865,6 +876,7 @@
       return;
     }
     loopStarted = true;
+    loopTrigger = reason || 'page_load';
     detachTriggers();
     if (reason === 'page_load') {
       next();

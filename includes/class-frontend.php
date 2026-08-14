@@ -564,8 +564,9 @@ class MW_Sales_Toast_Frontend {
 
 		if ( class_exists( 'MW_Sales_Toast_Analytics' ) && MW_Sales_Toast_Analytics::is_enabled() ) {
 			$config['analytics'] = array(
-				'endpoint' => esc_url_raw( rest_url( 'mw-st/v1/analytics' ) ),
-				'pageType' => self::page_type(),
+				'endpoint'      => esc_url_raw( rest_url( 'mw-st/v1/analytics' ) ),
+				'pageType'      => self::page_type(),
+				'attrWindowSec' => MW_Sales_Toast_Analytics::attr_window_sec(),
 			);
 			if ( empty( $config['nonce'] ) ) {
 				$config['nonce'] = MW_Sales_Toast_REST::create_nonce();
