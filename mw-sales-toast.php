@@ -2,7 +2,7 @@
 /**
  * Plugin Name: MW Sales Toast
  * Description: Recent-sale social-proof toasts for WooCommerce — cached real orders, privacy controls, and optional demo fill.
- * Version: 2.0.8
+ * Version: 2.0.9
  * Author: MWV3
  * Requires at least: 5.8
  * Requires PHP: 7.2
@@ -11,7 +11,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'MW_SALES_TOAST_VERSION', '2.0.8' );
+define( 'MW_SALES_TOAST_VERSION', '2.0.9' );
 define( 'MW_SALES_TOAST_FILE', __FILE__ );
 define( 'MW_SALES_TOAST_URL', plugin_dir_url( __FILE__ ) );
 define( 'MW_SALES_TOAST_PATH', plugin_dir_path( __FILE__ ) );
@@ -19,12 +19,11 @@ define( 'MW_SALES_TOAST_OPTION', 'mw_sales_toast_settings' );
 define( 'MW_SALES_TOAST_TRANSIENT', 'mw_st_sales_cache' );
 define( 'MW_SALES_TOAST_CRON', 'mw_st_update_sales_cache' );
 define( 'MW_SALES_TOAST_CONSENT_META', '_mw_st_allow_public' );
-/** Temporary Pro unlock for design/testing. Flip to false before shipping Free. */
-define( 'MW_SALES_TOAST_IS_PRO', true );
 /** Bump when cached event shape / eligibility rules change. */
 define( 'MW_SALES_TOAST_CACHE_SCHEMA', 7 );
 
 require_once MW_SALES_TOAST_PATH . 'includes/class-settings.php';
+require_once MW_SALES_TOAST_PATH . 'includes/class-transfer.php';
 require_once MW_SALES_TOAST_PATH . 'includes/class-cache.php';
 require_once MW_SALES_TOAST_PATH . 'includes/class-rest.php';
 require_once MW_SALES_TOAST_PATH . 'includes/class-analytics.php';
@@ -92,6 +91,7 @@ function mw_sales_toast_maybe_flush_cache_schema() {
 function mw_sales_toast_init() {
 	mw_sales_toast_maybe_flush_cache_schema();
 	MW_Sales_Toast_Settings::init();
+	MW_Sales_Toast_Transfer::init();
 	MW_Sales_Toast_Cache::init();
 	MW_Sales_Toast_REST::init();
 	MW_Sales_Toast_Analytics::init();

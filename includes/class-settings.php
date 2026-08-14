@@ -19,7 +19,6 @@ class MW_Sales_Toast_Settings {
 		add_action( 'admin_init', array( __CLASS__, 'register' ) );
 		add_action( 'admin_menu', array( __CLASS__, 'menu' ) );
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_admin' ) );
-		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_plugins_list' ) );
 		add_filter(
 			'plugin_action_links_' . plugin_basename( MW_SALES_TOAST_FILE ),
 			array( __CLASS__, 'plugin_action_links' )
@@ -70,7 +69,7 @@ class MW_Sales_Toast_Settings {
 			'event_delivery'         => 'rest',
 			'stock_display'          => 'soft',
 			'stock_threshold'        => 5,
-			// Pro targeting (Where toasts appear).
+			// Advanced targeting (where toasts appear).
 			'url_include'            => '',
 			'url_exclude'            => '',
 			'include_products'       => array(),
@@ -234,20 +233,6 @@ class MW_Sales_Toast_Settings {
 			'style_border' => $text ? $text : ( $primary ? $primary : $defaults['style_border'] ),
 			'font'         => $font,
 		);
-	}
-
-	/**
-	 * Whether Pro features are active.
-	 *
-	 * @return bool
-	 */
-	public static function is_pro() {
-		/**
-		 * Whether the Pro license is active.
-		 *
-		 * @param bool $is_pro Pro active.
-		 */
-		return (bool) apply_filters( 'mw_sales_toast_is_pro', (bool) MW_SALES_TOAST_IS_PRO );
 	}
 
 	/**
@@ -544,7 +529,7 @@ class MW_Sales_Toast_Settings {
 			$font_css
 		);
 
-		$custom = self::is_pro() ? self::sanitize_css( $s['custom_css'] ?? '' ) : '';
+		$custom = self::sanitize_css( $s['custom_css'] ?? '' );
 		if ( '' !== $custom ) {
 			$css .= "\n" . $custom;
 		}
@@ -1020,15 +1005,7 @@ class MW_Sales_Toast_Settings {
 				: $defaults['style_image_fit'];
 			$out['style_image_fit'] = ( 'padded' === $prev_fit ) ? 'padded' : 'full';
 		}
-		if ( self::is_pro() ) {
-			$out['custom_css'] = self::sanitize_css( $input['custom_css'] ?? '' );
-		} else {
-			$out['custom_css'] = self::sanitize_css(
-				( is_array( $saved_opts ) && isset( $saved_opts['custom_css'] ) )
-					? $saved_opts['custom_css']
-					: ''
-			);
-		}
+		$out['custom_css'] = self::sanitize_css( $input['custom_css'] ?? '' );
 
 		$design_presets = self::design_presets();
 		$design_preset  = isset( $input['design_preset'] ) ? sanitize_key( $input['design_preset'] ) : $defaults['design_preset'];
@@ -1048,41 +1025,14 @@ class MW_Sales_Toast_Settings {
 			$out['design_preset'] = 'custom';
 		}
 
-		// Pro targeting — only update from POST when Pro is active; otherwise keep saved values.
-		$pro_keys = array(
-			'url_include',
-			'url_exclude',
-			'include_products',
-			'exclude_products',
-			'include_categories',
-			'exclude_categories',
-			'match_product_page',
-			'hide_roles',
-		);
-		if ( self::is_pro() ) {
-			$out['url_include'] = self::sanitize_path_list( $input['url_include'] ?? '' );
-			$out['url_exclude'] = self::sanitize_path_list( $input['url_exclude'] ?? '' );
-			$out['include_products']   = self::sanitize_id_list( $input['include_products'] ?? array() );
-			$out['exclude_products']   = self::sanitize_id_list( $input['exclude_products'] ?? array() );
-			$out['include_categories'] = self::sanitize_id_list( $input['include_categories'] ?? array() );
-			$out['exclude_categories'] = self::sanitize_id_list( $input['exclude_categories'] ?? array() );
-			$out['match_product_page'] = empty( $input['match_product_page'] ) ? 0 : 1;
-			$out['hide_roles']         = self::sanitize_role_list( $input['hide_roles'] ?? array() );
-		} else {
-			foreach ( $pro_keys as $key ) {
-				if ( is_array( $saved_opts ) && array_key_exists( $key, $saved_opts ) ) {
-					$out[ $key ] = $saved_opts[ $key ];
-				}
-			}
-			$out['include_products']   = self::sanitize_id_list( $out['include_products'] ?? array() );
-			$out['exclude_products']   = self::sanitize_id_list( $out['exclude_products'] ?? array() );
-			$out['include_categories'] = self::sanitize_id_list( $out['include_categories'] ?? array() );
-			$out['exclude_categories'] = self::sanitize_id_list( $out['exclude_categories'] ?? array() );
-			$out['hide_roles']         = self::sanitize_role_list( $out['hide_roles'] ?? array() );
-			$out['url_include']        = self::sanitize_path_list( $out['url_include'] ?? '' );
-			$out['url_exclude']        = self::sanitize_path_list( $out['url_exclude'] ?? '' );
-			$out['match_product_page'] = empty( $out['match_product_page'] ) ? 0 : 1;
-		}
+		$out['url_include']        = self::sanitize_path_list( $input['url_include'] ?? '' );
+		$out['url_exclude']        = self::sanitize_path_list( $input['url_exclude'] ?? '' );
+		$out['include_products']   = self::sanitize_id_list( $input['include_products'] ?? array() );
+		$out['exclude_products']   = self::sanitize_id_list( $input['exclude_products'] ?? array() );
+		$out['include_categories'] = self::sanitize_id_list( $input['include_categories'] ?? array() );
+		$out['exclude_categories'] = self::sanitize_id_list( $input['exclude_categories'] ?? array() );
+		$out['match_product_page'] = empty( $input['match_product_page'] ) ? 0 : 1;
+		$out['hide_roles']         = self::sanitize_role_list( $input['hide_roles'] ?? array() );
 
 		// Rebuild cache + reschedule cron so admin status and front end reflect the new settings immediately.
 		delete_transient( MW_SALES_TOAST_TRANSIENT );
@@ -1125,15 +1075,6 @@ class MW_Sales_Toast_Settings {
 			$links
 		);
 
-		// Hide upgrade CTA when Pro is active.
-		if ( ! self::is_pro() ) {
-			$out['go_pro'] = sprintf(
-				'<a class="mwst-go-pro" href="%1$s">%2$s</a>',
-				esc_url( admin_url( 'admin.php?page=mw-sales-toast&tab=account' ) ),
-				esc_html__( 'Go Pro', 'mw-sales-toast' )
-			);
-		}
-
 		return $out;
 	}
 
@@ -1173,25 +1114,6 @@ class MW_Sales_Toast_Settings {
 				array( __CLASS__, 'render' )
 			);
 		}
-	}
-
-	/**
-	 * Style the Go Pro link on Plugins → Installed Plugins.
-	 *
-	 * @param string $hook Current admin page hook.
-	 */
-	public static function enqueue_plugins_list( $hook ) {
-		if ( 'plugins.php' !== $hook || self::is_pro() ) {
-			return;
-		}
-
-		wp_register_style( 'mw-sales-toast-plugins', false, array(), MW_SALES_TOAST_VERSION );
-		wp_enqueue_style( 'mw-sales-toast-plugins' );
-		wp_add_inline_style(
-			'mw-sales-toast-plugins',
-			'.plugins .mwst-go-pro{color:#c3368a;font-weight:700;}' .
-			'.plugins .mwst-go-pro:hover,.plugins .mwst-go-pro:focus{color:#a12c72;}'
-		);
 	}
 
 	/**
@@ -1240,7 +1162,6 @@ class MW_Sales_Toast_Settings {
 						'tabSize'      => 2,
 						'lineNumbers'  => true,
 						'lineWrapping' => true,
-						'readOnly'     => self::is_pro() ? false : 'nocursor',
 					),
 				)
 			);
@@ -1275,7 +1196,6 @@ class MW_Sales_Toast_Settings {
 			'mw-sales-toast-admin',
 			'mwSalesToastAdmin',
 			array(
-				'isPro'          => self::is_pro(),
 				'codeEditor'     => ( false !== $code_editor ) ? $code_editor : null,
 				'customCssExample' => self::custom_css_example(),
 				'designDefaults' => array(
@@ -1304,7 +1224,7 @@ class MW_Sales_Toast_Settings {
 					'nonce'   => wp_create_nonce( 'mw_st_support' ),
 					'action'  => 'mw_st_support_request',
 				),
-				'analytics'      => ( self::is_pro() && class_exists( 'MW_Sales_Toast_Analytics' ) )
+				'analytics'      => class_exists( 'MW_Sales_Toast_Analytics' )
 					? MW_Sales_Toast_Analytics::dashboard_payload()
 					: null,
 				'i18n'           => array(
@@ -1324,6 +1244,8 @@ class MW_Sales_Toast_Settings {
 					'supportError'     => __( 'Something went wrong. Please try again.', 'mw-sales-toast' ),
 					'statsEmpty'       => __( 'No product data yet.', 'mw-sales-toast' ),
 					'statsMinutes'     => __( 'minutes', 'mw-sales-toast' ),
+					'transferNoFile'   => __( 'Choose a JSON file first.', 'mw-sales-toast' ),
+					'transferImporting' => __( 'Importing…', 'mw-sales-toast' ),
 				),
 			)
 		);
@@ -1562,7 +1484,8 @@ class MW_Sales_Toast_Settings {
 		$opt     = MW_SALES_TOAST_OPTION;
 		$status  = self::status_meta( $s );
 		$enabled = ! empty( $s['enabled'] );
-		$saved   = isset( $_GET['settings-updated'] ) && 'true' === $_GET['settings-updated']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$saved    = isset( $_GET['settings-updated'] ) && 'true' === $_GET['settings-updated']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$transfer = isset( $_GET['mwst_transfer'] ) ? sanitize_key( wp_unslash( $_GET['mwst_transfer'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		$allowed_tabs = array( 'general', 'message', 'design', 'timing', 'demo', 'statistics', 'support', 'account' );
 		$current_tab  = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'general'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -1570,7 +1493,7 @@ class MW_Sales_Toast_Settings {
 		if ( 'contact' === $current_tab ) {
 			$current_tab = 'support';
 		}
-		// Legacy License tab → Account → License.
+		// Legacy License tab → Account.
 		if ( 'license' === $current_tab ) {
 			$current_tab = 'account';
 		}
@@ -1578,7 +1501,6 @@ class MW_Sales_Toast_Settings {
 			$current_tab = 'general';
 		}
 		$nonsave_tabs = array( 'statistics', 'support' );
-		$is_pro = self::is_pro();
 
 		$source_labels = array(
 			'real_orders'    => __( 'Real orders only', 'mw-sales-toast' ),
@@ -1587,6 +1509,12 @@ class MW_Sales_Toast_Settings {
 		);
 		?>
 		<div class="wrap mwst-admin" id="mwst-admin">
+			<?php
+			if ( class_exists( 'MW_Sales_Toast_Transfer' ) ) {
+				MW_Sales_Toast_Transfer::render_import_form( 'settings', 'account' );
+				MW_Sales_Toast_Transfer::render_import_form( 'theme', 'design' );
+			}
+			?>
 			<header class="mwst-header">
 				<div class="mwst-header__glow" aria-hidden="true"></div>
 				<div class="mwst-header__main">
@@ -1624,14 +1552,6 @@ class MW_Sales_Toast_Settings {
 					</span>
 					<dl class="mwst-header__metrics" aria-label="<?php esc_attr_e( 'System status', 'mw-sales-toast' ); ?>">
 						<div class="mwst-header__metric">
-							<dt><?php esc_html_e( 'Plan', 'mw-sales-toast' ); ?></dt>
-							<dd>
-								<a href="<?php echo esc_url( add_query_arg( 'tab', 'account' ) ); ?>" class="mwst-plan-pill <?php echo $is_pro ? 'mwst-plan-pill--pro' : 'mwst-plan-pill--free'; ?>">
-									<?php echo $is_pro ? esc_html__( 'Pro', 'mw-sales-toast' ) : esc_html__( 'Free', 'mw-sales-toast' ); ?>
-								</a>
-							</dd>
-						</div>
-						<div class="mwst-header__metric">
 							<dt><?php esc_html_e( 'WooCommerce', 'mw-sales-toast' ); ?></dt>
 							<dd>
 								<span class="mwst-header__status <?php echo ! empty( $status['wc_active'] ) ? 'is-ok' : 'is-bad'; ?>">
@@ -1656,6 +1576,47 @@ class MW_Sales_Toast_Settings {
 					</div>
 					<button type="button" class="mwst-notice__dismiss" id="mwst-dismiss-notice" aria-label="<?php esc_attr_e( 'Dismiss', 'mw-sales-toast' ); ?>">×</button>
 				</div>
+			<?php elseif ( $transfer ) : ?>
+				<?php
+				$transfer_notices = array(
+					'imported' => array(
+						'title' => __( 'Settings imported', 'mw-sales-toast' ),
+						'body'  => __( 'The JSON pack was applied. Product and category filters may need a pass if this file came from another store.', 'mw-sales-toast' ),
+						'ok'    => true,
+					),
+					'theme'    => array(
+						'title' => __( 'Theme imported', 'mw-sales-toast' ),
+						'body'  => __( 'Toast colors, layout, and custom CSS were replaced from the theme file.', 'mw-sales-toast' ),
+						'ok'    => true,
+					),
+					'invalid'  => array(
+						'title' => __( 'Import failed', 'mw-sales-toast' ),
+						'body'  => __( 'That file is not a Sales Toast settings or theme export.', 'mw-sales-toast' ),
+						'ok'    => false,
+					),
+					'empty'    => array(
+						'title' => __( 'No file selected', 'mw-sales-toast' ),
+						'body'  => __( 'Choose a .json export before importing.', 'mw-sales-toast' ),
+						'ok'    => false,
+					),
+					'error'    => array(
+						'title' => __( 'Import failed', 'mw-sales-toast' ),
+						'body'  => __( 'The file could not be read. Try exporting again and keep it under 512 KB.', 'mw-sales-toast' ),
+						'ok'    => false,
+					),
+				);
+				$tn = isset( $transfer_notices[ $transfer ] ) ? $transfer_notices[ $transfer ] : null;
+				?>
+				<?php if ( $tn ) : ?>
+					<div class="mwst-notice <?php echo ! empty( $tn['ok'] ) ? 'mwst-notice--success' : 'mwst-notice--warn'; ?>" role="status" aria-live="polite" id="mwst-saved-notice">
+						<span class="mwst-notice__icon" aria-hidden="true"><?php echo ! empty( $tn['ok'] ) ? '✓' : '!'; ?></span>
+						<div class="mwst-notice__body">
+							<strong><?php echo esc_html( $tn['title'] ); ?></strong>
+							<p><?php echo esc_html( $tn['body'] ); ?></p>
+						</div>
+						<button type="button" class="mwst-notice__dismiss" id="mwst-dismiss-notice" aria-label="<?php esc_attr_e( 'Dismiss', 'mw-sales-toast' ); ?>">×</button>
+					</div>
+				<?php endif; ?>
 			<?php endif; ?>
 
 			<?php if ( 0 === (int) $status['events'] && in_array( $s['source'], array( 'real_orders', 'real_then_demo' ), true ) && ! empty( $status['wc_active'] ) ) : ?>
@@ -1891,53 +1852,31 @@ class MW_Sales_Toast_Settings {
 								</div>
 							</div>
 
-							<div class="mwst-card mwst-card--pro<?php echo $is_pro ? '' : ' is-locked'; ?>" id="mwst-targeting-pro">
+							<div class="mwst-card" id="mwst-targeting">
 								<div class="mwst-card__head">
-									<h2>
-										<?php esc_html_e( 'Advanced targeting', 'mw-sales-toast' ); ?>
-										<span class="mwst-tab-pro"><?php esc_html_e( 'Pro', 'mw-sales-toast' ); ?></span>
-									</h2>
+									<h2><?php esc_html_e( 'Advanced targeting', 'mw-sales-toast' ); ?></h2>
 									<p><?php esc_html_e( 'URL rules, product/category filters, PDP matching, and role exclusions.', 'mw-sales-toast' ); ?></p>
 								</div>
 								<div class="mwst-card__body">
-									<?php if ( ! $is_pro ) : ?>
-										<div class="mwst-pro-lock" role="status">
-											<span class="mwst-plan-pill mwst-plan-pill--pro"><?php esc_html_e( 'Pro', 'mw-sales-toast' ); ?></span>
-											<p>
-												<?php
-												printf(
-													/* translators: %s: Account tab link */
-													esc_html__( 'Unlock advanced targeting with Pro. Activate a license under %s.', 'mw-sales-toast' ),
-													self::tab_link( 'account', __( 'Account', 'mw-sales-toast' ) )
-												);
-												?>
-											</p>
-										</div>
-									<?php endif; ?>
-
-									<fieldset class="mwst-pro-fields" <?php disabled( ! $is_pro ); ?>>
+									<fieldset class="mwst-targeting-fields">
 										<div class="mwst-field">
 											<div class="mwst-field__label"><label for="mwst-url-include"><?php esc_html_e( 'Include URLs', 'mw-sales-toast' ); ?></label></div>
 											<div class="mwst-field__control">
-												<textarea id="mwst-url-include" name="<?php echo esc_attr( $opt ); ?>[url_include]" rows="4" class="large-text code" <?php disabled( ! $is_pro ); ?> placeholder="<?php esc_attr_e( "/sale/*\n/collections/summer", 'mw-sales-toast' ); ?>"><?php echo esc_textarea( (string) ( $s['url_include'] ?? '' ) ); ?></textarea>
+												<textarea id="mwst-url-include" name="<?php echo esc_attr( $opt ); ?>[url_include]" rows="4" class="large-text code" placeholder="<?php esc_attr_e( "/sale/*\n/collections/summer", 'mw-sales-toast' ); ?>"><?php echo esc_textarea( (string) ( $s['url_include'] ?? '' ) ); ?></textarea>
 												<p class="description"><?php esc_html_e( 'One path per line. Use * as a wildcard. Leave empty to allow all (after other rules).', 'mw-sales-toast' ); ?></p>
-												<?php if ( $is_pro ) : ?>
-													<p class="mwst-path-actions">
-														<button type="button" class="button button-small mwst-path-example" data-target="mwst-url-include" data-path="/sale/*"><?php esc_html_e( 'Add /sale/*', 'mw-sales-toast' ); ?></button>
-													</p>
-												<?php endif; ?>
+												<p class="mwst-path-actions">
+													<button type="button" class="button button-small mwst-path-example" data-target="mwst-url-include" data-path="/sale/*"><?php esc_html_e( 'Add /sale/*', 'mw-sales-toast' ); ?></button>
+												</p>
 											</div>
 										</div>
 										<div class="mwst-field">
 											<div class="mwst-field__label"><label for="mwst-url-exclude"><?php esc_html_e( 'Exclude URLs', 'mw-sales-toast' ); ?></label></div>
 											<div class="mwst-field__control">
-												<textarea id="mwst-url-exclude" name="<?php echo esc_attr( $opt ); ?>[url_exclude]" rows="4" class="large-text code" <?php disabled( ! $is_pro ); ?> placeholder="<?php esc_attr_e( "/blog/*\n/about", 'mw-sales-toast' ); ?>"><?php echo esc_textarea( (string) ( $s['url_exclude'] ?? '' ) ); ?></textarea>
+												<textarea id="mwst-url-exclude" name="<?php echo esc_attr( $opt ); ?>[url_exclude]" rows="4" class="large-text code" placeholder="<?php esc_attr_e( "/blog/*\n/about", 'mw-sales-toast' ); ?>"><?php echo esc_textarea( (string) ( $s['url_exclude'] ?? '' ) ); ?></textarea>
 												<p class="description"><?php esc_html_e( 'One path per line. Matching pages never show toasts.', 'mw-sales-toast' ); ?></p>
-												<?php if ( $is_pro ) : ?>
-													<p class="mwst-path-actions">
-														<button type="button" class="button button-small mwst-path-example" data-target="mwst-url-exclude" data-path="/blog/*"><?php esc_html_e( 'Add /blog/*', 'mw-sales-toast' ); ?></button>
-													</p>
-												<?php endif; ?>
+												<p class="mwst-path-actions">
+													<button type="button" class="button button-small mwst-path-example" data-target="mwst-url-exclude" data-path="/blog/*"><?php esc_html_e( 'Add /blog/*', 'mw-sales-toast' ); ?></button>
+												</p>
 											</div>
 										</div>
 
@@ -1951,28 +1890,28 @@ class MW_Sales_Toast_Settings {
 										<div class="mwst-field">
 											<div class="mwst-field__label"><label for="mwst-include-products"><?php esc_html_e( 'Include products', 'mw-sales-toast' ); ?></label></div>
 											<div class="mwst-field__control">
-												<?php self::render_product_picker( $opt, 'include_products', 'mwst-include-products', $inc_products, $is_pro ); ?>
+												<?php self::render_product_picker( $opt, 'include_products', 'mwst-include-products', $inc_products, true ); ?>
 												<p class="description"><?php esc_html_e( 'Only sales of these products appear in toasts. Combined with Include categories as a union (product listed or in a listed category).', 'mw-sales-toast' ); ?></p>
 											</div>
 										</div>
 										<div class="mwst-field">
 											<div class="mwst-field__label"><label for="mwst-exclude-products"><?php esc_html_e( 'Exclude products', 'mw-sales-toast' ); ?></label></div>
 											<div class="mwst-field__control">
-												<?php self::render_product_picker( $opt, 'exclude_products', 'mwst-exclude-products', $exc_products, $is_pro ); ?>
+												<?php self::render_product_picker( $opt, 'exclude_products', 'mwst-exclude-products', $exc_products, true ); ?>
 												<p class="description"><?php esc_html_e( 'Never toast these products, and hide toasts on their product pages.', 'mw-sales-toast' ); ?></p>
 											</div>
 										</div>
 										<div class="mwst-field">
 											<div class="mwst-field__label"><label for="mwst-include-categories"><?php esc_html_e( 'Include categories', 'mw-sales-toast' ); ?></label></div>
 											<div class="mwst-field__control">
-												<?php self::render_category_picker( $opt, 'include_categories', 'mwst-include-categories', $inc_cats, $is_pro ); ?>
+												<?php self::render_category_picker( $opt, 'include_categories', 'mwst-include-categories', $inc_cats, true ); ?>
 												<p class="description"><?php esc_html_e( 'Only sales of products in these categories (including child categories). Combined with Include products as a union.', 'mw-sales-toast' ); ?></p>
 											</div>
 										</div>
 										<div class="mwst-field">
 											<div class="mwst-field__label"><label for="mwst-exclude-categories"><?php esc_html_e( 'Exclude categories', 'mw-sales-toast' ); ?></label></div>
 											<div class="mwst-field__control">
-												<?php self::render_category_picker( $opt, 'exclude_categories', 'mwst-exclude-categories', $exc_cats, $is_pro ); ?>
+												<?php self::render_category_picker( $opt, 'exclude_categories', 'mwst-exclude-categories', $exc_cats, true ); ?>
 												<p class="description"><?php esc_html_e( 'Never toast products in these categories, and hide toasts on those category/product pages.', 'mw-sales-toast' ); ?></p>
 											</div>
 										</div>
@@ -1980,19 +1919,7 @@ class MW_Sales_Toast_Settings {
 										<div class="mwst-field">
 											<div class="mwst-field__label"><?php esc_html_e( 'Product page match', 'mw-sales-toast' ); ?></div>
 											<div class="mwst-field__control">
-												<?php
-												if ( $is_pro ) {
-													self::toggle( $opt, 'match_product_page', $s, 'mwst-match-product', __( 'On product pages, only show toasts for that product', 'mw-sales-toast' ) );
-												} else {
-													?>
-													<label class="mwst-toggle is-disabled">
-														<input type="checkbox" disabled <?php checked( ! empty( $s['match_product_page'] ) ); ?> />
-														<span class="mwst-toggle__track" aria-hidden="true"></span>
-														<span class="mwst-toggle__text"><?php esc_html_e( 'On product pages, only show toasts for that product', 'mw-sales-toast' ); ?></span>
-													</label>
-													<?php
-												}
-												?>
+												<?php self::toggle( $opt, 'match_product_page', $s, 'mwst-match-product', __( 'On product pages, only show toasts for that product', 'mw-sales-toast' ) ); ?>
 												<p class="description"><?php esc_html_e( 'Stronger social proof on the product the visitor is viewing.', 'mw-sales-toast' ); ?></p>
 											</div>
 										</div>
@@ -2013,7 +1940,6 @@ class MW_Sales_Toast_Settings {
 																name="<?php echo esc_attr( $opt ); ?>[hide_roles][]"
 																value="<?php echo esc_attr( $role_key ); ?>"
 																<?php checked( in_array( $role_key, $hide_roles, true ) ); ?>
-																<?php disabled( ! $is_pro ); ?>
 															/>
 															<span><?php echo esc_html( translate_user_role( $role_obj['name'] ) ); ?></span>
 														</label>
@@ -2348,31 +2274,12 @@ class MW_Sales_Toast_Settings {
 								</div>
 							</div>
 
-							<div class="mwst-card mwst-card--pro<?php echo $is_pro ? '' : ' is-locked'; ?>" id="mwst-custom-css-pro">
+							<div class="mwst-card" id="mwst-custom-css-card">
 								<div class="mwst-card__head">
-									<h2>
-										<?php esc_html_e( 'Custom CSS', 'mw-sales-toast' ); ?>
-										<span class="mwst-tab-pro"><?php esc_html_e( 'Pro', 'mw-sales-toast' ); ?></span>
-									</h2>
+									<h2><?php esc_html_e( 'Custom CSS', 'mw-sales-toast' ); ?></h2>
 									<p><?php esc_html_e( 'Advanced overrides. Loaded after the base toast styles.', 'mw-sales-toast' ); ?></p>
 								</div>
 								<div class="mwst-card__body">
-									<?php if ( ! $is_pro ) : ?>
-										<div class="mwst-pro-lock" role="status">
-											<span class="mwst-plan-pill mwst-plan-pill--pro"><?php esc_html_e( 'Pro', 'mw-sales-toast' ); ?></span>
-											<p>
-												<?php
-												printf(
-													/* translators: %s: Account tab link */
-													esc_html__( 'Unlock custom CSS with Pro. Activate a license under %s.', 'mw-sales-toast' ),
-													self::tab_link( 'account', __( 'Account', 'mw-sales-toast' ) )
-												);
-												?>
-											</p>
-										</div>
-									<?php endif; ?>
-
-									<fieldset class="mwst-pro-fields" <?php disabled( ! $is_pro ); ?>>
 									<div class="mwst-field mwst-field--editor">
 										<div class="mwst-field__label"><label for="mwst-custom-css"><?php esc_html_e( 'CSS', 'mw-sales-toast' ); ?></label></div>
 										<div class="mwst-field__control">
@@ -2383,7 +2290,7 @@ class MW_Sales_Toast_Settings {
 													$custom_css_value = self::custom_css_example();
 												}
 												?>
-												<textarea id="mwst-custom-css" name="<?php echo esc_attr( $opt ); ?>[custom_css]" rows="12" class="large-text code mwst-design-input" data-design="custom_css" spellcheck="false" <?php disabled( ! $is_pro ); ?>><?php echo esc_textarea( $custom_css_value ); ?></textarea>
+												<textarea id="mwst-custom-css" name="<?php echo esc_attr( $opt ); ?>[custom_css]" rows="12" class="large-text code mwst-design-input" data-design="custom_css" spellcheck="false"><?php echo esc_textarea( $custom_css_value ); ?></textarea>
 											</div>
 											<div class="mwst-css-cheatsheet">
 												<p class="description" style="margin-top:10px;margin-bottom:6px;"><strong><?php esc_html_e( 'Structure', 'mw-sales-toast' ); ?></strong></p>
@@ -2435,7 +2342,21 @@ class MW_Sales_Toast_Settings {
 											</div>
 										</div>
 									</div>
-									</fieldset>
+								</div>
+							</div>
+
+							<div class="mwst-card" id="mwst-theme-json">
+								<div class="mwst-card__head">
+									<h2><?php esc_html_e( 'Theme JSON', 'mw-sales-toast' ); ?></h2>
+									<p><?php esc_html_e( 'Reuse colors, layout, and custom CSS across stores. Does not change targeting, privacy, or demo data.', 'mw-sales-toast' ); ?></p>
+								</div>
+								<div class="mwst-card__body">
+									<?php
+									if ( class_exists( 'MW_Sales_Toast_Transfer' ) ) {
+										MW_Sales_Toast_Transfer::render_controls( 'theme' );
+									}
+									?>
+									<p class="description"><?php esc_html_e( 'Import applies immediately. Elementor Site Kit sync is included when that toggle is on.', 'mw-sales-toast' ); ?></p>
 								</div>
 							</div>
 						</div>
@@ -2583,9 +2504,9 @@ class MW_Sales_Toast_Settings {
 							</div>
 						</div>
 
-						<!-- Statistics (Pro toast performance) -->
+						<!-- Statistics -->
 						<?php
-						$stats_payload = ( $is_pro && class_exists( 'MW_Sales_Toast_Analytics' ) )
+						$stats_payload = class_exists( 'MW_Sales_Toast_Analytics' )
 							? MW_Sales_Toast_Analytics::dashboard_payload()
 							: array();
 						$stats_seed = ! empty( $stats_payload['7'] ) ? $stats_payload['7'] : array(
@@ -2602,10 +2523,9 @@ class MW_Sales_Toast_Settings {
 							'attrWindow'  => 30,
 						);
 						?>
-						<div class="mwst-panel<?php echo 'statistics' === $current_tab ? ' is-active' : ''; ?>" id="mwst-panel-statistics" role="tabpanel" data-mwst-analytics="<?php echo $is_pro ? '1' : '0'; ?>">
+						<div class="mwst-panel<?php echo 'statistics' === $current_tab ? ' is-active' : ''; ?>" id="mwst-panel-statistics" role="tabpanel">
 							<div class="mwst-stats-toolbar">
 								<div class="mwst-stats-toolbar__intro">
-									<span class="mwst-plan-pill mwst-plan-pill--pro"><?php esc_html_e( 'Pro', 'mw-sales-toast' ); ?></span>
 									<div class="mwst-stats-toolbar__copy">
 										<strong><?php esc_html_e( 'Toast performance', 'mw-sales-toast' ); ?></strong>
 										<p><?php esc_html_e( 'Aggregate engagement only — no names, emails, or IPs.', 'mw-sales-toast' ); ?></p>
@@ -2618,23 +2538,7 @@ class MW_Sales_Toast_Settings {
 								</div>
 							</div>
 
-							<?php if ( ! $is_pro ) : ?>
-								<div class="mwst-notice mwst-notice--pro" role="status">
-									<span class="mwst-notice__icon" aria-hidden="true">★</span>
-									<div class="mwst-notice__body">
-										<strong><?php esc_html_e( 'Pro analytics', 'mw-sales-toast' ); ?></strong>
-										<p>
-											<?php
-											printf(
-												/* translators: %s: Account tab link */
-												esc_html__( 'Unlock toast performance tracking with Pro. Activate a license under %s.', 'mw-sales-toast' ),
-												self::tab_link( 'account', __( 'Account', 'mw-sales-toast' ) )
-											);
-											?>
-										</p>
-									</div>
-								</div>
-							<?php elseif ( empty( $stats_seed['hasData'] ) ) : ?>
+							<?php if ( empty( $stats_seed['hasData'] ) ) : ?>
 								<div class="mwst-notice mwst-notice--warn" role="status">
 									<span class="mwst-notice__icon" aria-hidden="true">!</span>
 									<div class="mwst-notice__body">
@@ -3002,7 +2906,7 @@ class MW_Sales_Toast_Settings {
 													<?php
 													printf(
 														/* translators: %s: General tab link */
-														esc_html__( '%s — enable toasts, data source, event delivery (REST or inline), position, where they appear, cache lifetime, cron, sound, and mobile.', 'mw-sales-toast' ),
+														esc_html__( '%s — enable toasts, data source, event delivery (REST or inline), position, where they appear, targeting, cache lifetime, cron, sound, and mobile.', 'mw-sales-toast' ),
 														self::tab_link( 'general', __( 'General', 'mw-sales-toast' ) )
 													);
 													?>
@@ -3020,7 +2924,7 @@ class MW_Sales_Toast_Settings {
 													<?php
 													printf(
 														/* translators: %s: Design tab link */
-														esc_html__( '%s — colors, radius, width, and (Pro) custom CSS for the toast chrome.', 'mw-sales-toast' ),
+														esc_html__( '%s — colors, radius, width, custom CSS, and theme JSON for the toast chrome.', 'mw-sales-toast' ),
 														self::tab_link( 'design', __( 'Design', 'mw-sales-toast' ) )
 													);
 													?>
@@ -3046,8 +2950,17 @@ class MW_Sales_Toast_Settings {
 												<li>
 													<?php
 													printf(
+														/* translators: %s: Statistics tab link */
+														esc_html__( '%s — toast impressions, clicks, CTR, and per-product performance.', 'mw-sales-toast' ),
+														self::tab_link( 'statistics', __( 'Statistics', 'mw-sales-toast' ) )
+													);
+													?>
+												</li>
+												<li>
+													<?php
+													printf(
 														/* translators: %s: Account tab link */
-														esc_html__( '%s — profile and license (Pro).', 'mw-sales-toast' ),
+														esc_html__( '%s — profile, newsletter, and settings import/export.', 'mw-sales-toast' ),
 														self::tab_link( 'account', __( 'Account', 'mw-sales-toast' ) )
 													);
 													?>
@@ -3224,17 +3137,12 @@ class MW_Sales_Toast_Settings {
 								<div class="mwst-card__head">
 									<h2><?php esc_html_e( 'Contact', 'mw-sales-toast' ); ?></h2>
 									<p>
-										<?php
-										echo $is_pro
-											? esc_html__( 'Pro support — questions, bugs, or setup help for MW Sales Toast. We prioritize Pro tickets.', 'mw-sales-toast' )
-											: esc_html__( 'Questions, bugs, or setup help for MW Sales Toast. We usually reply within 1–2 business days.', 'mw-sales-toast' );
-										?>
+										<?php esc_html_e( 'Questions, bugs, or setup help for MW Sales Toast. We usually reply within 1–2 business days.', 'mw-sales-toast' ); ?>
 									</p>
 								</div>
 								<div class="mwst-card__body">
 									<div class="mwst-support" id="mwst-support">
 										<div class="mwst-support__status" id="mwst-support-status" hidden></div>
-										<input type="hidden" id="mwst-support-is-pro" value="<?php echo $is_pro ? '1' : '0'; ?>" />
 										<div class="mwst-support__grid">
 											<label class="mwst-support__field">
 												<span><?php esc_html_e( 'Name', 'mw-sales-toast' ); ?></span>
@@ -3255,7 +3163,7 @@ class MW_Sales_Toast_Settings {
 										</label>
 										<label class="mwst-support__check">
 											<input type="checkbox" id="mwst-support-system" value="1" checked />
-											<span><?php esc_html_e( 'Include system info (plan, WordPress, PHP, WooCommerce, theme)', 'mw-sales-toast' ); ?></span>
+											<span><?php esc_html_e( 'Include system info (WordPress, PHP, WooCommerce, theme)', 'mw-sales-toast' ); ?></span>
 										</label>
 										<details class="mwst-support__details">
 											<summary><?php esc_html_e( 'Preview system info', 'mw-sales-toast' ); ?></summary>
@@ -3271,47 +3179,44 @@ class MW_Sales_Toast_Settings {
 
 						<!-- Account -->
 						<div class="mwst-panel<?php echo 'account' === $current_tab ? ' is-active' : ''; ?>" id="mwst-panel-account" role="tabpanel">
-							<?php if ( $is_pro ) : ?>
-								<div class="mwst-card" id="mwst-account-profile">
-									<div class="mwst-card__head">
-										<h2><?php esc_html_e( 'Profile', 'mw-sales-toast' ); ?></h2>
-										<p><?php esc_html_e( 'Account details used for license and support communication.', 'mw-sales-toast' ); ?></p>
-									</div>
-									<div class="mwst-card__body">
-										<div class="mwst-account">
-											<div class="mwst-account__hero">
-												<span class="mwst-account__avatar" aria-hidden="true">
-													<?php echo get_avatar( $current_user->ID, 64, '', '', array( 'class' => 'mwst-account__avatar-img' ) ); ?>
-												</span>
-												<div class="mwst-account__hero-copy">
-													<p class="mwst-account__hero-name"><?php echo esc_html( $current_user->display_name ); ?></p>
-													<p class="mwst-account__hero-email"><?php echo esc_html( $current_user->user_email ); ?></p>
-												</div>
-												<span class="mwst-plan-pill mwst-plan-pill--pro"><?php esc_html_e( 'Pro', 'mw-sales-toast' ); ?></span>
+							<div class="mwst-card" id="mwst-account-profile">
+								<div class="mwst-card__head">
+									<h2><?php esc_html_e( 'Profile', 'mw-sales-toast' ); ?></h2>
+									<p><?php esc_html_e( 'WordPress account details used for support communication.', 'mw-sales-toast' ); ?></p>
+								</div>
+								<div class="mwst-card__body">
+									<div class="mwst-account">
+										<div class="mwst-account__hero">
+											<span class="mwst-account__avatar" aria-hidden="true">
+												<?php echo get_avatar( $current_user->ID, 64, '', '', array( 'class' => 'mwst-account__avatar-img' ) ); ?>
+											</span>
+											<div class="mwst-account__hero-copy">
+												<p class="mwst-account__hero-name"><?php echo esc_html( $current_user->display_name ); ?></p>
+												<p class="mwst-account__hero-email"><?php echo esc_html( $current_user->user_email ); ?></p>
 											</div>
-											<div class="mwst-account__grid">
-												<label class="mwst-account__field">
-													<span><?php esc_html_e( 'Name', 'mw-sales-toast' ); ?></span>
-													<input type="text" id="mwst-account-name" class="regular-text" value="<?php echo esc_attr( $current_user->display_name ); ?>" autocomplete="name" readonly />
-												</label>
-												<label class="mwst-account__field">
-													<span><?php esc_html_e( 'Email', 'mw-sales-toast' ); ?></span>
-													<input type="email" id="mwst-account-email" class="regular-text" value="<?php echo esc_attr( $current_user->user_email ); ?>" autocomplete="email" readonly />
-												</label>
-											</div>
-											<p class="description">
-												<?php
-												printf(
-													/* translators: %s: link to WordPress profile screen */
-													esc_html__( 'Pulled from your WordPress user. Change your name or email in %s.', 'mw-sales-toast' ),
-													'<a href="' . esc_url( get_edit_profile_url( $current_user->ID ) ) . '">' . esc_html__( 'your profile', 'mw-sales-toast' ) . '</a>'
-												);
-												?>
-											</p>
 										</div>
+										<div class="mwst-account__grid">
+											<label class="mwst-account__field">
+												<span><?php esc_html_e( 'Name', 'mw-sales-toast' ); ?></span>
+												<input type="text" id="mwst-account-name" class="regular-text" value="<?php echo esc_attr( $current_user->display_name ); ?>" autocomplete="name" readonly />
+											</label>
+											<label class="mwst-account__field">
+												<span><?php esc_html_e( 'Email', 'mw-sales-toast' ); ?></span>
+												<input type="email" id="mwst-account-email" class="regular-text" value="<?php echo esc_attr( $current_user->user_email ); ?>" autocomplete="email" readonly />
+											</label>
+										</div>
+										<p class="description">
+											<?php
+											printf(
+												/* translators: %s: link to WordPress profile screen */
+												esc_html__( 'Pulled from your WordPress user. Change your name or email in %s.', 'mw-sales-toast' ),
+												'<a href="' . esc_url( get_edit_profile_url( $current_user->ID ) ) . '">' . esc_html__( 'your profile', 'mw-sales-toast' ) . '</a>'
+											);
+											?>
+										</p>
 									</div>
 								</div>
-							<?php endif; ?>
+							</div>
 
 							<div class="mwst-card" id="mwst-account-newsletter">
 								<div class="mwst-card__head">
@@ -3337,42 +3242,18 @@ class MW_Sales_Toast_Settings {
 								</div>
 							</div>
 
-							<div class="mwst-card" id="mwst-account-license">
+							<div class="mwst-card" id="mwst-account-transfer">
 								<div class="mwst-card__head">
-									<h2><?php esc_html_e( 'License', 'mw-sales-toast' ); ?></h2>
-									<p><?php esc_html_e( 'Activate a Pro serial key to unlock advanced features. Design preview — activation is not wired yet.', 'mw-sales-toast' ); ?></p>
+									<h2><?php esc_html_e( 'Import / export', 'mw-sales-toast' ); ?></h2>
+									<p><?php esc_html_e( 'Move all settings between sites. Newsletter preference stays on this WordPress user.', 'mw-sales-toast' ); ?></p>
 								</div>
 								<div class="mwst-card__body">
-									<div class="mwst-license">
-										<div class="mwst-license__status">
-											<span class="mwst-plan-pill <?php echo $is_pro ? 'mwst-plan-pill--pro' : 'mwst-plan-pill--free'; ?>">
-												<?php echo $is_pro ? esc_html__( 'Pro', 'mw-sales-toast' ) : esc_html__( 'Free', 'mw-sales-toast' ); ?>
-											</span>
-											<p class="mwst-license__status-text">
-												<?php
-												echo $is_pro
-													? esc_html__( 'Pro features are marked as active in this preview.', 'mw-sales-toast' )
-													: esc_html__( 'You are on the Free plan. Enter a serial key when you have one.', 'mw-sales-toast' );
-												?>
-											</p>
-										</div>
-										<div class="mwst-license__field">
-											<span><?php esc_html_e( 'Serial key', 'mw-sales-toast' ); ?></span>
-											<?php if ( $is_pro ) : ?>
-												<p class="mwst-license__key" id="mwst-license-key"><?php echo esc_html( '****-****-****-****' ); ?></p>
-											<?php else : ?>
-												<input type="text" id="mwst-license-key" class="large-text code" value="" autocomplete="off" spellcheck="false" placeholder="<?php esc_attr_e( 'XXXX-XXXX-XXXX-XXXX', 'mw-sales-toast' ); ?>" />
-											<?php endif; ?>
-										</div>
-										<div class="mwst-license__actions">
-											<?php if ( $is_pro ) : ?>
-												<button type="button" class="button" id="mwst-license-deactivate"><?php esc_html_e( 'Deactivate', 'mw-sales-toast' ); ?></button>
-											<?php else : ?>
-												<button type="button" class="button button-primary" id="mwst-license-activate" disabled><?php esc_html_e( 'Activate', 'mw-sales-toast' ); ?></button>
-											<?php endif; ?>
-										</div>
-										<p class="description"><?php esc_html_e( 'License validation and renew links will land here in a future update.', 'mw-sales-toast' ); ?></p>
-									</div>
+									<?php
+									if ( class_exists( 'MW_Sales_Toast_Transfer' ) ) {
+										MW_Sales_Toast_Transfer::render_controls( 'settings' );
+									}
+									?>
+									<p class="description"><?php esc_html_e( 'Product and category IDs belong to the source store — review targeting after import. For design-only, use Theme JSON on the Design tab.', 'mw-sales-toast' ); ?></p>
 								</div>
 							</div>
 						</div>

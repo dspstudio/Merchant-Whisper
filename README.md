@@ -57,6 +57,25 @@ Requires WordPress 5.8+, PHP 7.2+. WooCommerce is required for real orders; demo
 - Products pulled from the published catalog when available
 - Labeled clearly in admin; useful for low-traffic stores
 
+### Targeting
+- Include / exclude URL paths (wildcards)
+- Include / exclude products and categories
+- On product pages, optionally show only that product’s sales
+- Hide toasts for selected user roles
+
+### Design
+- Color, radius, width, shadow, and image-fit controls
+- Custom CSS loaded after base toast styles
+- **Theme JSON** — export/import design (colors, layout, CSS) for reuse across stores
+
+### Statistics
+- Aggregate impressions, clicks, CTR, and soft-attributed carts/purchases
+- Per-product table; no names, emails, or IPs stored
+
+### Import / export
+- Full settings JSON on Account (newsletter stays local)
+- Product/category IDs are per-site — review targeting after import
+
 ## Architecture
 
 ```text
@@ -91,6 +110,13 @@ Visitor JS ──► GET mw-st/v1/notifications ──────┘──► t
 | Max cached orders | Cap rebuild query size |
 | Order lookback (days) | Query window (default 30) |
 | Demo people / times | Simulated social proof |
+| URL include / exclude | Path rules for where toasts appear |
+| Product / category filters | Limit which sales are toasted |
+| Product page match | Only that product’s sales on its PDP |
+| Custom CSS | Extra toast chrome overrides |
+| Theme JSON | Export/import design tokens + custom CSS |
+| Statistics | Toast engagement aggregates |
+| Import / export | Full settings JSON (Account tab) |
 
 ## How checkout consent works
 
@@ -118,15 +144,18 @@ mw-sales-toast/
 │   └── toast.css
 └── includes/
     ├── class-settings.php      Options + admin UI
+    ├── class-transfer.php      Settings / theme JSON import-export
     ├── class-cache.php         Rebuild + cron/order hooks
     ├── class-rest.php          GET mw-st/v1/notifications
+    ├── class-analytics.php     Toast engagement aggregates
     ├── class-privacy.php       Checkout consent meta
+    ├── class-support.php       Admin contact form
     └── class-frontend.php      Enqueue + page gates
 ```
 
-## Out of scope (later / Pro)
+## Out of scope (later)
 
-Review notifications, view-based fake sales, geolocation targeting, analytics dashboards, and WP.org submission packaging.
+Review notifications, view-based fake sales, geolocation targeting, and WordPress.org submission packaging.
 
 ## Keywords / discovery
 

@@ -37,11 +37,9 @@ class MW_Sales_Toast_Support {
 	public static function system_info() {
 		global $wp_version;
 
-		$is_pro = class_exists( 'MW_Sales_Toast_Settings' ) && MW_Sales_Toast_Settings::is_pro();
 		$theme  = wp_get_theme();
 		$lines  = array(
 			'Plugin: MW Sales Toast ' . MW_SALES_TOAST_VERSION,
-			'Plan: ' . ( $is_pro ? 'Pro' : 'Free' ),
 			'Site: ' . home_url( '/' ),
 			'WP: ' . ( isset( $wp_version ) ? $wp_version : '' ),
 			'PHP: ' . PHP_VERSION,
@@ -86,8 +84,6 @@ class MW_Sales_Toast_Support {
 			wp_send_json_error( array( 'message' => __( 'Message is too long.', 'mw-sales-toast' ) ), 400 );
 		}
 
-		$is_pro = class_exists( 'MW_Sales_Toast_Settings' ) && MW_Sales_Toast_Settings::is_pro();
-
 		$payload = array(
 			'name'    => $name,
 			'email'   => $email,
@@ -95,8 +91,6 @@ class MW_Sales_Toast_Support {
 			'message' => $message,
 			'site'    => home_url( '/' ),
 			'plugin'  => 'MW Sales Toast ' . MW_SALES_TOAST_VERSION,
-			'plan'    => $is_pro ? 'pro' : 'free',
-			'is_pro'  => $is_pro ? 1 : 0,
 			'source'  => 'wordpress-admin',
 		);
 

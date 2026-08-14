@@ -209,7 +209,7 @@
 			if (id === 'contact') {
 				return 'support';
 			}
-			// Legacy License tab → Account (License section).
+			// Legacy License tab → Account.
 			if (id === 'license') {
 				return 'account';
 			}
@@ -879,7 +879,7 @@
 			shadow +
 			';}';
 
-		var custom = cfg.isPro ? designValue('custom_css', '') : '';
+		var custom = designValue('custom_css', '');
 		if (custom) {
 			css += '\n' + custom;
 		}
@@ -1269,8 +1269,6 @@
 			if (includeSystem) {
 				body.append('include_system', '1');
 			}
-			var isProEl = root.querySelector('#mwst-support-is-pro');
-			body.append('is_pro', isProEl && isProEl.value === '1' ? '1' : '0');
 
 			window
 				.fetch(supportCfg.ajaxUrl, {
@@ -1408,16 +1406,15 @@
 		scrollToHashTarget();
 	} else if (requestedTab === 'license' && !window.location.hash) {
 		try {
-			var licenseUrl = new URL(window.location.href);
-			licenseUrl.searchParams.set('tab', 'account');
-			licenseUrl.hash = 'mwst-account-license';
+			var accountUrl = new URL(window.location.href);
+			accountUrl.searchParams.set('tab', 'account');
 			window.history.replaceState(
 				{},
 				'',
-				licenseUrl.pathname + licenseUrl.search + licenseUrl.hash
+				accountUrl.pathname + accountUrl.search + accountUrl.hash
 			);
 		} catch (err3) {
-			window.location.hash = 'mwst-account-license';
+			// Ignore URL sync failures.
 		}
 		scrollToHashTarget();
 	} else if (window.location.hash) {
@@ -1430,7 +1427,7 @@
 	syncElementorThemeUi();
 	syncTimingPreset();
 
-	/* Statistics date range — live aggregates when Pro analytics payload exists. */
+	/* Statistics date range — live aggregates when analytics payload exists. */
 	var analyticsData = cfg.analytics || null;
 	function formatStatNumber(n) {
 		n = Number(n) || 0;
@@ -1561,4 +1558,51 @@
 	if (analyticsData) {
 		applyStats(analyticsData['7'] || analyticsData[7]);
 	}
+
+	root.querySelectorAll('.mwst-transfer__submit').forEach(function (btn) {
+		var fileId = btn.getAttribute('data-mwst-file') || '';
+		var formId = btn.getAttribute('data-mwst-form') || '';
+		var file = fileId ? document.getElementById(fileId) : null;
+		var form = formId ? document.getElementById(formId) : null;
+		var wrap = btn.closest('.mwst-transfer__import');
+		var spinner = wrap ? wrap.querySelector('.mwst-transfer__spinner') : null;
+		var idleLabel = btn.textContent;
+
+		function setBusy(on) {
+			if (wrap) {
+				wrap.classList.toggle('is-busy', !!on);
+			}
+			btn.disabled = !!on;
+			if (spinner) {
+				spinner.hidden = !on;
+			}
+			btn.textContent = on ? i18n.transferImporting || 'Importing…' : idleLabel;
+		}
+
+		btn.addEventListener('click', function () {
+			if (!file || btn.disabled) {
+				return;
+			}
+			file.value = '';
+			file.click();
+		});
+
+		if (file) {
+			file.addEventListener('change', function () {
+				if (!file.value) {
+					return;
+				}
+				var msg = btn.getAttribute('data-mwst-confirm') || '';
+				if (msg && !window.confirm(msg)) {
+					file.value = '';
+					return;
+				}
+				if (!form) {
+					return;
+				}
+				setBusy(true);
+				form.submit();
+			});
+		}
+	});
 })();

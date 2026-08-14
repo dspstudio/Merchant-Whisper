@@ -1,6 +1,6 @@
 <?php
 /**
- * Pro analytics — aggregate toast events (no PII).
+ * Analytics — aggregate toast events (no PII).
  *
  * @package MW_Sales_Toast
  */
@@ -40,10 +40,6 @@ class MW_Sales_Toast_Analytics {
 	 * Boot hooks.
 	 */
 	public static function init() {
-		if ( ! class_exists( 'MW_Sales_Toast_Settings' ) || ! MW_Sales_Toast_Settings::is_pro() ) {
-			return;
-		}
-
 		add_action( 'rest_api_init', array( __CLASS__, 'register_routes' ) );
 		add_action( 'woocommerce_add_to_cart', array( __CLASS__, 'on_add_to_cart' ), 20, 6 );
 		add_action( 'woocommerce_thankyou', array( __CLASS__, 'on_thankyou' ), 20, 1 );
@@ -56,7 +52,7 @@ class MW_Sales_Toast_Analytics {
 	 * @return bool
 	 */
 	public static function is_enabled() {
-		return class_exists( 'MW_Sales_Toast_Settings' ) && MW_Sales_Toast_Settings::is_pro();
+		return true;
 	}
 
 	/**

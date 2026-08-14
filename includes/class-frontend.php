@@ -93,7 +93,7 @@ class MW_Sales_Toast_Frontend {
 			return false;
 		}
 
-		if ( MW_Sales_Toast_Settings::is_pro() && ! self::passes_pro_targeting( $settings ) ) {
+		if ( ! self::passes_targeting( $settings ) ) {
 			return false;
 		}
 
@@ -101,12 +101,12 @@ class MW_Sales_Toast_Frontend {
 	}
 
 	/**
-	 * Pro URL / catalog / role gates.
+	 * URL / catalog / role gates.
 	 *
 	 * @param array $settings Settings.
 	 * @return bool
 	 */
-	private static function passes_pro_targeting( $settings ) {
+	private static function passes_targeting( $settings ) {
 		if ( ! self::passes_url_rules( $settings ) ) {
 			return false;
 		}
@@ -266,7 +266,7 @@ class MW_Sales_Toast_Frontend {
 	}
 
 	/**
-	 * Filter toast events by Pro include/exclude product & category lists.
+	 * Filter toast events by include/exclude product & category lists.
 	 *
 	 * Include products + categories = union (product is listed OR in an included category).
 	 * Exclude products + categories = never show those products in the feed.
@@ -276,10 +276,6 @@ class MW_Sales_Toast_Frontend {
 	 * @return array
 	 */
 	public static function filter_events_by_catalog( $events, $settings ) {
-		if ( ! MW_Sales_Toast_Settings::is_pro() ) {
-			return $events;
-		}
-
 		$inc_products = MW_Sales_Toast_Settings::normalize_id_list( $settings['include_products'] ?? array() );
 		$exc_products = MW_Sales_Toast_Settings::normalize_id_list( $settings['exclude_products'] ?? array() );
 		$inc_cats     = self::expand_category_ids( $settings['include_categories'] ?? array() );
@@ -364,7 +360,7 @@ class MW_Sales_Toast_Frontend {
 	}
 
 	/**
-	 * Apply Pro feed filters + optional PDP product match.
+	 * Apply catalog feed filters + optional PDP product match.
 	 *
 	 * @param array $events   Events.
 	 * @param array $settings Settings.
@@ -376,14 +372,14 @@ class MW_Sales_Toast_Frontend {
 	}
 
 	/**
-	 * Filter events to the current product when Pro match is on.
+	 * Filter events to the current product when match is on.
 	 *
 	 * @param array $events   Events.
 	 * @param array $settings Settings.
 	 * @return array
 	 */
 	public static function filter_events_for_page( $events, $settings ) {
-		if ( ! MW_Sales_Toast_Settings::is_pro() || empty( $settings['match_product_page'] ) ) {
+		if ( empty( $settings['match_product_page'] ) ) {
 			return $events;
 		}
 		if ( ! function_exists( 'is_product' ) || ! is_product() ) {
@@ -472,7 +468,7 @@ class MW_Sales_Toast_Frontend {
 			'muteHours'            => max( 0, (int) $settings['mute_hours'] ),
 			'messageTemplate'      => $settings['message_template'],
 			'whenStyle'            => ( 'exact' === ( $settings['when_style'] ?? '' ) ) ? 'exact' : 'natural',
-			'matchProductPage'     => MW_Sales_Toast_Settings::is_pro() && ! empty( $settings['match_product_page'] ),
+			'matchProductPage'     => ! empty( $settings['match_product_page'] ),
 			'currentProductId'     => $current_product_id,
 			'analytics'            => false,
 			'refetchMs'            => 0,
