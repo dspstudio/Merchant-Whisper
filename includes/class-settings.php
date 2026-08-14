@@ -51,6 +51,26 @@ class MW_Sales_Toast_Settings {
 			'trigger_scroll_percent' => 50,
 			'trigger_idle_seconds'   => 20,
 			'trigger_click_selector' => '',
+			'type_sale'              => 1,
+			'type_viewing'           => 0,
+			'type_review'            => 0,
+			'type_cta'               => 0,
+			'viewing_template'       => '{count} {people} are viewing {product}',
+			'viewing_min'            => 2,
+			'viewing_max'            => 12,
+			'viewing_mode'           => 'simulated',
+			'viewing_window'         => 5,
+			'viewing_products'       => array(),
+			'review_template'        => '{name} left a {rating}-star review of {product}',
+			'review_min_rating'      => 4,
+			'review_max'             => 4,
+			'review_lookback'        => 90,
+			'review_excerpt'         => 1,
+			'cta_message'            => 'Get 10% off your next order',
+			'cta_coupon'             => '',
+			'cta_button'             => 'Copy code',
+			'cta_url'                => '',
+			'cta_once'               => 1,
 			'max_events'             => 8,
 			'max_cached_orders'      => 40,
 			'cache_minutes'          => 60,
@@ -682,6 +702,48 @@ class MW_Sales_Toast_Settings {
 	}
 
 	/**
+	 * Extra toast type cards for the Message tab.
+	 *
+	 * @return array<string, array{key:string,label:string,desc:string}>
+	 */
+	public static function type_defs() {
+		return array(
+			'sale'    => array(
+				'key'   => 'type_sale',
+				'label' => __( 'Purchases', 'mw-sales-toast' ),
+				'desc'  => __( 'Recent orders (the original toast)', 'mw-sales-toast' ),
+			),
+			'viewing' => array(
+				'key'   => 'type_viewing',
+				'label' => __( 'Viewing now', 'mw-sales-toast' ),
+				'desc'  => __( '“X people are viewing this”', 'mw-sales-toast' ),
+			),
+			'review'  => array(
+				'key'   => 'type_review',
+				'label' => __( 'Reviews', 'mw-sales-toast' ),
+				'desc'  => __( 'Approved product reviews', 'mw-sales-toast' ),
+			),
+			'cta'     => array(
+				'key'   => 'type_cta',
+				'label' => __( 'CTA / coupon', 'mw-sales-toast' ),
+				'desc'  => __( 'Promo line with optional code', 'mw-sales-toast' ),
+			),
+		);
+	}
+
+	/**
+	 * Sanitize a coupon / promo code.
+	 *
+	 * @param mixed $raw Raw.
+	 * @return string
+	 */
+	public static function sanitize_coupon( $raw ) {
+		$code = strtoupper( sanitize_text_field( (string) $raw ) );
+		$code = preg_replace( '/[^A-Z0-9\-_]/', '', $code );
+		return is_string( $code ) ? substr( $code, 0, 32 ) : '';
+	}
+
+	/**
 	 * Design theme presets (colors + radius). Keeps palettes coherent.
 	 *
 	 * @return array<string, array<string, mixed>>
@@ -863,7 +925,7 @@ class MW_Sales_Toast_Settings {
 		}
 		$merged['stock_threshold'] = max( 1, min( 50, (int) ( $merged['stock_threshold'] ?? $defaults['stock_threshold'] ) ) );
 
-		foreach ( array( 'include_products', 'exclude_products', 'include_categories', 'exclude_categories', 'hide_roles' ) as $list_key ) {
+		foreach ( array( 'include_products', 'exclude_products', 'include_categories', 'exclude_categories', 'viewing_products', 'hide_roles' ) as $list_key ) {
 			$merged[ $list_key ] = self::normalize_id_list( $merged[ $list_key ] ?? array(), 'hide_roles' === $list_key );
 		}
 		$merged['url_include'] = isset( $merged['url_include'] ) ? (string) $merged['url_include'] : '';
@@ -886,6 +948,34 @@ class MW_Sales_Toast_Settings {
 		) {
 			$merged['trigger_page_load'] = 1;
 		}
+
+		foreach ( array( 'type_sale', 'type_viewing', 'type_review', 'type_cta', 'review_excerpt', 'cta_once' ) as $type_key ) {
+			$merged[ $type_key ] = empty( $merged[ $type_key ] ) ? 0 : 1;
+		}
+		if (
+			empty( $merged['type_sale'] )
+			&& empty( $merged['type_viewing'] )
+			&& empty( $merged['type_review'] )
+			&& empty( $merged['type_cta'] )
+		) {
+			$merged['type_sale'] = 1;
+		}
+		$viewing_modes = array( 'simulated', 'live' );
+		if ( ! in_array( $merged['viewing_mode'] ?? '', $viewing_modes, true ) ) {
+			$merged['viewing_mode'] = 'simulated';
+		}
+		$merged['viewing_min']      = max( 1, min( 99, (int) ( $merged['viewing_min'] ?? 2 ) ) );
+		$merged['viewing_max']      = max( $merged['viewing_min'], min( 99, (int) ( $merged['viewing_max'] ?? 12 ) ) );
+		$merged['viewing_window']   = max( 2, min( 30, (int) ( $merged['viewing_window'] ?? 5 ) ) );
+		$merged['review_min_rating'] = max( 1, min( 5, (int) ( $merged['review_min_rating'] ?? 4 ) ) );
+		$merged['review_max']       = max( 1, min( 12, (int) ( $merged['review_max'] ?? 4 ) ) );
+		$merged['review_lookback']  = max( 7, min( 365, (int) ( $merged['review_lookback'] ?? 90 ) ) );
+		$merged['cta_coupon']       = self::sanitize_coupon( $merged['cta_coupon'] ?? '' );
+		$merged['cta_url']          = esc_url_raw( (string) ( $merged['cta_url'] ?? '' ) );
+		$merged['viewing_template'] = isset( $merged['viewing_template'] ) ? (string) $merged['viewing_template'] : '';
+		$merged['review_template']  = isset( $merged['review_template'] ) ? (string) $merged['review_template'] : '';
+		$merged['cta_message']      = isset( $merged['cta_message'] ) ? (string) $merged['cta_message'] : '';
+		$merged['cta_button']       = isset( $merged['cta_button'] ) ? (string) $merged['cta_button'] : '';
 
 		$presets = self::timing_presets();
 		$preset  = isset( $merged['timing_preset'] ) ? $merged['timing_preset'] : 'balanced';
@@ -979,6 +1069,12 @@ class MW_Sales_Toast_Settings {
 			'trigger_add_to_cart',
 			'trigger_inactivity',
 			'trigger_click',
+			'type_sale',
+			'type_viewing',
+			'type_review',
+			'type_cta',
+			'review_excerpt',
+			'cta_once',
 		);
 		foreach ( $checks as $key ) {
 			$out[ $key ] = empty( $input[ $key ] ) ? 0 : 1;
@@ -1090,6 +1186,48 @@ class MW_Sales_Toast_Settings {
 					? $saved_opts['trigger_click_selector']
 					: $defaults['trigger_click_selector'] )
 		);
+
+		if (
+			empty( $out['type_sale'] )
+			&& empty( $out['type_viewing'] )
+			&& empty( $out['type_review'] )
+			&& empty( $out['type_cta'] )
+		) {
+			$out['type_sale'] = 1;
+		}
+
+		$viewing_modes = array( 'simulated', 'live' );
+		$out['viewing_mode'] = in_array( $input['viewing_mode'] ?? '', $viewing_modes, true )
+			? $input['viewing_mode']
+			: $defaults['viewing_mode'];
+		$out['viewing_min'] = max( 1, min( 99, (int) ( $input['viewing_min'] ?? $defaults['viewing_min'] ) ) );
+		$out['viewing_max'] = max( $out['viewing_min'], min( 99, (int) ( $input['viewing_max'] ?? $defaults['viewing_max'] ) ) );
+		$out['viewing_window'] = max( 2, min( 30, (int) ( $input['viewing_window'] ?? $defaults['viewing_window'] ) ) );
+		$out['viewing_products'] = self::sanitize_id_list( $input['viewing_products'] ?? array() );
+		$out['review_min_rating'] = max( 1, min( 5, (int) ( $input['review_min_rating'] ?? $defaults['review_min_rating'] ) ) );
+		$out['review_max'] = max( 1, min( 12, (int) ( $input['review_max'] ?? $defaults['review_max'] ) ) );
+		$out['review_lookback'] = max( 7, min( 365, (int) ( $input['review_lookback'] ?? $defaults['review_lookback'] ) ) );
+
+		$out['viewing_template'] = isset( $input['viewing_template'] )
+			? sanitize_text_field( $input['viewing_template'] )
+			: $defaults['viewing_template'];
+		if ( '' === $out['viewing_template'] ) {
+			$out['viewing_template'] = $defaults['viewing_template'];
+		}
+		$out['review_template'] = isset( $input['review_template'] )
+			? sanitize_text_field( $input['review_template'] )
+			: $defaults['review_template'];
+		if ( '' === $out['review_template'] ) {
+			$out['review_template'] = $defaults['review_template'];
+		}
+		$out['cta_message'] = isset( $input['cta_message'] )
+			? sanitize_text_field( $input['cta_message'] )
+			: $defaults['cta_message'];
+		$out['cta_button'] = isset( $input['cta_button'] )
+			? sanitize_text_field( $input['cta_button'] )
+			: $defaults['cta_button'];
+		$out['cta_coupon'] = self::sanitize_coupon( $input['cta_coupon'] ?? $defaults['cta_coupon'] );
+		$out['cta_url']    = isset( $input['cta_url'] ) ? esc_url_raw( (string) $input['cta_url'] ) : '';
 
 		$when_styles = array( 'natural', 'exact' );
 		$out['when_style'] = in_array( $input['when_style'] ?? '', $when_styles, true )
@@ -1398,13 +1536,16 @@ class MW_Sales_Toast_Settings {
 				'i18n'           => array(
 					/* translators: %s: relative time */
 					'ago'            => __( '%s ago', 'mw-sales-toast' ),
-					'showToast'      => __( 'Show toast', 'mw-sales-toast' ),
-					'hideToast'      => __( 'Hide toast', 'mw-sales-toast' ),
+					'previewToast'     => __( 'Preview %s toast', 'mw-sales-toast' ),
 					'dismiss'        => __( 'Dismiss', 'mw-sales-toast' ),
 					'sampleWhen'       => __( '2 minutes', 'mw-sales-toast' ),
 					'sampleNatural'    => __( 'just now', 'mw-sales-toast' ),
 					'sampleStockExact' => __( 'only 3 left', 'mw-sales-toast' ),
 					'sampleStockSoft'  => __( 'only a few left', 'mw-sales-toast' ),
+					'sampleExcerpt'    => __( 'Exactly what I needed.', 'mw-sales-toast' ),
+					'now'              => __( 'now', 'mw-sales-toast' ),
+					'people'           => __( 'people', 'mw-sales-toast' ),
+					'copyCode'         => __( 'Copy code', 'mw-sales-toast' ),
 					'saving'           => __( 'Saving…', 'mw-sales-toast' ),
 					'saveHintBusy'     => __( 'Saving your settings and rebuilding the sales cache…', 'mw-sales-toast' ),
 					'supportSending'   => __( 'Sending…', 'mw-sales-toast' ),
@@ -2143,8 +2284,39 @@ class MW_Sales_Toast_Settings {
 						<div class="mwst-panel<?php echo 'message' === $current_tab ? ' is-active' : ''; ?>" id="mwst-panel-message" role="tabpanel">
 							<div class="mwst-card">
 								<div class="mwst-card__head">
-									<h2><?php esc_html_e( 'Message', 'mw-sales-toast' ); ?></h2>
-									<p><?php esc_html_e( 'Template for the toast line. Preview updates live in the sidebar.', 'mw-sales-toast' ); ?></p>
+									<h2><?php esc_html_e( 'Toast types', 'mw-sales-toast' ); ?></h2>
+									<p><?php esc_html_e( 'Mix purchase social proof with viewing counts, reviews, and a promo toast. Types rotate in the same loop.', 'mw-sales-toast' ); ?></p>
+								</div>
+								<div class="mwst-card__body">
+									<div class="mwst-field">
+										<div class="mwst-field__label"><?php esc_html_e( 'Include', 'mw-sales-toast' ); ?></div>
+										<div class="mwst-field__control">
+											<div class="mwst-presets mwst-presets--types" role="group" aria-label="<?php esc_attr_e( 'Toast types', 'mw-sales-toast' ); ?>">
+												<?php foreach ( self::type_defs() as $type_id => $type ) : ?>
+													<label class="mwst-preset<?php echo ! empty( $s[ $type['key'] ] ) ? ' is-active' : ''; ?>">
+														<input
+															type="checkbox"
+															name="<?php echo esc_attr( $opt ); ?>[<?php echo esc_attr( $type['key'] ); ?>]"
+															value="1"
+															class="mwst-type-input"
+															data-type="<?php echo esc_attr( $type_id ); ?>"
+															<?php checked( ! empty( $s[ $type['key'] ] ) ); ?>
+														/>
+														<span class="mwst-preset__label"><?php echo esc_html( $type['label'] ); ?></span>
+														<span class="mwst-preset__desc"><?php echo esc_html( $type['desc'] ); ?></span>
+													</label>
+												<?php endforeach; ?>
+											</div>
+											<p class="description"><?php esc_html_e( 'If none are selected, Purchases is used. Uncheck Purchases to show only extra types.', 'mw-sales-toast' ); ?></p>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="mwst-card mwst-type-opt" id="mwst-type-sale-opt" <?php echo ! empty( $s['type_sale'] ) ? '' : 'hidden'; ?>>
+								<div class="mwst-card__head">
+									<h2><?php esc_html_e( 'Purchases', 'mw-sales-toast' ); ?></h2>
+									<p><?php esc_html_e( 'Template, fallback name, and stock for purchase toasts. Preview updates live in the sidebar.', 'mw-sales-toast' ); ?></p>
 								</div>
 								<div class="mwst-card__body">
 									<div class="mwst-field">
@@ -2152,11 +2324,11 @@ class MW_Sales_Toast_Settings {
 										<div class="mwst-field__control">
 											<input id="mwst-template" type="text" class="large-text" name="<?php echo esc_attr( $opt ); ?>[message_template]" value="<?php echo esc_attr( $s['message_template'] ); ?>" />
 											<div class="mwst-tokens" aria-label="<?php esc_attr_e( 'Insert placeholder', 'mw-sales-toast' ); ?>">
-												<button type="button" class="mwst-token" data-token="{name}">{name}</button>
-												<button type="button" class="mwst-token" data-token="{city}">{city}</button>
-												<button type="button" class="mwst-token" data-token="{product}">{product}</button>
-												<button type="button" class="mwst-token" data-token="{stock}">{stock}</button>
-												<button type="button" class="mwst-token" data-token="{stock_label}">{stock_label}</button>
+												<button type="button" class="mwst-token" data-token="{name}" data-target="mwst-template">{name}</button>
+												<button type="button" class="mwst-token" data-token="{city}" data-target="mwst-template">{city}</button>
+												<button type="button" class="mwst-token" data-token="{product}" data-target="mwst-template">{product}</button>
+												<button type="button" class="mwst-token" data-token="{stock}" data-target="mwst-template">{stock}</button>
+												<button type="button" class="mwst-token" data-token="{stock_label}" data-target="mwst-template">{stock_label}</button>
 											</div>
 											<p class="description"><?php esc_html_e( 'If you omit stock tokens, a stock phrase still appears next to the time when stock display is on (real orders only).', 'mw-sales-toast' ); ?></p>
 										</div>
@@ -2194,6 +2366,159 @@ class MW_Sales_Toast_Settings {
 											/>
 											<span class="mwst-hint"><?php esc_html_e( 'units', 'mw-sales-toast' ); ?></span>
 											<p class="description"><?php esc_html_e( 'Hide stock above this quantity so high inventory does not look odd.', 'mw-sales-toast' ); ?></p>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="mwst-card mwst-type-opt" id="mwst-type-viewing-opt" <?php echo ! empty( $s['type_viewing'] ) ? '' : 'hidden'; ?>>
+								<div class="mwst-card__head">
+									<h2><?php esc_html_e( 'Viewing now', 'mw-sales-toast' ); ?></h2>
+									<p><?php esc_html_e( 'Show how many people are looking at a product. Simulated counts stay stable for about 15 minutes; Live counts unique visitors on product pages (no IPs stored).', 'mw-sales-toast' ); ?></p>
+								</div>
+								<div class="mwst-card__body">
+									<div class="mwst-field">
+										<div class="mwst-field__label"><label for="mwst-viewing-template"><?php esc_html_e( 'Template', 'mw-sales-toast' ); ?></label></div>
+										<div class="mwst-field__control">
+											<input id="mwst-viewing-template" type="text" class="large-text" name="<?php echo esc_attr( $opt ); ?>[viewing_template]" value="<?php echo esc_attr( (string) $s['viewing_template'] ); ?>" />
+											<div class="mwst-tokens">
+												<button type="button" class="mwst-token" data-token="{count}" data-target="mwst-viewing-template">{count}</button>
+												<button type="button" class="mwst-token" data-token="{people}" data-target="mwst-viewing-template">{people}</button>
+												<button type="button" class="mwst-token" data-token="{product}" data-target="mwst-viewing-template">{product}</button>
+											</div>
+										</div>
+									</div>
+									<div class="mwst-field">
+										<div class="mwst-field__label"><label for="mwst-viewing-mode"><?php esc_html_e( 'Count mode', 'mw-sales-toast' ); ?></label></div>
+										<div class="mwst-field__control">
+											<select id="mwst-viewing-mode" name="<?php echo esc_attr( $opt ); ?>[viewing_mode]">
+												<option value="simulated" <?php selected( $s['viewing_mode'], 'simulated' ); ?>><?php esc_html_e( 'Simulated — random in a range (no tracking)', 'mw-sales-toast' ); ?></option>
+												<option value="live" <?php selected( $s['viewing_mode'], 'live' ); ?>><?php esc_html_e( 'Live — unique visitors on this product (last N minutes)', 'mw-sales-toast' ); ?></option>
+											</select>
+										</div>
+									</div>
+									<div class="mwst-field">
+										<div class="mwst-field__label"><?php esc_html_e( 'Range', 'mw-sales-toast' ); ?></div>
+										<div class="mwst-field__control">
+											<div class="mwst-inline-nums">
+												<label>
+													<?php esc_html_e( 'Min', 'mw-sales-toast' ); ?>
+													<input type="number" min="1" max="99" class="small-text" name="<?php echo esc_attr( $opt ); ?>[viewing_min]" value="<?php echo esc_attr( (string) (int) $s['viewing_min'] ); ?>" />
+												</label>
+												<label>
+													<?php esc_html_e( 'Max', 'mw-sales-toast' ); ?>
+													<input type="number" min="1" max="99" class="small-text" name="<?php echo esc_attr( $opt ); ?>[viewing_max]" value="<?php echo esc_attr( (string) (int) $s['viewing_max'] ); ?>" />
+												</label>
+												<label>
+													<?php esc_html_e( 'Live window', 'mw-sales-toast' ); ?>
+													<input type="number" min="2" max="30" class="small-text" name="<?php echo esc_attr( $opt ); ?>[viewing_window]" value="<?php echo esc_attr( (string) (int) $s['viewing_window'] ); ?>" />
+												</label>
+											</div>
+											<p class="description"><?php esc_html_e( 'Simulated stays between min and max. Live uses real unique pings, then clamps to max. Window is minutes.', 'mw-sales-toast' ); ?></p>
+										</div>
+									</div>
+									<div class="mwst-field" id="mwst-viewing-products-field" <?php echo ( 'live' === ( $s['viewing_mode'] ?? '' ) ) ? 'hidden' : ''; ?>>
+										<div class="mwst-field__label"><label for="mwst-viewing-products"><?php esc_html_e( 'Products', 'mw-sales-toast' ); ?></label></div>
+										<div class="mwst-field__control">
+											<?php
+											self::render_product_picker(
+												$opt,
+												'viewing_products',
+												'mwst-viewing-products',
+												array_map( 'absint', (array) ( $s['viewing_products'] ?? array() ) ),
+												true
+											);
+											?>
+											<p class="description"><?php esc_html_e( 'Simulated only. Leave empty for random catalog products. Live uses real visitors and follows Include / Exclude products on the General tab.', 'mw-sales-toast' ); ?></p>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="mwst-card mwst-type-opt" id="mwst-type-review-opt" <?php echo ! empty( $s['type_review'] ) ? '' : 'hidden'; ?>>
+								<div class="mwst-card__head">
+									<h2><?php esc_html_e( 'Reviews', 'mw-sales-toast' ); ?></h2>
+									<p><?php esc_html_e( 'Approved WooCommerce product reviews. Demo source (or Real + demo fill) can add simulated reviews when volume is low.', 'mw-sales-toast' ); ?></p>
+								</div>
+								<div class="mwst-card__body">
+									<div class="mwst-field">
+										<div class="mwst-field__label"><label for="mwst-review-template"><?php esc_html_e( 'Template', 'mw-sales-toast' ); ?></label></div>
+										<div class="mwst-field__control">
+											<input id="mwst-review-template" type="text" class="large-text" name="<?php echo esc_attr( $opt ); ?>[review_template]" value="<?php echo esc_attr( (string) $s['review_template'] ); ?>" />
+											<div class="mwst-tokens">
+												<button type="button" class="mwst-token" data-token="{name}" data-target="mwst-review-template">{name}</button>
+												<button type="button" class="mwst-token" data-token="{rating}" data-target="mwst-review-template">{rating}</button>
+												<button type="button" class="mwst-token" data-token="{stars}" data-target="mwst-review-template">{stars}</button>
+												<button type="button" class="mwst-token" data-token="{product}" data-target="mwst-review-template">{product}</button>
+												<button type="button" class="mwst-token" data-token="{excerpt}" data-target="mwst-review-template">{excerpt}</button>
+											</div>
+										</div>
+									</div>
+									<div class="mwst-field">
+										<div class="mwst-field__label"><?php esc_html_e( 'Filters', 'mw-sales-toast' ); ?></div>
+										<div class="mwst-field__control">
+											<div class="mwst-inline-nums">
+												<label>
+													<?php esc_html_e( 'Min stars', 'mw-sales-toast' ); ?>
+													<input type="number" min="1" max="5" class="small-text" name="<?php echo esc_attr( $opt ); ?>[review_min_rating]" value="<?php echo esc_attr( (string) (int) $s['review_min_rating'] ); ?>" />
+												</label>
+												<label>
+													<?php esc_html_e( 'Max shown', 'mw-sales-toast' ); ?>
+													<input type="number" min="1" max="12" class="small-text" name="<?php echo esc_attr( $opt ); ?>[review_max]" value="<?php echo esc_attr( (string) (int) $s['review_max'] ); ?>" />
+												</label>
+												<label>
+													<?php esc_html_e( 'Lookback', 'mw-sales-toast' ); ?>
+													<input type="number" min="7" max="365" class="small-text" name="<?php echo esc_attr( $opt ); ?>[review_lookback]" value="<?php echo esc_attr( (string) (int) $s['review_lookback'] ); ?>" />
+												</label>
+											</div>
+											<p class="description"><?php esc_html_e( 'Lookback is days. Hide names still applies. Stars appear under the line when you omit {stars}.', 'mw-sales-toast' ); ?></p>
+										</div>
+									</div>
+									<div class="mwst-field">
+										<div class="mwst-field__label"><?php esc_html_e( 'Excerpt', 'mw-sales-toast' ); ?></div>
+										<div class="mwst-field__control">
+											<?php self::toggle( $opt, 'review_excerpt', $s, 'mwst-review-excerpt', __( 'Show a short quote under the review', 'mw-sales-toast' ) ); ?>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="mwst-card mwst-type-opt" id="mwst-type-cta-opt" <?php echo ! empty( $s['type_cta'] ) ? '' : 'hidden'; ?>>
+								<div class="mwst-card__head">
+									<h2><?php esc_html_e( 'CTA / coupon', 'mw-sales-toast' ); ?></h2>
+									<p><?php esc_html_e( 'A promo toast with an optional coupon chip (click to copy) and button.', 'mw-sales-toast' ); ?></p>
+								</div>
+								<div class="mwst-card__body">
+									<div class="mwst-field">
+										<div class="mwst-field__label"><label for="mwst-cta-message"><?php esc_html_e( 'Message', 'mw-sales-toast' ); ?></label></div>
+										<div class="mwst-field__control">
+											<input id="mwst-cta-message" type="text" class="large-text" name="<?php echo esc_attr( $opt ); ?>[cta_message]" value="<?php echo esc_attr( (string) $s['cta_message'] ); ?>" />
+											<p class="description"><?php esc_html_e( 'Shown as the toast line. Use {coupon} to insert the code in the text.', 'mw-sales-toast' ); ?></p>
+										</div>
+									</div>
+									<div class="mwst-field">
+										<div class="mwst-field__label"><label for="mwst-cta-coupon"><?php esc_html_e( 'Coupon code', 'mw-sales-toast' ); ?></label></div>
+										<div class="mwst-field__control">
+											<input id="mwst-cta-coupon" type="text" class="regular-text" name="<?php echo esc_attr( $opt ); ?>[cta_coupon]" value="<?php echo esc_attr( (string) $s['cta_coupon'] ); ?>" placeholder="<?php esc_attr_e( 'SAVE10', 'mw-sales-toast' ); ?>" />
+										</div>
+									</div>
+									<div class="mwst-field">
+										<div class="mwst-field__label"><label for="mwst-cta-button"><?php esc_html_e( 'Button label', 'mw-sales-toast' ); ?></label></div>
+										<div class="mwst-field__control">
+											<input id="mwst-cta-button" type="text" class="regular-text" name="<?php echo esc_attr( $opt ); ?>[cta_button]" value="<?php echo esc_attr( (string) $s['cta_button'] ); ?>" />
+										</div>
+									</div>
+									<div class="mwst-field">
+										<div class="mwst-field__label"><label for="mwst-cta-url"><?php esc_html_e( 'Button URL', 'mw-sales-toast' ); ?></label></div>
+										<div class="mwst-field__control">
+											<input id="mwst-cta-url" type="url" class="large-text" name="<?php echo esc_attr( $opt ); ?>[cta_url]" value="<?php echo esc_attr( (string) $s['cta_url'] ); ?>" placeholder="https://" />
+											<p class="description"><?php esc_html_e( 'Leave empty to copy the coupon when the button is clicked.', 'mw-sales-toast' ); ?></p>
+										</div>
+									</div>
+									<div class="mwst-field">
+										<div class="mwst-field__label"><?php esc_html_e( 'Once per visit', 'mw-sales-toast' ); ?></div>
+										<div class="mwst-field__control">
+											<?php self::toggle( $opt, 'cta_once', $s, 'mwst-cta-once', __( 'Show the promo toast at most once per browser session', 'mw-sales-toast' ) ); ?>
 										</div>
 									</div>
 								</div>
@@ -2995,6 +3320,20 @@ class MW_Sales_Toast_Settings {
 											</div>
 										</details>
 										<details class="mwst-faq__item">
+											<summary><?php esc_html_e( 'Can I show “X viewing now”, reviews, or a coupon on the toast?', 'mw-sales-toast' ); ?></summary>
+											<div class="mwst-faq__answer">
+												<p>
+													<?php
+													printf(
+														/* translators: %s: Message & privacy tab link */
+														esc_html__( 'Yes. Under %s → Toast types, enable Viewing now, Reviews, and/or CTA / coupon alongside (or instead of) Purchases. They rotate in the same loop. Viewing can be simulated or live unique visitors on the product page — live mode stores no IPs, only a short-lived session token. Simulated can pin specific products; live follows Include / Exclude products on the General tab. Reviews use approved WooCommerce product reviews (min stars). The coupon chip copies the code; the button can copy or open a URL.', 'mw-sales-toast' ),
+														self::tab_link( 'message', __( 'Message & privacy', 'mw-sales-toast' ) )
+													);
+													?>
+												</p>
+											</div>
+										</details>
+										<details class="mwst-faq__item">
 											<summary><?php esc_html_e( 'Is this GDPR / privacy friendly?', 'mw-sales-toast' ); ?></summary>
 											<div class="mwst-faq__answer">
 												<p>
@@ -3071,7 +3410,7 @@ class MW_Sales_Toast_Settings {
 													<?php
 													printf(
 														/* translators: 1: Design tab link, 2: Timing & cache tab link, 3: Demo data tab link */
-														esc_html__( 'Use Show toast in the sidebar preview. Tune colors in %1$s and cadence in %2$s, then Save. For a quiet store, use Demo only or Real + demo fill and edit people/times in %3$s.', 'mw-sales-toast' ),
+														esc_html__( 'Click a toast in the sidebar preview. Tune colors in %1$s and cadence in %2$s, then Save. For a quiet store, use Demo only or Real + demo fill and edit people/times in %3$s.', 'mw-sales-toast' ),
 														self::tab_link( 'design', __( 'Design', 'mw-sales-toast' ) ),
 														self::tab_link( 'timing', __( 'Timing & cache', 'mw-sales-toast' ) ),
 														self::tab_link( 'demo', __( 'Demo data', 'mw-sales-toast' ) )
@@ -3158,7 +3497,7 @@ class MW_Sales_Toast_Settings {
 													<?php
 													printf(
 														/* translators: %s: Message & privacy tab link */
-														esc_html__( '%s — message template tokens, fallback name, stock display, hide names, checkout consent, mute, and session limits.', 'mw-sales-toast' ),
+														esc_html__( '%s — toast types (purchases, viewing now, reviews, CTA/coupon), message templates, fallback name, stock display, hide names, checkout consent, mute, and session limits.', 'mw-sales-toast' ),
 														self::tab_link( 'message', __( 'Message & privacy', 'mw-sales-toast' ) )
 													);
 													?>
@@ -3243,7 +3582,7 @@ class MW_Sales_Toast_Settings {
 													);
 													?>
 												</li>
-												<li><?php esc_html_e( 'Use Show toast in the sidebar preview, then Save settings (Enter works in most fields).', 'mw-sales-toast' ); ?></li>
+												<li><?php esc_html_e( 'Click a toast in the sidebar preview, then Save settings (Enter works in most fields).', 'mw-sales-toast' ); ?></li>
 											</ol>
 										</section>
 
@@ -3282,9 +3621,12 @@ class MW_Sales_Toast_Settings {
 										</section>
 
 										<section class="mwst-docs__section">
-											<h3><?php esc_html_e( 'Message, stock & privacy', 'mw-sales-toast' ); ?></h3>
+											<h3><?php esc_html_e( 'Message, types & privacy', 'mw-sales-toast' ); ?></h3>
 											<ul>
-												<li><?php esc_html_e( 'Template tokens: {name}, {city}, {product}, {stock}, {stock_label}.', 'mw-sales-toast' ); ?></li>
+												<li><?php esc_html_e( 'Purchase tokens: {name}, {city}, {product}, {stock}, {stock_label}.', 'mw-sales-toast' ); ?></li>
+												<li><?php esc_html_e( 'Viewing now: {count}, {people}, {product}. Simulated range or live unique visitors on the product page (no IPs).', 'mw-sales-toast' ); ?></li>
+												<li><?php esc_html_e( 'Reviews: {name}, {rating}, {stars}, {product}, {excerpt} from approved WooCommerce reviews.', 'mw-sales-toast' ); ?></li>
+												<li><?php esc_html_e( 'CTA / coupon: promo line, optional code (click to copy), and button URL.', 'mw-sales-toast' ); ?></li>
 												<li><?php esc_html_e( 'Stock: Off / Soft phrases / Exact when low — real orders only, qty at or below threshold; demo never shows stock.', 'mw-sales-toast' ); ?></li>
 												<li><?php esc_html_e( 'Only first name and city are shown — never email or full address.', 'mw-sales-toast' ); ?></li>
 												<li><?php esc_html_e( 'Checkout consent hides customers who declined; legacy/admin orders without a choice can still appear.', 'mw-sales-toast' ); ?></li>
@@ -3507,21 +3849,9 @@ class MW_Sales_Toast_Settings {
 						<div class="mwst-side-card">
 							<div class="mwst-side-card__head"><?php esc_html_e( 'Preview', 'mw-sales-toast' ); ?></div>
 							<div class="mwst-side-card__body">
-								<aside id="mwst-sample-toast" class="mw-sales-toast mwst-sample-toast is-visible mw-sales-toast--media-<?php echo esc_attr( ( 'padded' === ( $s['style_image_fit'] ?? '' ) ) ? 'padded' : 'full' ); ?>" aria-hidden="true">
-									<div id="mwst-sample-media" class="mw-sales-toast__media"></div>
-									<div class="mw-sales-toast__body">
-										<p id="mwst-sample-text" class="mw-sales-toast__text"></p>
-										<p id="mwst-sample-meta" class="mw-sales-toast__meta"></p>
-									</div>
-									<span class="mw-sales-toast__close" aria-hidden="true">×</span>
-								</aside>
-								<div class="mwst-preview-actions">
-									<button type="button" class="button button-secondary" id="mwst-toggle-toast">
-										<?php esc_html_e( 'Show toast', 'mw-sales-toast' ); ?>
-									</button>
-								</div>
+								<div id="mwst-sample-list" class="mwst-sample-list"></div>
 								<p class="mwst-preview-hint">
-									<?php esc_html_e( 'Shows the real toast over this admin page using the form values above (save to apply on the storefront).', 'mw-sales-toast' ); ?>
+									<?php esc_html_e( 'Click a toast to preview it on this page using the form values above (save to apply on the storefront).', 'mw-sales-toast' ); ?>
 								</p>
 							</div>
 						</div>

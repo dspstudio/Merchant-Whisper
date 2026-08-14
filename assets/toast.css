@@ -166,6 +166,81 @@
   color: var(--mw-st-meta);
 }
 
+.mw-sales-toast__meta[hidden] {
+  display: none !important;
+}
+
+.mw-sales-toast__stars {
+  letter-spacing: 0.06em;
+}
+
+.mw-sales-toast__text .mw-sales-toast__stars {
+  white-space: nowrap;
+}
+
+.mw-sales-toast__star {
+  color: rgba(168, 178, 196, 0.35);
+}
+
+.mw-sales-toast__star.is-on {
+  color: var(--mw-st-accent);
+}
+
+.mw-sales-toast__cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.mw-sales-toast__cta[hidden] {
+  display: none !important;
+}
+
+.mw-sales-toast__coupon,
+.mw-sales-toast__btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.mw-sales-toast__coupon {
+  border: 1px dashed var(--mw-st-accent);
+  color: var(--mw-st-accent);
+  background: transparent;
+  letter-spacing: 0.04em;
+}
+
+.mw-sales-toast__coupon:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.mw-sales-toast__btn {
+  border: 0;
+  color: #0c1220;
+  background: var(--mw-st-accent);
+}
+
+.mw-sales-toast__btn:hover {
+  filter: brightness(1.08);
+  text-decoration: none;
+}
+
+.mw-sales-toast--viewing .mw-sales-toast__meta {
+  text-transform: lowercase;
+}
+
 .mw-sales-toast__close {
   display: inline-flex;
   align-items: center;

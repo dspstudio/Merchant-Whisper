@@ -39,6 +39,16 @@ class MW_Sales_Toast_REST {
 	 * Route registration.
 	 */
 	public static function register_routes() {
+		register_rest_route(
+			'mw-st/v1',
+			'/presence',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( __CLASS__, 'post_presence' ),
+				'permission_callback' => array( __CLASS__, 'permission_check' ),
+			)
+		);
+
 		if ( ! self::is_enabled() ) {
 			return;
 		}
@@ -54,6 +64,11 @@ class MW_Sales_Toast_REST {
 					'_mwst_nonce' => array(
 						'description' => __( 'Storefront nonce from the page load (do not use X-WP-Nonce).', 'mw-sales-toast' ),
 						'type'        => 'string',
+						'required'    => false,
+					),
+					'product'     => array(
+						'description' => __( 'Current product ID (viewing toasts).', 'mw-sales-toast' ),
+						'type'        => 'integer',
 						'required'    => false,
 					),
 				),
@@ -116,7 +131,10 @@ class MW_Sales_Toast_REST {
 			return rest_ensure_response( array() );
 		}
 
-		$limit  = max( 1, min( 30, (int) $settings['max_events'] ) );
+		$limit  = max( 1, min( 40, (int) $settings['max_events'] ) );
+		if ( class_exists( 'MW_Sales_Toast_Types' ) && MW_Sales_Toast_Types::any_enabled( $settings ) ) {
+			$limit = min( 40, $limit + 8 );
+		}
 		$events = MW_Sales_Toast_Cache::get_events();
 		// Pull a wider pool before catalog/PDP filters so includes still fill the limit.
 		$events = array_slice( $events, 0, max( $limit * 5, 50 ) );
@@ -124,6 +142,34 @@ class MW_Sales_Toast_REST {
 			$events = MW_Sales_Toast_Frontend::filter_events_for_display( $events, $settings );
 		}
 
+		$product_id = absint( $request->get_param( 'product' ) );
+		if ( $product_id && class_exists( 'MW_Sales_Toast_Types' ) ) {
+			$events = MW_Sales_Toast_Types::inject_current_viewing( $events, $settings, $product_id );
+		}
+
 		return rest_ensure_response( array_values( array_slice( $events, 0, $limit ) ) );
+	}
+
+	/**
+	 * POST product-page presence for live “viewing now” counts (no IPs).
+	 *
+	 * @param WP_REST_Request $request Request.
+	 * @return WP_REST_Response
+	 */
+	public static function post_presence( $request ) {
+		$settings = MW_Sales_Toast_Settings::get();
+		if ( empty( $settings['enabled'] ) || empty( $settings['type_viewing'] ) || 'live' !== ( $settings['viewing_mode'] ?? '' ) ) {
+			return rest_ensure_response( array( 'count' => 0 ) );
+		}
+		if ( ! class_exists( 'MW_Sales_Toast_Types' ) ) {
+			return rest_ensure_response( array( 'count' => 0 ) );
+		}
+
+		$body       = $request->get_json_params();
+		$product_id = isset( $body['productId'] ) ? absint( $body['productId'] ) : 0;
+		$visitor    = isset( $body['visitor'] ) ? (string) $body['visitor'] : '';
+		$count      = MW_Sales_Toast_Types::ping( $product_id, $visitor, $settings );
+
+		return rest_ensure_response( array( 'count' => $count ) );
 	}
 }

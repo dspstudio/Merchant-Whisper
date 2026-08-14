@@ -12,3 +12,4 @@ delete_option( 'mw_st_analytics' );
 delete_option( 'mw_st_cache_schema' );
 delete_transient( 'mw_st_sales_cache' );
 delete_transient( 'mw_st_rebuild_lock' );
+delete_transient( 'mw_st_presence' );

@@ -36,9 +36,12 @@ class MW_Sales_Toast_Frontend {
 			return false;
 		}
 
-		// Real-only without WooCommerce: nothing to show.
+		// Real-only without WooCommerce: nothing to show unless extra types can run.
 		if ( 'real_orders' === $settings['source'] && ! class_exists( 'WooCommerce' ) ) {
-			return false;
+			$extras = ! empty( $settings['type_cta'] ) || ! empty( $settings['type_viewing'] ) || ! empty( $settings['type_review'] );
+			if ( ! $extras ) {
+				return false;
+			}
 		}
 
 		if ( ! empty( $settings['guests_only'] ) && is_user_logged_in() ) {
@@ -288,6 +291,11 @@ class MW_Sales_Toast_Frontend {
 
 		$out = array();
 		foreach ( (array) $events as $event ) {
+			$type = isset( $event['type'] ) ? (string) $event['type'] : 'sale';
+			if ( 'cta' === $type ) {
+				$out[] = $event;
+				continue;
+			}
 			$pid = isset( $event['productId'] ) ? absint( $event['productId'] ) : 0;
 			if ( $pid < 1 ) {
 				// Keep demo/unknown without product id only when no include list is set.
@@ -360,6 +368,23 @@ class MW_Sales_Toast_Frontend {
 	}
 
 	/**
+	 * Whether a product is allowed by include/exclude product and category lists.
+	 *
+	 * @param int   $product_id Product ID.
+	 * @param array $settings   Settings.
+	 * @return bool
+	 */
+	public static function product_passes_catalog( $product_id, $settings ) {
+		$probe = array(
+			array(
+				'type'      => 'viewing',
+				'productId' => absint( $product_id ),
+			),
+		);
+		return ! empty( self::filter_events_by_catalog( $probe, $settings ) );
+	}
+
+	/**
 	 * Apply catalog feed filters + optional PDP product match.
 	 *
 	 * @param array $events   Events.
@@ -393,6 +418,11 @@ class MW_Sales_Toast_Frontend {
 
 		$filtered = array();
 		foreach ( (array) $events as $event ) {
+			$type = isset( $event['type'] ) ? (string) $event['type'] : 'sale';
+			if ( 'cta' === $type ) {
+				$filtered[] = $event;
+				continue;
+			}
 			$eid = isset( $event['productId'] ) ? (int) $event['productId'] : 0;
 			if ( $eid === $product_id ) {
 				$filtered[] = $event;
@@ -442,6 +472,9 @@ class MW_Sales_Toast_Frontend {
 
 		$delivery   = ( 'inline' === ( $settings['event_delivery'] ?? '' ) ) ? 'inline' : 'rest';
 		$limit      = max( 1, min( 30, (int) $settings['max_events'] ) );
+		if ( class_exists( 'MW_Sales_Toast_Types' ) && MW_Sales_Toast_Types::any_enabled( $settings ) ) {
+			$limit = min( 40, $limit + 8 );
+		}
 		$breakpoint = max( 320, min( 1200, (int) ( $settings['mobile_breakpoint'] ?? 768 ) ) );
 
 		$current_product_id = 0;
@@ -467,6 +500,11 @@ class MW_Sales_Toast_Frontend {
 			'maxPerSession'        => max( 1, (int) $settings['max_per_session'] ),
 			'muteHours'            => max( 0, (int) $settings['mute_hours'] ),
 			'messageTemplate'      => $settings['message_template'],
+			'viewingTemplate'      => (string) ( $settings['viewing_template'] ?? '' ),
+			'reviewTemplate'       => (string) ( $settings['review_template'] ?? '' ),
+			'ctaOnce'              => ! empty( $settings['cta_once'] ),
+			'viewingMode'          => ( 'live' === ( $settings['viewing_mode'] ?? '' ) ) ? 'live' : 'simulated',
+			'presenceEndpoint'     => '',
 			'whenStyle'            => ( 'exact' === ( $settings['when_style'] ?? '' ) ) ? 'exact' : 'natural',
 			'matchProductPage'     => ! empty( $settings['match_product_page'] ),
 			'currentProductId'     => $current_product_id,
@@ -493,12 +531,20 @@ class MW_Sales_Toast_Frontend {
 				'weeks'        => __( 'weeks', 'mw-sales-toast' ),
 				'month'        => __( 'month', 'mw-sales-toast' ),
 				'months'       => __( 'months', 'mw-sales-toast' ),
+				'copied'       => __( 'Copied', 'mw-sales-toast' ),
+				'copyFailed'   => __( 'Copy failed', 'mw-sales-toast' ),
+				'now'          => __( 'now', 'mw-sales-toast' ),
+				'person'       => __( 'person', 'mw-sales-toast' ),
+				'people'       => __( 'people', 'mw-sales-toast' ),
 			),
 		);
 
 		if ( 'inline' === $delivery ) {
 			$events           = array_slice( MW_Sales_Toast_Cache::get_events(), 0, max( $limit * 3, 30 ) );
 			$events           = self::filter_events_for_display( $events, $settings );
+			if ( $current_product_id && class_exists( 'MW_Sales_Toast_Types' ) ) {
+				$events = MW_Sales_Toast_Types::inject_current_viewing( $events, $settings, $current_product_id );
+			}
 			$config['events'] = array_values( array_slice( $events, 0, $limit ) );
 			if ( class_exists( 'MW_Sales_Toast_Analytics' ) && MW_Sales_Toast_Analytics::is_enabled() ) {
 				$config['nonce'] = MW_Sales_Toast_REST::create_nonce();
@@ -507,6 +553,13 @@ class MW_Sales_Toast_Frontend {
 			$config['endpoint']  = esc_url_raw( rest_url( 'mw-st/v1/notifications' ) );
 			$config['nonce']     = MW_Sales_Toast_REST::create_nonce();
 			$config['refetchMs'] = MW_Sales_Toast_Cache::cache_ttl_seconds( $settings ) * 1000;
+		}
+
+		if ( ! empty( $settings['type_viewing'] ) && 'live' === ( $settings['viewing_mode'] ?? '' ) && $current_product_id > 0 ) {
+			$config['presenceEndpoint'] = esc_url_raw( rest_url( 'mw-st/v1/presence' ) );
+			if ( empty( $config['nonce'] ) ) {
+				$config['nonce'] = MW_Sales_Toast_REST::create_nonce();
+			}
 		}
 
 		if ( class_exists( 'MW_Sales_Toast_Analytics' ) && MW_Sales_Toast_Analytics::is_enabled() ) {

@@ -151,7 +151,13 @@ class MW_Sales_Toast_Cache {
 	 */
 	public static function rebuild( $settings = null ) {
 		$settings = is_array( $settings ) ? $settings : MW_Sales_Toast_Settings::get();
-		$events   = self::build_events( $settings );
+		$need_sales = ! empty( $settings['type_sale'] )
+			|| ! class_exists( 'MW_Sales_Toast_Types' )
+			|| ! MW_Sales_Toast_Types::any_enabled( $settings );
+		$events     = $need_sales ? self::build_events( $settings ) : array();
+		if ( class_exists( 'MW_Sales_Toast_Types' ) ) {
+			$events = MW_Sales_Toast_Types::mix( $events, $settings );
+		}
 		set_transient( MW_SALES_TOAST_TRANSIENT, $events, self::cache_ttl_seconds( $settings ) );
 		return $events;
 	}
@@ -265,6 +271,7 @@ class MW_Sales_Toast_Cache {
 			$stock   = self::stock_fields( $product, $settings );
 			$events[] = array(
 				'id'         => 'o' . $order->get_id(),
+				'type'       => 'sale',
 				'productId'  => $pid > 0 ? $pid : null,
 				'name'       => $first,
 				'city'       => $city,
@@ -661,6 +668,7 @@ class MW_Sales_Toast_Cache {
 
 			$events[] = array(
 				'id'          => 'd' . $i . '-' . wp_generate_password( 4, false ),
+				'type'        => 'sale',
 				'productId'   => $pid > 0 ? $pid : null,
 				'name'        => $name,
 				'city'        => $person['city'],

@@ -102,6 +102,13 @@
   var i18n = cfg.i18n || {};
   var template =
     cfg.messageTemplate || '{name} from {city} just bought {product}';
+  var viewingTemplate =
+    cfg.viewingTemplate || '{count} {people} are viewing {product}';
+  var reviewTemplate =
+    cfg.reviewTemplate || '{name} left a {rating}-star review of {product}';
+  var ctaOnce = cfg.ctaOnce !== false;
+  var CTA_KEY = 'mw_st_cta_shown';
+  var VISITOR_KEY = 'mw_st_vid';
 
   var events = [];
   var index = 0;
@@ -158,6 +165,10 @@
     track('muted', eventPayload(currentEvent));
   }
 
+  function eventType(event) {
+    return event && event.type ? String(event.type) : 'sale';
+  }
+
   function eventPayload(event) {
     if (!event) return {};
     return {
@@ -210,21 +221,48 @@
     return /\{stock(_label)?\}/.test(String(template || ''));
   }
 
-  function formatLine(event) {
-    var product = event.url
+  function starsHtml(rating) {
+    var n = Math.max(0, Math.min(5, Number(rating) || 0));
+    var out = '';
+    var i;
+    for (i = 1; i <= 5; i++) {
+      out +=
+        '<span class="mw-sales-toast__star' +
+        (i <= n ? ' is-on' : '') +
+        '" aria-hidden="true">★</span>';
+    }
+    return '<span class="mw-sales-toast__stars" aria-label="' + n + '">' + out + '</span>';
+  }
+
+  function productHtml(event) {
+    return event.url
       ? '<a href="' + escapeAttr(event.url) + '">' + escapeHtml(event.title) + '</a>'
       : '<strong>' + escapeHtml(event.title) + '</strong>';
+  }
+
+  function applyTemplate(tpl, event) {
     var stock = stockOf(event);
     var stockLabel = stockLabelOf(event);
+    var rating = Number(event.rating) || 0;
+    var count = Number(event.count) || 0;
+    var people =
+      event.people ||
+      (count === 1 ? i18n.person || 'person' : i18n.people || 'people');
+    var coupon = String(event.coupon || '');
 
-    var out = String(template)
+    var out = String(tpl || '')
       .replace(/\{name\}/g, escapeHtml(event.name))
       .replace(/\{city\}/g, escapeHtml(event.city))
-      .replace(/\{product\}/g, product)
+      .replace(/\{product\}/g, productHtml(event))
       .replace(/\{stock_label\}/g, escapeHtml(stockLabel))
-      .replace(/\{stock\}/g, escapeHtml(stock));
+      .replace(/\{stock\}/g, escapeHtml(stock))
+      .replace(/\{count\}/g, escapeHtml(count))
+      .replace(/\{people\}/g, escapeHtml(people))
+      .replace(/\{rating\}/g, escapeHtml(rating))
+      .replace(/\{stars\}/g, starsHtml(rating))
+      .replace(/\{excerpt\}/g, escapeHtml(event.excerpt || ''))
+      .replace(/\{coupon\}/g, escapeHtml(coupon));
 
-    // Drop empty stock clauses left by missing stock (demo / high qty / off).
     out = out
       .replace(/\s*[—–\-|·]\s*(<\/?strong>)?\s*$/g, '')
       .replace(/\s*[—–\-|·]\s{2,}/g, ' ')
@@ -236,8 +274,45 @@
     return out;
   }
 
+  function formatLine(event) {
+    var type = eventType(event);
+    if (type === 'viewing') {
+      return applyTemplate(viewingTemplate, event);
+    }
+    if (type === 'review') {
+      return applyTemplate(reviewTemplate, event);
+    }
+    if (type === 'cta') {
+      var msg = String(event.title || '');
+      return applyTemplate(msg, event);
+    }
+    return applyTemplate(template, event);
+  }
+
   function formatMetaLine(event) {
+    var type = eventType(event);
+    if (type === 'viewing') {
+      return i18n.now || 'now';
+    }
+    if (type === 'cta') {
+      return '';
+    }
     var when = formatWhenLabel(event);
+    if (type === 'review') {
+      var usesStars = /\{stars\}/.test(String(reviewTemplate || ''));
+      var excerpt = String(event.excerpt || '').trim();
+      var bits = [];
+      if (!usesStars && Number(event.rating)) {
+        bits.push('★'.repeat(Math.max(1, Math.min(5, Number(event.rating) || 0))));
+      }
+      if (excerpt && !/\{excerpt\}/.test(String(reviewTemplate || ''))) {
+        bits.push(excerpt);
+      }
+      if (when) {
+        bits.push(when);
+      }
+      return bits.join(' · ');
+    }
     var stockLabel = stockLabelOf(event);
     if (stockLabel && !templateUsesStock()) {
       return when ? when + ' · ' + stockLabel : stockLabel;
@@ -422,6 +497,7 @@
       '<div class="mw-sales-toast__body">' +
       '<p class="mw-sales-toast__text"></p>' +
       '<p class="mw-sales-toast__meta"></p>' +
+      '<div class="mw-sales-toast__cta" hidden></div>' +
       '</div>' +
       '<button type="button" class="mw-sales-toast__close" aria-label="Dismiss">×</button>';
 
@@ -451,6 +527,18 @@
     });
 
     el.addEventListener('click', function (ev) {
+      var couponBtn =
+        ev.target && ev.target.closest
+          ? ev.target.closest('.mw-sales-toast__coupon, [data-mwst-copy]')
+          : null;
+      if (couponBtn) {
+        ev.preventDefault();
+        copyCoupon(couponBtn);
+        if (currentEvent) {
+          track('click', eventPayload(currentEvent));
+        }
+        return;
+      }
       var link = ev.target && ev.target.closest ? ev.target.closest('a') : null;
       if (!link || !currentEvent) return;
       var payload = eventPayload(currentEvent);
@@ -463,6 +551,123 @@
     return el;
   }
 
+  function ctaAlreadyShown() {
+    if (!ctaOnce) return false;
+    try {
+      return sessionStorage.getItem(CTA_KEY) === '1';
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function markCtaShown() {
+    try {
+      sessionStorage.setItem(CTA_KEY, '1');
+    } catch (e) {
+      /* ignore */
+    }
+  }
+
+  function visitorId() {
+    try {
+      var id = sessionStorage.getItem(VISITOR_KEY);
+      if (id && /^[a-zA-Z0-9]{8,32}$/.test(id)) {
+        return id;
+      }
+      id = '';
+      while (id.length < 16) {
+        id += Math.random().toString(36).slice(2);
+      }
+      id = id.replace(/[^a-zA-Z0-9]/g, '').slice(0, 16);
+      sessionStorage.setItem(VISITOR_KEY, id);
+      return id;
+    } catch (e) {
+      return '';
+    }
+  }
+
+  function copyCoupon(btn) {
+    var code = btn.getAttribute('data-code') || '';
+    if (!code) return;
+    var done = function (ok) {
+      var prev = btn.getAttribute('data-label') || btn.textContent;
+      if (!btn.getAttribute('data-label')) {
+        btn.setAttribute('data-label', prev);
+      }
+      btn.textContent = ok ? i18n.copied || 'Copied' : i18n.copyFailed || 'Copy failed';
+      window.setTimeout(function () {
+        btn.textContent = btn.getAttribute('data-label') || prev;
+      }, 1600);
+    };
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(
+          function () {
+            done(true);
+          },
+          function () {
+            done(false);
+          }
+        );
+        return;
+      }
+    } catch (e) {
+      /* fall through */
+    }
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = code;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'absolute';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      done(document.execCommand('copy'));
+      document.body.removeChild(ta);
+    } catch (err) {
+      done(false);
+    }
+  }
+
+  function renderCta(root, event) {
+    var box = root.querySelector('.mw-sales-toast__cta');
+    if (!box) return;
+    if (eventType(event) !== 'cta') {
+      box.hidden = true;
+      box.innerHTML = '';
+      return;
+    }
+    var coupon = String(event.coupon || '').trim();
+    var label = String(event.ctaLabel || i18n.copied || 'Copy code');
+    var url = String(event.ctaUrl || event.url || '').trim();
+    var html = '';
+    if (coupon) {
+      html +=
+        '<button type="button" class="mw-sales-toast__coupon" data-code="' +
+        escapeAttr(coupon) +
+        '">' +
+        escapeHtml(coupon) +
+        '</button>';
+    }
+    if (url) {
+      html +=
+        '<a class="mw-sales-toast__btn" href="' +
+        escapeAttr(url) +
+        '">' +
+        escapeHtml(label) +
+        '</a>';
+    } else if (coupon) {
+      html +=
+        '<button type="button" class="mw-sales-toast__btn" data-mwst-copy="1" data-code="' +
+        escapeAttr(coupon) +
+        '">' +
+        escapeHtml(label) +
+        '</button>';
+    }
+    box.innerHTML = html;
+    box.hidden = !html;
+  }
+
   function show(event) {
     if (stopped || !event || sessionCapReached()) return;
 
@@ -470,13 +675,21 @@
     var media = root.querySelector('.mw-sales-toast__media');
     var text = root.querySelector('.mw-sales-toast__text');
     var meta = root.querySelector('.mw-sales-toast__meta');
+    var type = eventType(event);
 
     currentEvent = event;
     shownAt = Date.now();
     dismissPending = false;
 
     text.innerHTML = formatLine(event);
-    meta.textContent = formatMetaLine(event);
+    var metaLine = formatMetaLine(event);
+    meta.textContent = metaLine;
+    meta.hidden = !metaLine;
+    renderCta(root, event);
+
+    root.classList.toggle('mw-sales-toast--viewing', type === 'viewing');
+    root.classList.toggle('mw-sales-toast--review', type === 'review');
+    root.classList.toggle('mw-sales-toast--cta', type === 'cta');
 
     if (event.image && event.url) {
       media.hidden = false;
@@ -502,6 +715,9 @@
     root.classList.add('is-visible');
     bumpSessionCount();
     track('impression', eventPayload(event));
+    if (type === 'cta') {
+      markCtaShown();
+    }
 
     if (cfg.soundEnabled && typeof window.mwSalesToastPlayPop === 'function') {
       try {
@@ -543,9 +759,18 @@
       clearGapTimer();
       return;
     }
-    var event = events[index % events.length];
-    index += 1;
-    show(event);
+    var attempts = 0;
+    while (attempts < events.length) {
+      var event = events[index % events.length];
+      index += 1;
+      attempts += 1;
+      if (eventType(event) === 'cta' && ctaAlreadyShown()) {
+        continue;
+      }
+      show(event);
+      return;
+    }
+    clearGapTimer();
   }
 
   function normalizeEvents(data) {
@@ -555,6 +780,8 @@
     var currentId = Number(cfg.currentProductId) || 0;
     return data.filter(function (item) {
       if (!item || !item.title) return false;
+      var type = item.type ? String(item.type) : 'sale';
+      if (type === 'cta') return true;
       if (!matchProduct) return true;
       return Number(item.productId) === currentId;
     });
@@ -567,7 +794,13 @@
       headers['X-MW-ST-Nonce'] = cfg.nonce;
     }
 
-    return fetch(cfg.endpoint, {
+    var url = cfg.endpoint;
+    var pid = Number(cfg.currentProductId) || 0;
+    if (pid > 0) {
+      url += (url.indexOf('?') === -1 ? '?' : '&') + 'product=' + pid;
+    }
+
+    return fetch(url, {
       credentials: 'same-origin',
       headers: headers,
     })
@@ -813,25 +1046,60 @@
     }
   }
 
+  function pingPresence() {
+    if (!cfg.presenceEndpoint || !cfg.nonce) {
+      return Promise.resolve();
+    }
+    var pid = Number(cfg.currentProductId) || 0;
+    var vid = visitorId();
+    if (pid < 1 || !vid) {
+      return Promise.resolve();
+    }
+    var send = function () {
+      try {
+        return fetch(cfg.presenceEndpoint, {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+            'X-MW-ST-Nonce': cfg.nonce
+          },
+          body: JSON.stringify({ productId: pid, visitor: vid }),
+          keepalive: true
+        }).catch(function () {});
+      } catch (e) {
+        return Promise.resolve();
+      }
+    };
+    window.setInterval(function () {
+      if (stopped || document.visibilityState === 'hidden') return;
+      send();
+    }, 45000);
+    return send();
+  }
+
   function boot(list) {
     events = normalizeEvents(list);
     if (!events.length) return;
     startLoop();
   }
 
-  if (delivery === 'inline') {
-    boot(cfg.events || []);
-  } else {
-    fetchEvents().then(boot);
+  pingPresence().then(function () {
+    if (delivery === 'inline') {
+      boot(cfg.events || []);
+    } else {
+      fetchEvents().then(boot);
 
-    if (refetchMs > 0) {
-      window.setInterval(function () {
-        if (stopped || isMuted() || sessionCapReached()) return;
-        fetchEvents().then(function (list) {
-          if (!list.length) return;
-          events = list;
-        });
-      }, refetchMs);
+      if (refetchMs > 0) {
+        window.setInterval(function () {
+          if (stopped || isMuted() || sessionCapReached()) return;
+          fetchEvents().then(function (list) {
+            if (!list.length) return;
+            events = list;
+          });
+        }, refetchMs);
+      }
     }
-  }
+  });
 })();

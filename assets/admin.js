@@ -18,12 +18,8 @@
 	var fallback = root.querySelector('#mwst-fallback');
 	var hideNames = root.querySelector('#mwst-hide-names');
 	var showImage = root.querySelector('#mwst-show-image');
-	var sampleToast = root.querySelector('#mwst-sample-toast');
-	var sampleMedia = root.querySelector('#mwst-sample-media');
-	var sampleText = root.querySelector('#mwst-sample-text');
-	var sampleMeta = root.querySelector('#mwst-sample-meta');
+	var sampleList = root.querySelector('#mwst-sample-list');
 	var posCaption = root.querySelector('#mwst-pos-caption');
-	var toggleBtn = root.querySelector('#mwst-toggle-toast');
 	var dismissNotice = root.querySelector('#mwst-dismiss-notice');
 	var savedNotice = root.querySelector('#mwst-saved-notice');
 	var resetDesignBtn = root.querySelector('#mwst-reset-design');
@@ -45,6 +41,13 @@
 	var triggerScrollOpt = root.querySelector('#mwst-trigger-scroll-opt');
 	var triggerIdleOpt = root.querySelector('#mwst-trigger-idle-opt');
 	var triggerClickOpt = root.querySelector('#mwst-trigger-click-opt');
+	var typeInputs = root.querySelectorAll('.mwst-type-input');
+	var typeSaleOpt = root.querySelector('#mwst-type-sale-opt');
+	var typeViewingOpt = root.querySelector('#mwst-type-viewing-opt');
+	var typeReviewOpt = root.querySelector('#mwst-type-review-opt');
+	var typeCtaOpt = root.querySelector('#mwst-type-cta-opt');
+	var viewingMode = root.querySelector('#mwst-viewing-mode');
+	var viewingProductsField = root.querySelector('#mwst-viewing-products-field');
 	var whenStyle = root.querySelector('#mwst-when-style');
 	var stockDisplay = root.querySelector('#mwst-stock-display');
 	var stockThreshold = root.querySelector('#mwst-stock-threshold');
@@ -58,6 +61,7 @@
 	var liveEl = null;
 	var liveVisible = false;
 	var hideTimer = null;
+	var previewType = 'sale';
 	var designStyleEl = null;
 	var cssCodeMirror = null;
 
@@ -466,6 +470,76 @@
 		}
 	}
 
+	function syncTypeOptions() {
+		var selected = {};
+		var checkedCount = 0;
+		typeInputs.forEach(function (input) {
+			var key = input.getAttribute('data-type') || '';
+			if (key) {
+				selected[key] = !!input.checked;
+			}
+			if (input.checked) {
+				checkedCount += 1;
+			}
+			var label = input.closest('.mwst-preset');
+			if (label) {
+				label.classList.toggle('is-active', !!input.checked);
+			}
+		});
+		if (checkedCount < 1) {
+			var sale = root.querySelector('.mwst-type-input[data-type="sale"]');
+			if (sale) {
+				sale.checked = true;
+				selected.sale = true;
+				var saleLabel = sale.closest('.mwst-preset');
+				if (saleLabel) {
+					saleLabel.classList.add('is-active');
+				}
+			}
+		}
+		if (typeSaleOpt) {
+			typeSaleOpt.hidden = !selected.sale;
+		}
+		if (typeViewingOpt) {
+			typeViewingOpt.hidden = !selected.viewing;
+			if (selected.viewing) {
+				syncViewingModeOptions();
+			}
+		}
+		if (typeReviewOpt) {
+			typeReviewOpt.hidden = !selected.review;
+		}
+		if (typeCtaOpt) {
+			typeCtaOpt.hidden = !selected.cta;
+		}
+		if (liveVisible && selectedPreviewTypes().indexOf(previewType) === -1) {
+			hideLiveToast();
+		}
+		syncSample();
+	}
+
+	function refreshViewingProductSelect() {
+		if (typeof window.jQuery === 'undefined') {
+			return;
+		}
+		window.setTimeout(function () {
+			var $el = window.jQuery('#mwst-viewing-products');
+			if ($el.length && $el.data('select2')) {
+				$el.next('.select2-container').css('width', '100%');
+			}
+		}, 0);
+	}
+
+	function syncViewingModeOptions() {
+		var live = viewingMode && viewingMode.value === 'live';
+		if (viewingProductsField) {
+			viewingProductsField.hidden = !!live;
+			if (!live) {
+				refreshViewingProductSelect();
+			}
+		}
+	}
+
 	function sampleStockFields() {
 		var mode = stockDisplay ? stockDisplay.value : 'off';
 		if (mode === 'off') {
@@ -483,40 +557,74 @@
 		};
 	}
 
-	function buildMessageHtml() {
-		var tpl = (template && template.value) || '{name} from {city} just bought {product}';
-		var stock = sampleStockFields();
-		var map = {
-			'{name}': sampleName(),
-			'{city}': 'Bucharest',
-			'{product}': 'Classic Tee',
-			'{stock}': stock.stock,
-			'{stock_label}': stock.stockLabel
-		};
-		var html = '';
-		var tokenRe = /(\{name\}|\{city\}|\{product\}|\{stock_label\}|\{stock\})/g;
-
-		tpl.split(tokenRe).forEach(function (part) {
-			if (!part) {
-				return;
+	function selectedPreviewTypes() {
+		var types = [];
+		typeInputs.forEach(function (input) {
+			if (input.checked) {
+				types.push(input.getAttribute('data-type') || 'sale');
 			}
-			if (part === '{product}') {
-				html += '<strong>' + escapeHtml(map[part]) + '</strong>';
-				return;
-			}
-			if (Object.prototype.hasOwnProperty.call(map, part)) {
-				html += escapeHtml(map[part] || '');
-				return;
-			}
-			html += escapeHtml(part);
 		});
+		return types.length ? types : ['sale'];
+	}
 
-		html = html
+	function previewTypeTitle(type) {
+		var input = root.querySelector('.mwst-type-input[data-type="' + type + '"]');
+		var card = input ? input.closest('.mwst-preset') : null;
+		var label = card ? card.querySelector('.mwst-preset__label') : null;
+		return label ? String(label.textContent || '').trim() : type;
+	}
+
+	function fieldValue(selector, fallback) {
+		var el = root.querySelector(selector);
+		if (!el) {
+			return fallback;
+		}
+		return String(el.value || '').trim() || fallback;
+	}
+
+	function starsHtml(rating) {
+		var n = Math.max(0, Math.min(5, Number(rating) || 0));
+		var out = '<span class="mw-sales-toast__stars">';
+		var i;
+		for (i = 1; i <= 5; i++) {
+			out +=
+				'<span class="mw-sales-toast__star' +
+				(i <= n ? ' is-on' : '') +
+				'">★</span>';
+		}
+		return out + '</span>';
+	}
+
+	function applySampleTemplate(tpl, map) {
+		var html = '';
+		var tokenRe =
+			/(\{name\}|\{city\}|\{product\}|\{stock_label\}|\{stock\}|\{count\}|\{people\}|\{rating\}|\{stars\}|\{excerpt\}|\{coupon\})/g;
+		var htmlKeys = {
+			'{product}': 1,
+			'{stars}': 1
+		};
+
+		String(tpl || '')
+			.split(tokenRe)
+			.forEach(function (part) {
+				if (!part) {
+					return;
+				}
+				if (htmlKeys[part]) {
+					html += map[part] || '';
+					return;
+				}
+				if (Object.prototype.hasOwnProperty.call(map, part)) {
+					html += escapeHtml(map[part] || '');
+					return;
+				}
+				html += escapeHtml(part);
+			});
+
+		return html
 			.replace(/\s*[—–\-|·]\s*$/g, '')
 			.replace(/\s{2,}/g, ' ')
 			.trim();
-
-		return html;
 	}
 
 	function escapeHtml(value) {
@@ -536,28 +644,141 @@
 		return i18n.sampleNatural || 'just now';
 	}
 
-	function sampleMetaLabel() {
+	function sampleMaps() {
+		var stock = sampleStockFields();
+		var name = sampleName();
+		var product = '<strong>Classic Tee</strong>';
+		var coupon = fieldValue('#mwst-cta-coupon', '');
+		var rating = 5;
+		return {
+			sale: {
+				tpl:
+					(template && template.value) ||
+					'{name} from {city} just bought {product}',
+				map: {
+					'{name}': name,
+					'{city}': 'Bucharest',
+					'{product}': product,
+					'{stock}': stock.stock,
+					'{stock_label}': stock.stockLabel
+				},
+				meta: sampleSaleMeta(stock),
+				cta: '',
+				showMedia: true
+			},
+			viewing: {
+				tpl:
+					fieldValue(
+						'#mwst-viewing-template',
+						'{count} {people} are viewing {product}'
+					),
+				map: {
+					'{count}': '7',
+					'{people}': i18n.people || 'people',
+					'{product}': product
+				},
+				meta: i18n.now || 'now',
+				cta: '',
+				showMedia: true
+			},
+			review: {
+				tpl:
+					fieldValue(
+						'#mwst-review-template',
+						'{name} left a {rating}-star review of {product}'
+					),
+				map: {
+					'{name}': name,
+					'{rating}': String(rating),
+					'{stars}': starsHtml(rating),
+					'{product}': product,
+					'{excerpt}': i18n.sampleExcerpt || 'Exactly what I needed.'
+				},
+				meta: sampleReviewMeta(rating),
+				cta: '',
+				showMedia: true
+			},
+			cta: {
+				tpl: fieldValue('#mwst-cta-message', 'Get 10% off your next order'),
+				map: {
+					'{coupon}': coupon,
+					'{product}': product
+				},
+				meta: '',
+				cta: sampleCtaMarkup(coupon),
+				showMedia: false
+			}
+		};
+	}
+
+	function sampleSaleMeta(stock) {
 		var when = agoLabel();
 		var tpl = (template && template.value) || '';
 		var usesStock = /\{stock(_label)?\}/.test(tpl);
-		var stock = sampleStockFields();
 		if (stock.stockLabel && !usesStock) {
 			return when + ' · ' + stock.stockLabel;
 		}
 		return when;
 	}
 
-	function fillToastParts(mediaEl, textEl, metaEl) {
+	function sampleReviewMeta(rating) {
+		var tpl = fieldValue('#mwst-review-template', '');
+		var bits = [];
+		if (!/\{stars\}/.test(tpl)) {
+			bits.push('★'.repeat(Math.max(1, Math.min(5, rating))));
+		}
+		if (
+			root.querySelector('#mwst-review-excerpt') &&
+			root.querySelector('#mwst-review-excerpt').checked &&
+			!/\{excerpt\}/.test(tpl)
+		) {
+			bits.push(i18n.sampleExcerpt || 'Exactly what I needed.');
+		}
+		bits.push(agoLabel());
+		return bits.join(' · ');
+	}
+
+	function sampleCtaMarkup(coupon) {
+		var label = fieldValue('#mwst-cta-button', i18n.copyCode || 'Copy code');
+		var url = fieldValue('#mwst-cta-url', '');
+		var html = '';
+		if (coupon) {
+			html +=
+				'<span class="mw-sales-toast__coupon">' + escapeHtml(coupon) + '</span>';
+		}
+		if (label) {
+			html +=
+				'<span class="mw-sales-toast__btn">' + escapeHtml(label) + '</span>';
+		}
+		return html;
+	}
+
+	function fillToastParts(mediaEl, textEl, metaEl, ctaEl, toastEl, type) {
+		var samples = sampleMaps();
+		var sample = samples[type] || samples.sale;
+		var html = applySampleTemplate(sample.tpl, sample.map);
+
 		if (textEl) {
-			textEl.innerHTML = buildMessageHtml();
+			textEl.innerHTML = html;
 		}
 		if (metaEl) {
-			metaEl.textContent = sampleMetaLabel();
+			metaEl.textContent = sample.meta || '';
+			metaEl.hidden = !sample.meta;
+		}
+		if (ctaEl) {
+			ctaEl.innerHTML = sample.cta || '';
+			ctaEl.hidden = !sample.cta;
+		}
+		if (toastEl) {
+			toastEl.classList.toggle('mw-sales-toast--viewing', type === 'viewing');
+			toastEl.classList.toggle('mw-sales-toast--review', type === 'review');
+			toastEl.classList.toggle('mw-sales-toast--cta', type === 'cta');
 		}
 		if (!mediaEl) {
 			return;
 		}
-		if (showImage && showImage.checked) {
+		var show = sample.showMedia !== false && showImage && showImage.checked;
+		if (show) {
 			mediaEl.hidden = false;
 			mediaEl.innerHTML =
 				'<img src="' +
@@ -569,16 +790,121 @@
 		}
 	}
 
+	function fillToastEl(toastEl, type) {
+		if (!toastEl) {
+			return;
+		}
+		fillToastParts(
+			toastEl.querySelector('.mw-sales-toast__media'),
+			toastEl.querySelector('.mw-sales-toast__text'),
+			toastEl.querySelector('.mw-sales-toast__meta'),
+			toastEl.querySelector('.mw-sales-toast__cta'),
+			toastEl,
+			type
+		);
+		applyMediaFitClass(toastEl);
+	}
+
+	function previewAriaLabel(type) {
+		var title = previewTypeTitle(type);
+		var tpl = i18n.previewToast || 'Preview %s toast';
+		return tpl.replace('%s', title);
+	}
+
+	function rebuildSampleList(types) {
+		if (!sampleList) {
+			return;
+		}
+		sampleList.innerHTML = '';
+		types.forEach(function (type) {
+			var item = document.createElement('div');
+			item.className = 'mwst-sample-item';
+			item.setAttribute('data-preview-type', type);
+
+			var caption = document.createElement('p');
+			caption.className = 'mwst-preview-type';
+			caption.textContent = previewTypeTitle(type);
+			caption.hidden = types.length < 2;
+
+			var toast = document.createElement('aside');
+			toast.className =
+				'mw-sales-toast mwst-sample-toast is-visible mw-sales-toast--media-' +
+				currentImageFit();
+			toast.setAttribute('role', 'button');
+			toast.setAttribute('tabindex', '0');
+			toast.setAttribute('aria-pressed', 'false');
+			toast.setAttribute('aria-label', previewAriaLabel(type));
+			toast.innerHTML =
+				'<div class="mw-sales-toast__media" hidden></div>' +
+				'<div class="mw-sales-toast__body">' +
+				'<p class="mw-sales-toast__text"></p>' +
+				'<p class="mw-sales-toast__meta"></p>' +
+				'<div class="mw-sales-toast__cta" hidden></div>' +
+				'</div>' +
+				'<span class="mw-sales-toast__close" aria-hidden="true">×</span>';
+
+			item.appendChild(caption);
+			item.appendChild(toast);
+			sampleList.appendChild(item);
+
+			toast.addEventListener('click', function () {
+				previewSample(type);
+			});
+			toast.addEventListener('keydown', function (e) {
+				if (e.key === 'Enter' || e.key === ' ') {
+					e.preventDefault();
+					previewSample(type);
+				}
+			});
+		});
+	}
+
 	function syncSample() {
-		fillToastParts(sampleMedia, sampleText, sampleMeta);
+		var types = selectedPreviewTypes();
+		if (!sampleList) {
+			return;
+		}
+		var key = types.join(',');
+		if (sampleList.getAttribute('data-types') !== key) {
+			rebuildSampleList(types);
+			sampleList.setAttribute('data-types', key);
+		}
+		sampleList.querySelectorAll('.mwst-sample-item').forEach(function (item) {
+			var type = item.getAttribute('data-preview-type');
+			var toast = item.querySelector('.mwst-sample-toast');
+			var caption = item.querySelector('.mwst-preview-type');
+			fillToastEl(toast, type);
+			item.classList.toggle('is-previewing', liveVisible && previewType === type);
+			if (toast) {
+				toast.setAttribute(
+					'aria-pressed',
+					liveVisible && previewType === type ? 'true' : 'false'
+				);
+				toast.setAttribute('aria-label', previewAriaLabel(type));
+			}
+			if (caption) {
+				caption.hidden = types.length < 2;
+				caption.textContent = previewTypeTitle(type);
+			}
+		});
 		if (liveVisible && liveEl) {
-			fillToastParts(
-				liveEl.querySelector('.mw-sales-toast__media'),
-				liveEl.querySelector('.mw-sales-toast__text'),
-				liveEl.querySelector('.mw-sales-toast__meta')
-			);
+			fillToastEl(liveEl, previewType);
 			syncLivePosition();
 		}
+	}
+
+	function markPreviewingSample() {
+		if (!sampleList) {
+			return;
+		}
+		sampleList.querySelectorAll('.mwst-sample-item').forEach(function (item) {
+			var on = liveVisible && item.getAttribute('data-preview-type') === previewType;
+			item.classList.toggle('is-previewing', on);
+			var toast = item.querySelector('.mwst-sample-toast');
+			if (toast) {
+				toast.setAttribute('aria-pressed', on ? 'true' : 'false');
+			}
+		});
 	}
 
 	function syncPositionCaption() {
@@ -597,17 +923,9 @@
 			' mw-sales-toast--media-' +
 			currentImageFit() +
 			(liveVisible ? ' is-visible' : '');
-	}
-
-	function syncToggleLabel() {
-		if (!toggleBtn) {
-			return;
-		}
-		toggleBtn.textContent = liveVisible
-			? i18n.hideToast || 'Hide toast'
-			: i18n.showToast || 'Show toast';
-		toggleBtn.classList.toggle('is-active', liveVisible);
-		toggleBtn.setAttribute('aria-pressed', liveVisible ? 'true' : 'false');
+		liveEl.classList.toggle('mw-sales-toast--viewing', previewType === 'viewing');
+		liveEl.classList.toggle('mw-sales-toast--review', previewType === 'review');
+		liveEl.classList.toggle('mw-sales-toast--cta', previewType === 'cta');
 	}
 
 	function clearHideTimer() {
@@ -629,6 +947,7 @@
 			'<div class="mw-sales-toast__body">' +
 			'<p class="mw-sales-toast__text"></p>' +
 			'<p class="mw-sales-toast__meta"></p>' +
+			'<div class="mw-sales-toast__cta" hidden></div>' +
 			'</div>' +
 			'<button type="button" class="mw-sales-toast__close" aria-label="' +
 			escapeHtml(i18n.dismiss || 'Dismiss') +
@@ -660,29 +979,29 @@
 		playPopSample();
 	}
 
-	function showLiveToast() {
+	function showLiveToast(type) {
+		var types = selectedPreviewTypes();
+		previewType = types.indexOf(type) !== -1 ? type : types[0] || 'sale';
 		var el = ensureLiveToast();
-		fillToastParts(
-			el.querySelector('.mw-sales-toast__media'),
-			el.querySelector('.mw-sales-toast__text'),
-			el.querySelector('.mw-sales-toast__meta')
-		);
-
-		el.className =
-			'mw-sales-toast mwst-admin-live mw-sales-toast--' +
-			currentPosition() +
-			' mw-sales-toast--media-' +
-			currentImageFit();
+		liveVisible = true;
+		el.classList.remove('is-leaving');
+		fillToastEl(el, previewType);
+		syncLivePosition();
+		el.classList.remove('is-visible');
 		void el.offsetWidth;
 		el.classList.add('is-visible');
-		liveVisible = true;
-		syncToggleLabel();
 		playPopIfEnabled();
+		schedulePreviewHide();
+		markPreviewingSample();
+	}
 
+	function schedulePreviewHide() {
 		clearHideTimer();
 		hideTimer = window.setTimeout(function () {
 			hideTimer = null;
-			hideLiveToast();
+			if (liveVisible) {
+				hideLiveToast();
+			}
 		}, currentDurationMs());
 	}
 
@@ -698,15 +1017,15 @@
 			}, 400);
 		}
 		liveVisible = false;
-		syncToggleLabel();
+		markPreviewingSample();
 	}
 
-	function toggleLiveToast() {
-		if (liveVisible) {
+	function previewSample(type) {
+		if (liveVisible && previewType === type) {
 			hideLiveToast();
-		} else {
-			showLiveToast();
+			return;
 		}
+		showLiveToast(type);
 	}
 
 	function designValue(key, fallback) {
@@ -748,7 +1067,11 @@
 	}
 
 	function syncImageFit() {
-		applyMediaFitClass(sampleToast);
+		if (sampleList) {
+			sampleList.querySelectorAll('.mwst-sample-toast').forEach(function (toast) {
+				applyMediaFitClass(toast);
+			});
+		}
 		if (liveEl) {
 			applyMediaFitClass(liveEl);
 		}
@@ -1096,17 +1419,21 @@
 
 	root.querySelectorAll('.mwst-token').forEach(function (btn) {
 		btn.addEventListener('click', function () {
-			if (!template) {
+			var targetId = btn.getAttribute('data-target') || 'mwst-template';
+			var field = root.querySelector('#' + targetId);
+			if (!field) {
 				return;
 			}
 			var token = btn.getAttribute('data-token');
-			var start = template.selectionStart;
-			var end = template.selectionEnd;
-			var value = template.value;
-			template.value = value.slice(0, start) + token + value.slice(end);
-			template.focus();
+			var start = field.selectionStart;
+			var end = field.selectionEnd;
+			var value = field.value;
+			field.value = value.slice(0, start) + token + value.slice(end);
+			field.focus();
 			var caret = start + token.length;
-			template.setSelectionRange(caret, caret);
+			if (typeof field.setSelectionRange === 'function') {
+				field.setSelectionRange(caret, caret);
+			}
 			syncSample();
 		});
 	});
@@ -1118,7 +1445,9 @@
 		template.addEventListener('input', syncSample);
 	}
 	if (fallback) {
-		fallback.addEventListener('input', syncSample);
+		fallback.addEventListener('input', function () {
+			syncSample();
+		});
 	}
 	if (hideNames) {
 		hideNames.addEventListener('change', syncSample);
@@ -1132,6 +1461,34 @@
 	if (whenStyle) {
 		whenStyle.addEventListener('change', syncSample);
 	}
+
+	if (viewingMode) {
+		viewingMode.addEventListener('change', function () {
+			syncViewingModeOptions();
+			syncSample();
+		});
+	}
+
+	[
+		'#mwst-viewing-template',
+		'#mwst-review-template',
+		'#mwst-review-excerpt',
+		'#mwst-cta-message',
+		'#mwst-cta-coupon',
+		'#mwst-cta-button',
+		'#mwst-cta-url'
+	].forEach(function (selector) {
+		var el = root.querySelector(selector);
+		if (!el) {
+			return;
+		}
+		el.addEventListener('input', syncSample);
+		el.addEventListener('change', syncSample);
+	});
+	root.querySelectorAll('#mwst-type-viewing-opt input, #mwst-type-review-opt input').forEach(function (el) {
+		el.addEventListener('input', syncSample);
+		el.addEventListener('change', syncSample);
+	});
 	function syncStockThresholdState() {
 		var off = !stockDisplay || stockDisplay.value === 'off';
 		if (stockThreshold) {
@@ -1181,9 +1538,6 @@
 	}
 	if (disableMobile) {
 		disableMobile.addEventListener('change', syncMobileBreakpointState);
-	}
-	if (toggleBtn) {
-		toggleBtn.addEventListener('click', toggleLiveToast);
 	}
 
 	function initCustomCssEditor() {
@@ -1392,7 +1746,7 @@
 	if (durationInputField) {
 		durationInputField.addEventListener('change', function () {
 			if (liveVisible) {
-				showLiveToast();
+				showLiveToast(previewType);
 			}
 		});
 	}
@@ -1403,6 +1757,10 @@
 
 	triggerInputs.forEach(function (input) {
 		input.addEventListener('change', syncTriggerOptions);
+	});
+
+	typeInputs.forEach(function (input) {
+		input.addEventListener('change', syncTypeOptions);
 	});
 
 	syncBadge();
@@ -1467,12 +1825,12 @@
 		scrollToHashTarget();
 	}
 
-	syncToggleLabel();
 	syncImageFitState();
 	syncImageFit();
 	syncElementorThemeUi();
 	syncTimingPreset();
 	syncTriggerOptions();
+	syncTypeOptions();
 
 	/* Statistics date range — live aggregates when analytics payload exists. */
 	var analyticsData = cfg.analytics || null;

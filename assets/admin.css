@@ -879,7 +879,12 @@
 	padding: 14px;
 }
 
-/* Inline sample uses real toast.css, but stays in the card */
+.mwst-sample-list {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
 .mwst-sample-toast.mw-sales-toast {
 	position: relative;
 	left: auto !important;
@@ -891,18 +896,33 @@
 	max-width: 100%;
 	transform: none !important;
 	opacity: 1;
-	pointer-events: none;
+	pointer-events: auto;
+	cursor: pointer;
 	font-size: 0.8125rem;
+}
+
+.mwst-sample-toast.mw-sales-toast:hover,
+.mwst-sample-toast.mw-sales-toast:focus-visible {
+	box-shadow: 0 0 0 2px #93c5fd;
+}
+
+.mwst-sample-toast.mw-sales-toast:focus {
+	outline: none;
+}
+
+.mwst-sample-item.is-previewing .mwst-sample-toast.mw-sales-toast {
+	box-shadow: 0 0 0 2px var(--mwst-accent, #2563eb);
 }
 
 .mwst-sample-toast .mw-sales-toast__close {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	cursor: default;
+	cursor: inherit;
 	line-height: 1;
 	padding: 0 0 2px;
 	font-size: 1.125rem;
+	pointer-events: none;
 }
 
 .mwst-sample-toast .mw-sales-toast__media {
@@ -914,22 +934,13 @@
 	display: block;
 }
 
-.mwst-preview-actions {
-	margin-top: 12px;
-}
-
-.mwst-preview-actions .button {
-	width: 100%;
-	text-align: center;
-	height: 34px;
-	line-height: 32px;
-}
-
-.mwst-preview-actions .button.is-active {
-	background: var(--mwst-accent-soft);
-	border-color: #93c5fd;
-	color: var(--mwst-accent);
-	box-shadow: none;
+.mwst-preview-type {
+	margin: 0 0 6px;
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--mwst-muted);
 }
 
 .mwst-preview-hint {
@@ -1596,18 +1607,21 @@
 	}
 }
 
-.mwst-presets--triggers {
+.mwst-presets--triggers,
+.mwst-presets--types {
 	grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 @media (max-width: 1100px) {
-	.mwst-presets--triggers {
+	.mwst-presets--triggers,
+	.mwst-presets--types {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
 }
 
 @media (max-width: 782px) {
-	.mwst-presets--triggers {
+	.mwst-presets--triggers,
+	.mwst-presets--types {
 		grid-template-columns: 1fr;
 	}
 }
@@ -2311,7 +2325,10 @@
 
 #mwst-targeting .wc-product-search,
 #mwst-targeting .wc-enhanced-select,
-#mwst-targeting .select2-container {
+#mwst-targeting .select2-container,
+#mwst-type-viewing-opt .wc-product-search,
+#mwst-type-viewing-opt .select2-container {
+	width: 100% !important;
 	max-width: 100%;
 }
 

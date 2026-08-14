@@ -1,6 +1,6 @@
 # MW Sales Toast
 
-**Version 2.1.0** — Recent-purchase social-proof toasts for WooCommerce: cached real orders, privacy controls, and optional demo fill.
+**Version 2.2.0** — Recent-purchase social-proof toasts for WooCommerce: cached real orders, privacy controls, and optional demo fill.
 
 Requires WordPress 5.8+, PHP 7.2+. WooCommerce is required for real orders; demo mode can run without it.
 
@@ -49,6 +49,13 @@ Requires WordPress 5.8+, PHP 7.2+. WooCommerce is required for real orders; demo
 - **Inactivity** — no pointer/keyboard/scroll for N seconds
 - **Click** — CSS selector; first matching click starts the loop
 - Combine any of the above; the first match starts the loop. Duration and gap still apply after that.
+
+### Extra toast types
+- **Purchases** — recent orders (default; uncheck to run only extra types)
+- **Viewing now** — “X people are viewing {product}”. Simulated range (stable ~15 min) or live unique visitors on the product page (session token, no IPs). Simulated can pin specific products; live follows General include/exclude
+- **Reviews** — approved WooCommerce product reviews (min stars, excerpt, `{stars}`)
+- **CTA / coupon** — promo line, copyable coupon chip, optional button URL; once per session optional
+- Types rotate in the same toast loop
 
 ### Display & UX
 - Corner positions (bottom/top × left/right)
@@ -109,6 +116,7 @@ Visitor JS ──► GET mw-st/v1/notifications ──────┘──► t
 | Product image | Show thumbnail |
 | Reduced motion | Skip when visitor prefers reduced motion |
 | Message template | `{name}` `{city}` `{product}` |
+| Toast types | Purchases, viewing now, reviews, CTA/coupon |
 | Fallback name | Default “Someone” |
 | Hide names | Always use fallback name |
 | Require checkout consent | Privacy gate for real orders |
@@ -156,6 +164,7 @@ mw-sales-toast/
     ├── class-settings.php      Options + admin UI
     ├── class-transfer.php      Settings / theme JSON import-export
     ├── class-cache.php         Rebuild + cron/order hooks
+    ├── class-types.php         Viewing / review / CTA events + presence
     ├── class-rest.php          GET mw-st/v1/notifications
     ├── class-analytics.php     Toast engagement aggregates
     ├── class-privacy.php       Checkout consent meta
@@ -165,7 +174,7 @@ mw-sales-toast/
 
 ## Out of scope (later)
 
-Review notifications, view-based fake sales, geolocation targeting, and WordPress.org submission packaging.
+Geolocation targeting and WordPress.org submission packaging.
 
 ## Keywords / discovery
 
@@ -213,6 +222,9 @@ Terms people may use in **WordPress Admin → Plugins → Add New** or Google:
 5. fomo
 
 ## Changelog
+
+### 2.2.0
+- Extra toast types: viewing now, product reviews, and CTA/coupon
 
 ### 2.1.0
 - Triggers: page load, scroll depth, exit intent, add to cart, inactivity, and click selector
