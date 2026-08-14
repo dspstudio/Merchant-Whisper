@@ -1,5 +1,5 @@
 /**
- * Pure sine-wave pop for MW Sales Toast (Web Audio API).
+ * Pure sine-wave pop for MW Proof (Web Audio API).
  */
 (function (window) {
   'use strict';

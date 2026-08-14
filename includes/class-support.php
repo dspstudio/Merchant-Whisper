@@ -39,7 +39,7 @@ class MW_Sales_Toast_Support {
 
 		$theme  = wp_get_theme();
 		$lines  = array(
-			'Plugin: MW Sales Toast ' . MW_SALES_TOAST_VERSION,
+			'Plugin: ' . MW_SALES_TOAST_NAME . ' ' . MW_SALES_TOAST_VERSION,
 			'Site: ' . home_url( '/' ),
 			'WP: ' . ( isset( $wp_version ) ? $wp_version : '' ),
 			'PHP: ' . PHP_VERSION,
@@ -90,7 +90,7 @@ class MW_Sales_Toast_Support {
 			'subject' => $subject,
 			'message' => $message,
 			'site'    => home_url( '/' ),
-			'plugin'  => 'MW Sales Toast ' . MW_SALES_TOAST_VERSION,
+			'plugin'  => MW_SALES_TOAST_NAME . ' ' . MW_SALES_TOAST_VERSION,
 			'source'  => 'wordpress-admin',
 		);
 

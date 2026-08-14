@@ -37,6 +37,9 @@
 	var delayInput = root.querySelector('#mwst-delay');
 	var durationInputField = root.querySelector('#mwst-duration');
 	var gapInput = root.querySelector('#mwst-gap');
+	var jitterInput = root.querySelector('#mwst-jitter');
+	var maxEventsInput = root.querySelector('#mwst-max');
+	var cycleEstimate = root.querySelector('#mwst-cycle-estimate');
 	var triggerInputs = root.querySelectorAll('.mwst-trigger-input');
 	var triggerScrollOpt = root.querySelector('#mwst-trigger-scroll-opt');
 	var triggerIdleOpt = root.querySelector('#mwst-trigger-idle-opt');
@@ -48,6 +51,10 @@
 	var typeCtaOpt = root.querySelector('#mwst-type-cta-opt');
 	var viewingMode = root.querySelector('#mwst-viewing-mode');
 	var viewingProductsField = root.querySelector('#mwst-viewing-products-field');
+	var viewingMinWrap = root.querySelector('#mwst-viewing-min-wrap');
+	var viewingWindowWrap = root.querySelector('#mwst-viewing-window-wrap');
+	var viewingCountDesc = root.querySelector('#mwst-viewing-count-desc');
+	var viewingLiveDesc = root.querySelector('#mwst-viewing-live-desc');
 	var whenStyle = root.querySelector('#mwst-when-style');
 	var stockDisplay = root.querySelector('#mwst-stock-display');
 	var stockThreshold = root.querySelector('#mwst-stock-threshold');
@@ -86,17 +93,222 @@
 	var saveBar = root.querySelector('#mwst-save-bar');
 	var saveHint = root.querySelector('#mwst-save-hint');
 	var saveSpinner = root.querySelector('#mwst-save-spinner');
-	var settingsForm = root.querySelector('form');
+	var settingsForm =
+		root.querySelector('#mwst-settings-form') ||
+		root.querySelector('form[action="options.php"]');
 	var supportStatus = root.querySelector('#mwst-support-status');
 	var supportSubmit = root.querySelector('#mwst-support-submit');
 	var supportCfg = cfg.support || {};
+	var cacheCfg = cfg.cache || {};
 	var saveHintDefault = saveHint ? saveHint.textContent : '';
+	var optionPrefix = cfg.optionName || 'mw_sales_toast_settings';
+	var saveDirty = false;
+	var saveSnapshot = '';
+	var saveState = {};
+	var saveLeaving = false;
+	var dirtyReady = false;
+	var userTouchedForm = false;
+	var restoringForm = false;
+	var saveRevert = root.querySelector('#mwst-save-revert');
 
 	function getSaveSubmitButton() {
 		return (
 			(saveBar && saveBar.querySelector('input[type="submit"], button[type="submit"]')) ||
 			(settingsForm && settingsForm.querySelector('input[type="submit"][name="submit"]'))
 		);
+	}
+
+	function collectSettingsMap() {
+		var map = {};
+		if (!settingsForm) {
+			return map;
+		}
+		function add(name, value) {
+			if (!Object.prototype.hasOwnProperty.call(map, name)) {
+				map[name] = [];
+			}
+			map[name].push(String(value));
+		}
+		var fields = settingsForm.querySelectorAll('[name]');
+		for (var i = 0; i < fields.length; i++) {
+			var el = fields[i];
+			var name = el.getAttribute('name') || '';
+			if (name.indexOf(optionPrefix) !== 0) {
+				continue;
+			}
+			var tag = (el.tagName || '').toLowerCase();
+			if (tag === 'input') {
+				var type = (el.type || '').toLowerCase();
+				if (type === 'file' || type === 'button' || type === 'submit' || type === 'reset') {
+					continue;
+				}
+				if (type === 'checkbox' || type === 'radio') {
+					if (el.checked) {
+						add(name, el.value);
+					}
+				} else {
+					add(name, el.value);
+				}
+			} else if (tag === 'select') {
+				if (el.multiple) {
+					Array.prototype.forEach.call(el.selectedOptions || [], function (opt) {
+						add(name, opt.value);
+					});
+				} else {
+					add(name, el.value);
+				}
+			} else if (tag === 'textarea') {
+				add(name, el.value);
+			}
+		}
+		return map;
+	}
+
+	function snapshotFromMap(map) {
+		var keys = Object.keys(map).sort();
+		var ordered = {};
+		for (var i = 0; i < keys.length; i++) {
+			ordered[keys[i]] = map[keys[i]];
+		}
+		return JSON.stringify(ordered);
+	}
+
+	function collectSettingsSnapshot() {
+		return snapshotFromMap(collectSettingsMap());
+	}
+
+	function applySettingsMap(map) {
+		if (!settingsForm || !map) {
+			return;
+		}
+		var fields = settingsForm.querySelectorAll('[name]');
+		for (var i = 0; i < fields.length; i++) {
+			var el = fields[i];
+			var name = el.getAttribute('name') || '';
+			if (name.indexOf(optionPrefix) !== 0) {
+				continue;
+			}
+			var values = Object.prototype.hasOwnProperty.call(map, name) ? map[name] : [];
+			var tag = (el.tagName || '').toLowerCase();
+			if (tag === 'input') {
+				var type = (el.type || '').toLowerCase();
+				if (type === 'file' || type === 'button' || type === 'submit' || type === 'reset') {
+					continue;
+				}
+				if (type === 'checkbox' || type === 'radio') {
+					el.checked = values.indexOf(el.value) !== -1;
+				} else {
+					el.value = values.length ? values[0] : '';
+					if (window.jQuery && el.classList.contains('mwst-color-picker')) {
+						try {
+							window.jQuery(el).wpColorPicker('color', el.value);
+						} catch (err) {
+							/* picker not ready */
+						}
+					}
+				}
+			} else if (tag === 'select') {
+				if (window.jQuery && window.jQuery(el).data('select2')) {
+					window.jQuery(el).val(el.multiple ? values : values[0] || null).trigger('change');
+				} else if (el.multiple) {
+					Array.prototype.forEach.call(el.options || [], function (opt) {
+						opt.selected = values.indexOf(opt.value) !== -1;
+					});
+				} else {
+					el.value = values.length ? values[0] : '';
+				}
+			} else if (tag === 'textarea') {
+				el.value = values.length ? values[0] : '';
+				if (el.id === 'mwst-custom-css' && cssCodeMirror) {
+					cssCodeMirror.setValue(el.value);
+				}
+			}
+		}
+	}
+
+	function dirtyHintText() {
+		return i18n.saveHintDirty || 'Unsaved changes';
+	}
+
+	function applySaveHint() {
+		if (!saveHint) {
+			return;
+		}
+		if (saveBar && saveBar.classList.contains('is-saving')) {
+			saveHint.textContent = i18n.saveHintBusy || 'Saving your settings and rebuilding the sales cache…';
+			return;
+		}
+		saveHint.textContent = saveDirty ? dirtyHintText() : saveHintDefault;
+	}
+
+	function setDirty(on) {
+		saveDirty = !!on;
+		if (saveBar) {
+			saveBar.classList.toggle('is-dirty', saveDirty);
+		}
+		if (saveRevert) {
+			saveRevert.hidden = !saveDirty;
+		}
+		applySaveHint();
+	}
+
+	function refreshDirtyFromForm() {
+		if (restoringForm || !dirtyReady || !settingsForm) {
+			return;
+		}
+		if (cssCodeMirror) {
+			cssCodeMirror.save();
+		}
+		setDirty(collectSettingsSnapshot() !== saveSnapshot);
+	}
+
+	function captureSaveSnapshot(forceClean) {
+		if (cssCodeMirror) {
+			cssCodeMirror.save();
+		}
+		saveState = collectSettingsMap();
+		saveSnapshot = snapshotFromMap(saveState);
+		dirtyReady = true;
+		if (forceClean) {
+			setDirty(false);
+		} else {
+			refreshDirtyFromForm();
+		}
+	}
+
+	function restorePendingChanges() {
+		if (restoringForm) {
+			return;
+		}
+		restoringForm = true;
+		try {
+			applySettingsMap(saveState || {});
+			syncBadge();
+			syncTimingPreset();
+			updateCycleEstimate();
+			syncTriggerOptions();
+			syncTypeOptions();
+			syncViewingModeOptions();
+			syncPositionCaption();
+			syncLivePosition();
+			syncImageFitState();
+			syncImageFit();
+			syncElementorThemeUi();
+			syncDesignPresetUi();
+			syncStockThresholdState();
+			syncExcludeHomeState();
+			syncMobileBreakpointState();
+			syncDesign();
+			syncSample();
+			refreshProductSelects();
+		} catch (err) {
+			/* keep restoring flag until snapshot reset */
+		}
+		window.setTimeout(function () {
+			userTouchedForm = false;
+			captureSaveSnapshot(true);
+			restoringForm = false;
+		}, 80);
 	}
 
 	function setSavingState(on) {
@@ -108,11 +320,7 @@
 		if (saveSpinner) {
 			saveSpinner.hidden = !on;
 		}
-		if (saveHint) {
-			saveHint.textContent = on
-				? i18n.saveHintBusy || 'Saving your settings and rebuilding the sales cache…'
-				: saveHintDefault;
-		}
+		applySaveHint();
 		var btn = getSaveSubmitButton();
 		if (!btn) {
 			return;
@@ -144,8 +352,32 @@
 	/** Enter in inputs/selects submits Save settings (not in textareas or Support/Account). */
 	if (settingsForm) {
 		settingsForm.addEventListener('submit', function () {
+			saveLeaving = true;
 			setSavingState(true);
 		});
+
+		settingsForm.addEventListener(
+			'input',
+			function () {
+				if (restoringForm) {
+					return;
+				}
+				userTouchedForm = true;
+				refreshDirtyFromForm();
+			},
+			true
+		);
+		settingsForm.addEventListener(
+			'change',
+			function () {
+				if (restoringForm) {
+					return;
+				}
+				userTouchedForm = true;
+				refreshDirtyFromForm();
+			},
+			true
+		);
 
 		settingsForm.addEventListener('keydown', function (event) {
 			if (event.key !== 'Enter') {
@@ -203,10 +435,35 @@
 		});
 	}
 
+	if (saveBar) {
+		saveBar.addEventListener('click', function (event) {
+			var target = event.target;
+			if (!target || !target.closest) {
+				return;
+			}
+			if (!target.closest('#mwst-save-revert')) {
+				return;
+			}
+			event.preventDefault();
+			event.stopPropagation();
+			restorePendingChanges();
+		});
+	}
+
+	window.addEventListener('beforeunload', function (event) {
+		if (!saveDirty || saveLeaving) {
+			return;
+		}
+		event.preventDefault();
+		event.returnValue = '';
+	});
+
 	// Back/forward cache restores the pre-submit DOM (spinner + "Saving…" still visible).
 	window.addEventListener('pageshow', function (event) {
 		if (event.persisted) {
+			saveLeaving = false;
 			setSavingState(false);
+			refreshDirtyFromForm();
 		}
 	});
 
@@ -220,6 +477,9 @@
 			// Legacy License tab → Account.
 			if (id === 'license') {
 				return 'account';
+			}
+			if (id === 'demo') {
+				return 'message';
 			}
 			return id;
 		} catch (err) {
@@ -235,6 +495,9 @@
 		var el = root.querySelector(hash);
 		if (!el) {
 			return;
+		}
+		if (el.tagName === 'DETAILS') {
+			el.open = true;
 		}
 		window.setTimeout(function () {
 			el.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -262,17 +525,19 @@
 			// Ignore URL sync failures (older browsers).
 		}
 
-		var referer = document.querySelector('input[name="_wp_http_referer"]');
-		if (!referer || !referer.value) {
-			return;
-		}
-		try {
-			var ref = new URL(referer.value, window.location.origin);
-			ref.searchParams.set('tab', id);
-			referer.value = ref.pathname + ref.search + ref.hash;
-		} catch (err2) {
-			// Ignore referer sync failures.
-		}
+		var referers = root.querySelectorAll('input[name="_wp_http_referer"]');
+		referers.forEach(function (referer) {
+			if (!referer || !referer.value) {
+				return;
+			}
+			try {
+				var ref = new URL(referer.value, window.location.origin);
+				ref.searchParams.set('tab', id);
+				referer.value = ref.pathname + ref.search + ref.hash;
+			} catch (err2) {
+				// Ignore referer sync failures.
+			}
+		});
 	}
 
 	function activateTab(id) {
@@ -303,6 +568,9 @@
 			window.setTimeout(function () {
 				cssCodeMirror.refresh();
 			}, 0);
+		}
+		if (id === 'message' || id === 'general') {
+			refreshProductSelects();
 		}
 	}
 
@@ -430,6 +698,81 @@
 				gapInput.value = selected.getAttribute('data-gap') || gapInput.value;
 			}
 		}
+
+		updateCycleEstimate();
+	}
+
+	function fillI18n(template, parts) {
+		var i = 0;
+		return String(template || '')
+			.replace(/%(\d+)\$[sd]/g, function (_, n) {
+				return String(parts[Number(n) - 1] == null ? '' : parts[Number(n) - 1]);
+			})
+			.replace(/%[sd]/g, function () {
+				var value = parts[i];
+				i += 1;
+				return String(value == null ? '' : value);
+			})
+			.replace(/%%/g, '%');
+	}
+
+	function clampInt(value, min, max, fallback) {
+		var n = parseInt(value, 10);
+		if (!n && n !== 0) {
+			n = fallback;
+		}
+		if (n < min) {
+			n = min;
+		}
+		if (n > max) {
+			n = max;
+		}
+		return n;
+	}
+
+	function formatShortDuration(seconds) {
+		seconds = Math.max(0, Math.round(Number(seconds) || 0));
+		var h = Math.floor(seconds / 3600);
+		var m = Math.floor((seconds % 3600) / 60);
+		var s = seconds % 60;
+		if (h > 0) {
+			return m > 0
+				? fillI18n(i18n.durationHM || '%1$dh %2$dm', [h, m])
+				: fillI18n(i18n.durationH || '%dh', [h]);
+		}
+		if (m > 0) {
+			return s > 0
+				? fillI18n(i18n.durationMS || '%1$dm %2$ds', [m, s])
+				: fillI18n(i18n.durationM || '%dm', [m]);
+		}
+		return fillI18n(i18n.durationS || '%ds', [s]);
+	}
+
+	function updateCycleEstimate() {
+		if (!cycleEstimate) {
+			return;
+		}
+		var n = clampInt(maxEventsInput && maxEventsInput.value, 1, 30, 8);
+		var delay = clampInt(delayInput && delayInput.value, 1, 120, 6);
+		var duration = clampInt(durationInputField && durationInputField.value, 2, 60, 7);
+		var gap = clampInt(gapInput && gapInput.value, 1, 300, 12);
+		var jitter = clampInt(jitterInput && jitterInput.value, 0, 50, 0);
+		var j = jitter / 100;
+		var gaps = n - 1;
+		var nominal = delay + n * duration + gaps * gap;
+		var min = delay * (1 - j) + n * duration + gaps * gap * (1 - j);
+		var max = delay * (1 + j) + n * duration + gaps * gap * (1 + j);
+		if (jitter > 0) {
+			cycleEstimate.textContent = fillI18n(
+				i18n.cycleJitter || 'Estimated messages duration %1$s–%2$s (first delay + visible + gaps).',
+				[formatShortDuration(min), formatShortDuration(max)]
+			);
+			return;
+		}
+		cycleEstimate.textContent = fillI18n(
+			i18n.cycleNominal || 'Estimated messages duration %s (first delay + visible + gaps).',
+			[formatShortDuration(nominal)]
+		);
 	}
 
 	function syncTriggerOptions() {
@@ -518,16 +861,47 @@
 		syncSample();
 	}
 
-	function refreshViewingProductSelect() {
+	function refreshProductSelects() {
 		if (typeof window.jQuery === 'undefined') {
 			return;
 		}
 		window.setTimeout(function () {
-			var $el = window.jQuery('#mwst-viewing-products');
-			if ($el.length && $el.data('select2')) {
-				$el.next('.select2-container').css('width', '100%');
-			}
+			window.jQuery(root)
+				.find('.wc-product-search, .wc-enhanced-select')
+				.each(function () {
+					var $el = window.jQuery(this);
+					var $container = $el.next('.select2-container');
+					if (!$el.data('select2') || !$container.length) {
+						return;
+					}
+					$container.css({ width: '100%', maxWidth: '100%' });
+					$container.find('.select2-search__field').css({
+						width: '100%',
+						maxWidth: '100%'
+					});
+					if ($el.data('mwstSelectBound')) {
+						return;
+					}
+					$el.data('mwstSelectBound', true);
+					$el.on('select2:open', function () {
+						window.setTimeout(function () {
+							var w = $container.outerWidth();
+							if (!w) {
+								return;
+							}
+							window
+								.jQuery('body > .select2-container--open')
+								.css({ width: w, maxWidth: w })
+								.find('.select2-dropdown')
+								.css({ width: w, maxWidth: w });
+						}, 0);
+					});
+				});
 		}, 0);
+	}
+
+	function refreshViewingProductSelect() {
+		refreshProductSelects();
 	}
 
 	function syncViewingModeOptions() {
@@ -537,6 +911,18 @@
 			if (!live) {
 				refreshViewingProductSelect();
 			}
+		}
+		if (viewingMinWrap) {
+			viewingMinWrap.hidden = !!live;
+		}
+		if (viewingWindowWrap) {
+			viewingWindowWrap.hidden = !live;
+		}
+		if (viewingCountDesc) {
+			viewingCountDesc.hidden = !!live;
+		}
+		if (viewingLiveDesc) {
+			viewingLiveDesc.hidden = !live;
 		}
 	}
 
@@ -644,6 +1030,20 @@
 		return i18n.sampleNatural || 'just now';
 	}
 
+	function sampleViewingCount() {
+		var min = parseInt(fieldValue('#mwst-viewing-min', '2'), 10);
+		var max = parseInt(fieldValue('#mwst-viewing-max', '12'), 10);
+		if (isNaN(min) || min < 1) {
+			min = 2;
+		}
+		if (isNaN(max) || max < min) {
+			max = Math.max(min, 12);
+		}
+		min = Math.min(99, min);
+		max = Math.min(99, max);
+		return Math.round((min + max) / 2);
+	}
+
 	function sampleMaps() {
 		var stock = sampleStockFields();
 		var name = sampleName();
@@ -673,8 +1073,11 @@
 						'{count} {people} are viewing {product}'
 					),
 				map: {
-					'{count}': '7',
-					'{people}': i18n.people || 'people',
+					'{count}': String(sampleViewingCount()),
+					'{people}':
+						sampleViewingCount() === 1
+							? i18n.person || 'person'
+							: i18n.people || 'people',
 					'{product}': product
 				},
 				meta: i18n.now || 'now',
@@ -1390,6 +1793,7 @@
 			setDesignInputValue(key, designDefaults[key]);
 		});
 		finishApplyingDesignPreset('midnight');
+		refreshDirtyFromForm();
 	}
 
 	function initColorPickers() {
@@ -1405,12 +1809,14 @@
 						window.setTimeout(function () {
 							markDesignPresetCustom();
 							syncDesign();
+							refreshDirtyFromForm();
 						}, 10);
 					},
 					clear: function () {
 						window.setTimeout(function () {
 							markDesignPresetCustom();
 							syncDesign();
+							refreshDirtyFromForm();
 						}, 10);
 					}
 				});
@@ -1435,6 +1841,11 @@
 				field.setSelectionRange(caret, caret);
 			}
 			syncSample();
+			if (typeof field.dispatchEvent === 'function') {
+				field.dispatchEvent(new Event('input', { bubbles: true }));
+			} else {
+				refreshDirtyFromForm();
+			}
 		});
 	});
 
@@ -1471,6 +1882,8 @@
 
 	[
 		'#mwst-viewing-template',
+		'#mwst-viewing-min',
+		'#mwst-viewing-max',
 		'#mwst-review-template',
 		'#mwst-review-excerpt',
 		'#mwst-cta-message',
@@ -1553,10 +1966,22 @@
 		cssCodeMirror.on('change', function () {
 			cssCodeMirror.save();
 			syncDesign();
+			refreshDirtyFromForm();
 		});
 	}
 
 	initCustomCssEditor();
+
+	var customCssCard = root.querySelector('#mwst-custom-css-card');
+	if (customCssCard) {
+		customCssCard.addEventListener('toggle', function () {
+			if (customCssCard.open && cssCodeMirror) {
+				window.setTimeout(function () {
+					cssCodeMirror.refresh();
+				}, 0);
+			}
+		});
+	}
 
 	designInputs.forEach(function (input) {
 		input.addEventListener('input', function () {
@@ -1634,6 +2059,112 @@
 		if (type) {
 			supportStatus.classList.add('is-' + type);
 		}
+	}
+
+	var cacheRebuildBtn = root.querySelector('#mwst-cache-rebuild');
+	var cacheRebuildStatus = root.querySelector('#mwst-cache-rebuild-status');
+	if (cacheRebuildBtn) {
+		cacheRebuildBtn.addEventListener('click', function () {
+			if (!cacheCfg.ajaxUrl) {
+				return;
+			}
+			cacheRebuildBtn.disabled = true;
+			cacheRebuildBtn.textContent = i18n.cacheRebuilding || 'Rebuilding cache…';
+			if (cacheRebuildStatus) {
+				cacheRebuildStatus.classList.remove('is-ok', 'is-error');
+				cacheRebuildStatus.textContent = i18n.cacheRebuilding || 'Rebuilding cache…';
+			}
+
+			var body = new window.FormData();
+			body.append('action', cacheCfg.action || 'mw_st_rebuild_cache');
+			body.append('nonce', cacheCfg.nonce || '');
+
+			window
+				.fetch(cacheCfg.ajaxUrl, {
+					method: 'POST',
+					credentials: 'same-origin',
+					body: body
+				})
+				.then(function (res) {
+					return res.json().then(function (data) {
+						return { ok: res.ok, data: data };
+					});
+				})
+				.then(function (result) {
+					var payload = result.data || {};
+					var inner = payload.data || {};
+					var msg =
+						inner.message ||
+						payload.message ||
+						i18n.cacheRebuildError ||
+						'Could not rebuild the cache. Please try again.';
+					if (payload.success) {
+						if (cacheRebuildStatus) {
+							cacheRebuildStatus.classList.add('is-ok');
+							cacheRebuildStatus.classList.remove('is-error');
+							cacheRebuildStatus.textContent = msg;
+						}
+						var ttlEl = root.querySelector('#mwst-cache-ttl');
+						if (ttlEl && inner.ttl) {
+							ttlEl.textContent = inner.ttl;
+						}
+						if (typeof inner.events === 'number') {
+							var eventsEl = root.querySelector('#mwst-header-events');
+							if (eventsEl) {
+								var maxCached = parseInt(inner.max, 10);
+								if (!maxCached) {
+									maxCached = parseInt(eventsEl.getAttribute('data-max'), 10);
+								}
+								if (!maxCached) {
+									var maxInput = root.querySelector('#mwst-cached');
+									maxCached = maxInput ? parseInt(maxInput.value, 10) : 0;
+								}
+								function fmtNum(n) {
+									try {
+										return Number(n).toLocaleString();
+									} catch (e) {
+										return String(n);
+									}
+								}
+								eventsEl.textContent = maxCached
+									? fmtNum(inner.events) + '/' + fmtNum(maxCached)
+									: fmtNum(inner.events);
+								if (maxCached) {
+									eventsEl.setAttribute('data-max', String(maxCached));
+									eventsEl.setAttribute(
+										'aria-label',
+										fmtNum(inner.events) + ' of ' + fmtNum(maxCached) + ' cached events'
+									);
+								}
+								eventsEl.classList.toggle('is-ok', inner.events > 0);
+								eventsEl.classList.toggle('is-bad', inner.events < 1);
+							}
+							if (inner.events > 0) {
+								var emptyNotice = root.querySelector('#mwst-empty-cache-notice');
+								if (emptyNotice) {
+									emptyNotice.remove();
+								}
+							}
+						}
+					} else if (cacheRebuildStatus) {
+						cacheRebuildStatus.classList.add('is-error');
+						cacheRebuildStatus.classList.remove('is-ok');
+						cacheRebuildStatus.textContent = msg;
+					}
+				})
+				.catch(function () {
+					if (cacheRebuildStatus) {
+						cacheRebuildStatus.classList.add('is-error');
+						cacheRebuildStatus.classList.remove('is-ok');
+						cacheRebuildStatus.textContent =
+							i18n.cacheRebuildError || 'Could not rebuild the cache. Please try again.';
+					}
+				})
+				.finally(function () {
+					cacheRebuildBtn.disabled = false;
+					cacheRebuildBtn.textContent = i18n.cacheRebuild || 'Rebuild cache';
+				});
+		});
 	}
 
 	if (supportSubmit) {
@@ -1755,6 +2286,14 @@
 		input.addEventListener('change', syncTimingPreset);
 	});
 
+	[delayInput, durationInputField, gapInput, jitterInput, maxEventsInput].forEach(function (el) {
+		if (!el) {
+			return;
+		}
+		el.addEventListener('input', updateCycleEstimate);
+		el.addEventListener('change', updateCycleEstimate);
+	});
+
 	triggerInputs.forEach(function (input) {
 		input.addEventListener('change', syncTriggerOptions);
 	});
@@ -1793,6 +2332,11 @@
 	}
 
 	activateTab(tabFromUrl());
+	refreshProductSelects();
+	if (typeof window.jQuery !== 'undefined') {
+		window.jQuery(document).on('wc-enhanced-select-init', refreshProductSelects);
+	}
+	window.addEventListener('load', refreshProductSelects);
 
 	if (requestedTab === 'contact' && !window.location.hash) {
 		try {
@@ -1806,6 +2350,24 @@
 			);
 		} catch (err2) {
 			window.location.hash = 'mwst-support-contact';
+		}
+		scrollToHashTarget();
+	} else if (requestedTab === 'demo') {
+		var demoFold = root.querySelector('#mwst-demo-fold');
+		if (demoFold) {
+			demoFold.open = true;
+		}
+		try {
+			var demoUrl = new URL(window.location.href);
+			demoUrl.searchParams.set('tab', 'message');
+			demoUrl.hash = 'mwst-demo-fold';
+			window.history.replaceState(
+				{},
+				'',
+				demoUrl.pathname + demoUrl.search + demoUrl.hash
+			);
+		} catch (errDemo) {
+			window.location.hash = 'mwst-demo-fold';
 		}
 		scrollToHashTarget();
 	} else if (requestedTab === 'license' && !window.location.hash) {
@@ -1943,6 +2505,38 @@
 					.join('');
 			}
 		}
+		var typesBody = panel.querySelector('#mwst-stats-types-body');
+		if (typesBody) {
+			var types = summary.types || [];
+			if (!types.length) {
+				typesBody.innerHTML =
+					'<tr class="mwst-stats-empty"><td colspan="4">' +
+					(i18n.statsEmpty || 'No product data yet.') +
+					'</td></tr>';
+			} else {
+				typesBody.innerHTML = types
+					.map(function (row) {
+						var label = String(row.label || row.id || '')
+							.replace(/&/g, '&amp;')
+							.replace(/</g, '&lt;');
+						return (
+							'<tr><th scope="row">' +
+							label +
+							'</th>' +
+							'<td class="is-num">' +
+							formatStatNumber(row.impressions) +
+							'</td>' +
+							'<td class="is-num">' +
+							formatStatNumber(row.clicks) +
+							'</td>' +
+							'<td class="is-num">' +
+							(Number(row.ctr) || 0) +
+							'%</td></tr>'
+						);
+					})
+					.join('');
+			}
+		}
 	}
 
 	root.querySelectorAll('.mwst-stats-range').forEach(function (group) {
@@ -2010,4 +2604,11 @@
 			});
 		}
 	});
+
+	captureSaveSnapshot(true);
+	window.setTimeout(function () {
+		if (!userTouchedForm) {
+			captureSaveSnapshot(true);
+		}
+	}, 500);
 })();

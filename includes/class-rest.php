@@ -98,7 +98,7 @@ class MW_Sales_Toast_REST {
 			);
 		}
 
-		if ( ! wp_verify_nonce( $nonce, self::NONCE_ACTION ) ) {
+		if ( ! self::verify_nonce( $nonce ) ) {
 			return new WP_Error(
 				'mw_st_rest_nonce_invalid',
 				__( 'Invalid or expired notifications nonce.', 'mw-sales-toast' ),
@@ -110,12 +110,57 @@ class MW_Sales_Toast_REST {
 	}
 
 	/**
-	 * Create a nonce for the front-end script.
+	 * Create a storefront nonce (always as a logged-out visitor).
+	 *
+	 * Logged-in HTML otherwise signs a user-specific nonce that fails on REST
+	 * when the request is treated as a guest (or the reverse with page cache).
 	 *
 	 * @return string
 	 */
 	public static function create_nonce() {
-		return wp_create_nonce( self::NONCE_ACTION );
+		return (string) self::as_guest(
+			static function () {
+				return wp_create_nonce( self::NONCE_ACTION );
+			}
+		);
+	}
+
+	/**
+	 * Accept a storefront nonce for the current user or a guest.
+	 *
+	 * @param string $nonce Nonce.
+	 * @return bool
+	 */
+	public static function verify_nonce( $nonce ) {
+		if ( ! is_string( $nonce ) || '' === $nonce ) {
+			return false;
+		}
+		if ( wp_verify_nonce( $nonce, self::NONCE_ACTION ) ) {
+			return true;
+		}
+		return (bool) self::as_guest(
+			static function () use ( $nonce ) {
+				return wp_verify_nonce( $nonce, self::NONCE_ACTION );
+			}
+		);
+	}
+
+	/**
+	 * Run a callback as user 0, restoring the previous user.
+	 *
+	 * @param callable $callback Callback.
+	 * @return mixed
+	 */
+	private static function as_guest( $callback ) {
+		$uid = get_current_user_id();
+		if ( $uid ) {
+			wp_set_current_user( 0 );
+		}
+		$result = call_user_func( $callback );
+		if ( $uid ) {
+			wp_set_current_user( $uid );
+		}
+		return $result;
 	}
 
 	/**

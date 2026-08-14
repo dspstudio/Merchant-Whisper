@@ -26,6 +26,11 @@
 	box-sizing: border-box;
 }
 
+/* Author display:grid/flex otherwise wins over the hidden attribute. */
+.mwst-admin [hidden] {
+	display: none !important;
+}
+
 .mwst-admin .notice {
 	margin: 12px 0 0;
 }
@@ -344,6 +349,7 @@
 	grid-template-columns: minmax(0, 1fr) 300px;
 	gap: 20px;
 	align-items: start;
+	overflow-x: clip;
 }
 
 .mwst-main {
@@ -431,6 +437,8 @@
 	border: 1px solid var(--mwst-border);
 	border-radius: var(--mwst-radius);
 	box-shadow: var(--mwst-shadow);
+	min-width: 0;
+	max-width: 100%;
 	overflow: hidden;
 }
 
@@ -557,8 +565,9 @@
 }
 
 .mwst-field select {
-	min-width: 220px;
+	min-width: 0;
 	max-width: 100%;
+	width: 100%;
 }
 
 .mwst-field.is-disabled,
@@ -630,6 +639,103 @@
 
 .mwst-inline-nums input {
 	width: 72px;
+}
+
+.mwst-fold {
+	margin: 16px 0 0;
+	padding: 12px 0 0;
+	border-top: 1px solid var(--mwst-border);
+}
+
+.mwst-fold > summary {
+	cursor: pointer;
+	list-style: none;
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--mwst-text);
+	user-select: none;
+}
+
+.mwst-fold > summary::-webkit-details-marker {
+	display: none;
+}
+
+.mwst-fold > summary::after {
+	content: '';
+	display: inline-block;
+	width: 0.45em;
+	height: 0.45em;
+	margin: 0 0 0.12em 0.45em;
+	border-right: 1.5px solid currentColor;
+	border-bottom: 1.5px solid currentColor;
+	transform: rotate(-45deg);
+	vertical-align: middle;
+	opacity: 0.55;
+}
+
+.mwst-fold[open] > summary::after {
+	transform: rotate(45deg);
+	margin-bottom: 0.2em;
+}
+
+.mwst-fold--card {
+	margin: 0;
+	padding: 0;
+	border-top: 0;
+}
+
+.mwst-fold--card > summary.mwst-card__head {
+	position: relative;
+	padding-right: 40px;
+}
+
+.mwst-fold--card > summary.mwst-card__head::after {
+	position: absolute;
+	top: 22px;
+	right: 20px;
+	margin: 0;
+}
+
+.mwst-fold--card:not([open]) > summary.mwst-card__head {
+	border-bottom: 0;
+}
+
+.mwst-fold__body {
+	padding: 10px 0 0;
+}
+
+.mwst-fold__body > .description {
+	margin: 0 0 12px;
+}
+
+.mwst-cycle-estimate {
+	margin: 10px 0 0;
+	padding: 8px 10px;
+	border-radius: 6px;
+	border: 1px solid var(--mwst-border);
+	background: var(--mwst-accent-soft);
+	color: var(--mwst-text);
+	font-size: 12px;
+	line-height: 1.5;
+}
+
+.mwst-cache-actions {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px 14px;
+}
+
+.mwst-cache-rebuild-status {
+	margin: 0;
+}
+
+.mwst-cache-rebuild-status.is-ok {
+	color: var(--mwst-success);
+}
+
+.mwst-cache-rebuild-status.is-error {
+	color: #b32d2e;
 }
 
 .mwst-tokens {
@@ -1019,13 +1125,14 @@
 
 .mwst-save {
 	position: sticky;
-	bottom: 0;
+	bottom: 16px;
 	z-index: 10;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 	gap: 12px;
 	margin-top: 16px;
+	margin-bottom: 4px;
 	padding: 12px 16px;
 	background: rgba(255, 255, 255, 0.92);
 	border: 1px solid var(--mwst-border);
@@ -1047,6 +1154,24 @@
 	flex-shrink: 0;
 }
 
+.mwst-save__revert {
+	padding: 0;
+	border: 0;
+	background: none;
+	color: #9a3412;
+	font-size: 12px;
+	font-weight: 600;
+	text-decoration: underline;
+	text-underline-offset: 2px;
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+.mwst-save__revert:hover,
+.mwst-save__revert:focus {
+	color: #7c2d12;
+}
+
 .mwst-save__spinner {
 	display: none;
 	width: 18px;
@@ -1063,6 +1188,17 @@
 
 .mwst-save.is-saving {
 	pointer-events: none;
+}
+
+.mwst-save.is-dirty:not(.is-saving) {
+	background: #fff4e5;
+	border-color: #f0b429;
+	box-shadow: 0 -4px 20px rgba(180, 83, 9, 0.08);
+}
+
+.mwst-save.is-dirty:not(.is-saving) .mwst-save__hint {
+	color: #92400e;
+	font-weight: 600;
 }
 
 .mwst-save.is-saving .button-primary,
@@ -1607,14 +1743,16 @@
 	}
 }
 
-.mwst-presets--triggers,
-.mwst-presets--types {
+.mwst-presets--triggers {
 	grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.mwst-presets--types {
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 @media (max-width: 1100px) {
-	.mwst-presets--triggers,
-	.mwst-presets--types {
+	.mwst-presets--triggers {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
 }
@@ -1923,6 +2061,16 @@
 	.mwst-save {
 		flex-direction: column;
 		align-items: stretch;
+	}
+
+	.mwst-save__actions {
+		justify-content: flex-end;
+		flex-wrap: wrap;
+	}
+
+	.mwst-save__revert {
+		white-space: normal;
+		text-align: right;
 	}
 
 	.mwst-save .button-primary {
@@ -2323,13 +2471,54 @@
 	margin: 0;
 }
 
-#mwst-targeting .wc-product-search,
-#mwst-targeting .wc-enhanced-select,
-#mwst-targeting .select2-container,
-#mwst-type-viewing-opt .wc-product-search,
-#mwst-type-viewing-opt .select2-container {
-	width: 100% !important;
+.mwst-product-picker {
+	width: 100%;
 	max-width: 100%;
+	min-width: 0;
+}
+
+.mwst-admin .wc-product-search:not(.select2-hidden-accessible),
+.mwst-admin .wc-enhanced-select:not(.select2-hidden-accessible),
+.mwst-admin .select2-container {
+	display: block !important;
+	width: 100% !important;
+	max-width: 100% !important;
+	min-width: 0 !important;
+	box-sizing: border-box;
+}
+
+/*
+ * Woo Select2 sizes the inline search field to the full row, then floats it
+ * beside chips (white-space: nowrap). That row becomes wider than the page.
+ */
+.mwst-admin .select2-container .select2-selection--multiple .select2-selection__rendered {
+	display: flex !important;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 4px;
+	float: none !important;
+	white-space: normal !important;
+	width: 100% !important;
+	max-width: 100% !important;
+	overflow: hidden;
+	box-sizing: border-box;
+}
+
+.mwst-admin .select2-container .select2-selection--multiple .select2-selection__choice {
+	float: none !important;
+}
+
+.mwst-admin .select2-container .select2-search--inline {
+	float: none !important;
+	flex: 1 1 10em;
+	min-width: 8em;
+	max-width: 100%;
+}
+
+.mwst-admin .select2-container .select2-search--inline .select2-search__field {
+	width: 100% !important;
+	max-width: 100% !important;
+	min-width: 0 !important;
 }
 
 @media (max-width: 600px) {

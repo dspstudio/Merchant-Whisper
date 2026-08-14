@@ -58,6 +58,7 @@ class MW_Sales_Toast_Settings {
 			'viewing_template'       => '{count} {people} are viewing {product}',
 			'viewing_min'            => 2,
 			'viewing_max'            => 12,
+			'viewing_count'          => 7,
 			'viewing_mode'           => 'simulated',
 			'viewing_window'         => 5,
 			'viewing_products'       => array(),
@@ -73,8 +74,8 @@ class MW_Sales_Toast_Settings {
 			'cta_once'               => 1,
 			'max_events'             => 8,
 			'max_cached_orders'      => 40,
-			'cache_minutes'          => 60,
-			'cron_minutes'           => 60,
+			'cache_minutes'          => 15,
+			'cron_minutes'           => 15,
 			'lookback_days'          => 30,
 			'show_image'             => 1,
 			'show_on'                => 'all',
@@ -88,7 +89,7 @@ class MW_Sales_Toast_Settings {
 			'hide_names'             => 0,
 			'fallback_name'          => 'Someone',
 			'message_template'       => '{name} from {city} just bought {product}',
-			'max_per_session'        => 12,
+			'max_per_session'        => 8,
 			'mute_hours'             => 24,
 			'disable_mobile'         => 0,
 			'mobile_breakpoint'      => 768,
@@ -127,6 +128,19 @@ class MW_Sales_Toast_Settings {
 			'use_elementor_theme'    => 0,
 			'custom_css'             => '',
 		);
+	}
+
+	/**
+	 * One visit cap: list size equals session cap (no repeats).
+	 *
+	 * @param array<string, mixed> $s Settings.
+	 * @return array<string, mixed>
+	 */
+	public static function sync_visit_caps( $s ) {
+		$n                       = max( 1, min( 30, (int) ( $s['max_events'] ?? 8 ) ) );
+		$s['max_events']      = $n;
+		$s['max_per_session'] = $n;
+		return $s;
 	}
 
 	/**
@@ -711,7 +725,7 @@ class MW_Sales_Toast_Settings {
 			'sale'    => array(
 				'key'   => 'type_sale',
 				'label' => __( 'Purchases', 'mw-sales-toast' ),
-				'desc'  => __( 'Recent orders (the original toast)', 'mw-sales-toast' ),
+				'desc'  => __( 'Recent orders', 'mw-sales-toast' ),
 			),
 			'viewing' => array(
 				'key'   => 'type_viewing',
@@ -966,6 +980,7 @@ class MW_Sales_Toast_Settings {
 		}
 		$merged['viewing_min']      = max( 1, min( 99, (int) ( $merged['viewing_min'] ?? 2 ) ) );
 		$merged['viewing_max']      = max( $merged['viewing_min'], min( 99, (int) ( $merged['viewing_max'] ?? 12 ) ) );
+		$merged['viewing_count']    = max( 1, min( 99, (int) ( $merged['viewing_count'] ?? 7 ) ) );
 		$merged['viewing_window']   = max( 2, min( 30, (int) ( $merged['viewing_window'] ?? 5 ) ) );
 		$merged['review_min_rating'] = max( 1, min( 5, (int) ( $merged['review_min_rating'] ?? 4 ) ) );
 		$merged['review_max']       = max( 1, min( 12, (int) ( $merged['review_max'] ?? 4 ) ) );
@@ -1019,7 +1034,7 @@ class MW_Sales_Toast_Settings {
 			$merged['source'] = 'demo';
 		}
 
-		return $merged;
+		return self::sync_visit_caps( $merged );
 	}
 
 	/**
@@ -1202,6 +1217,7 @@ class MW_Sales_Toast_Settings {
 			: $defaults['viewing_mode'];
 		$out['viewing_min'] = max( 1, min( 99, (int) ( $input['viewing_min'] ?? $defaults['viewing_min'] ) ) );
 		$out['viewing_max'] = max( $out['viewing_min'], min( 99, (int) ( $input['viewing_max'] ?? $defaults['viewing_max'] ) ) );
+		$out['viewing_count'] = max( 1, min( 99, (int) ( $input['viewing_count'] ?? $defaults['viewing_count'] ) ) );
 		$out['viewing_window'] = max( 2, min( 30, (int) ( $input['viewing_window'] ?? $defaults['viewing_window'] ) ) );
 		$out['viewing_products'] = self::sanitize_id_list( $input['viewing_products'] ?? array() );
 		$out['review_min_rating'] = max( 1, min( 5, (int) ( $input['review_min_rating'] ?? $defaults['review_min_rating'] ) ) );
@@ -1256,11 +1272,11 @@ class MW_Sales_Toast_Settings {
 		);
 
 		$out['max_events']        = max( 1, min( 30, (int) ( $input['max_events'] ?? $defaults['max_events'] ) ) );
-		$out['max_cached_orders'] = max( 5, min( 100, (int) ( $input['max_cached_orders'] ?? $defaults['max_cached_orders'] ) ) );
+		$out                      = self::sync_visit_caps( $out );
+		$out['max_cached_orders'] = max( $out['max_events'], min( 100, (int) ( $input['max_cached_orders'] ?? $defaults['max_cached_orders'] ) ) );
 		$out['cache_minutes']     = max( 1, min( 120, (int) ( $input['cache_minutes'] ?? $defaults['cache_minutes'] ) ) );
 		$out['cron_minutes']      = max( 1, min( 120, (int) ( $input['cron_minutes'] ?? $defaults['cron_minutes'] ) ) );
 		$out['lookback_days']     = max( 1, min( 365, (int) ( $input['lookback_days'] ?? $defaults['lookback_days'] ) ) );
-		$out['max_per_session']   = max( 1, min( 100, (int) ( $input['max_per_session'] ?? $defaults['max_per_session'] ) ) );
 		$out['mute_hours']        = max( 0, min( 720, (int) ( $input['mute_hours'] ?? $defaults['mute_hours'] ) ) );
 
 		$out['fallback_name'] = isset( $input['fallback_name'] )
@@ -1391,8 +1407,8 @@ class MW_Sales_Toast_Settings {
 		$cap = self::capability();
 
 		add_menu_page(
-			__( 'Sales Toast', 'mw-sales-toast' ),
-			__( 'Sales Toast', 'mw-sales-toast' ),
+			__( 'MW Proof', 'mw-sales-toast' ),
+			__( 'MW Proof', 'mw-sales-toast' ),
 			$cap,
 			'mw-sales-toast',
 			array( __CLASS__, 'render' ),
@@ -1403,7 +1419,7 @@ class MW_Sales_Toast_Settings {
 		// Rename the auto-added first submenu item.
 		add_submenu_page(
 			'mw-sales-toast',
-			__( 'Sales Toast', 'mw-sales-toast' ),
+			__( 'MW Proof', 'mw-sales-toast' ),
 			__( 'Settings', 'mw-sales-toast' ),
 			$cap,
 			'mw-sales-toast',
@@ -1413,8 +1429,8 @@ class MW_Sales_Toast_Settings {
 		if ( class_exists( 'WooCommerce' ) ) {
 			add_submenu_page(
 				'woocommerce',
-				__( 'Sales Toast', 'mw-sales-toast' ),
-				__( 'Sales Toast', 'mw-sales-toast' ),
+				__( 'MW Proof', 'mw-sales-toast' ),
+				__( 'MW Proof', 'mw-sales-toast' ),
 				$cap,
 				'mw-sales-toast',
 				array( __CLASS__, 'render' )
@@ -1444,19 +1460,21 @@ class MW_Sales_Toast_Settings {
 			wp_add_inline_style( 'mw-sales-toast', $design_css );
 		}
 
+		$admin_style_deps = array( 'mw-sales-toast' );
+		if ( class_exists( 'WooCommerce' ) ) {
+			wp_enqueue_style( 'woocommerce_admin_styles' );
+			$admin_style_deps[] = 'woocommerce_admin_styles';
+			wp_enqueue_script( 'wc-enhanced-select' );
+		}
+
 		wp_enqueue_style(
 			'mw-sales-toast-admin',
 			MW_SALES_TOAST_URL . 'assets/admin.css',
-			array( 'mw-sales-toast' ),
+			$admin_style_deps,
 			MW_SALES_TOAST_VERSION
 		);
 
 		wp_enqueue_style( 'wp-color-picker' );
-
-		if ( class_exists( 'WooCommerce' ) ) {
-			wp_enqueue_style( 'woocommerce_admin_styles' );
-			wp_enqueue_script( 'wc-enhanced-select' );
-		}
 
 		$code_editor = false;
 		if ( function_exists( 'wp_enqueue_code_editor' ) ) {
@@ -1530,9 +1548,15 @@ class MW_Sales_Toast_Settings {
 					'nonce'   => wp_create_nonce( 'mw_st_support' ),
 					'action'  => 'mw_st_support_request',
 				),
+				'cache'          => array(
+					'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+					'nonce'   => wp_create_nonce( 'mw_st_rebuild_cache' ),
+					'action'  => 'mw_st_rebuild_cache',
+				),
 				'analytics'      => class_exists( 'MW_Sales_Toast_Analytics' )
 					? MW_Sales_Toast_Analytics::dashboard_payload()
 					: null,
+				'optionName'     => MW_SALES_TOAST_OPTION,
 				'i18n'           => array(
 					/* translators: %s: relative time */
 					'ago'            => __( '%s ago', 'mw-sales-toast' ),
@@ -1544,10 +1568,13 @@ class MW_Sales_Toast_Settings {
 					'sampleStockSoft'  => __( 'only a few left', 'mw-sales-toast' ),
 					'sampleExcerpt'    => __( 'Exactly what I needed.', 'mw-sales-toast' ),
 					'now'              => __( 'now', 'mw-sales-toast' ),
+					'person'           => __( 'person', 'mw-sales-toast' ),
 					'people'           => __( 'people', 'mw-sales-toast' ),
 					'copyCode'         => __( 'Copy code', 'mw-sales-toast' ),
 					'saving'           => __( 'Saving…', 'mw-sales-toast' ),
 					'saveHintBusy'     => __( 'Saving your settings and rebuilding the sales cache…', 'mw-sales-toast' ),
+					'saveHintDirty'    => __( 'Unsaved changes', 'mw-sales-toast' ),
+					'saveRevert'       => __( 'Cancel changes', 'mw-sales-toast' ),
 					'supportSending'   => __( 'Sending…', 'mw-sales-toast' ),
 					'supportSend'      => __( 'Send message', 'mw-sales-toast' ),
 					'supportError'     => __( 'Something went wrong. Please try again.', 'mw-sales-toast' ),
@@ -1555,6 +1582,23 @@ class MW_Sales_Toast_Settings {
 					'statsMinutes'     => __( 'minutes', 'mw-sales-toast' ),
 					'transferNoFile'   => __( 'Choose a JSON file first.', 'mw-sales-toast' ),
 					'transferImporting' => __( 'Importing…', 'mw-sales-toast' ),
+					/* translators: %s: duration label */
+					'cycleNominal'     => __( 'Estimated messages duration %s (first delay + visible + gaps).', 'mw-sales-toast' ),
+					/* translators: 1: min duration, 2: max duration */
+					'cycleJitter'      => __( 'Estimated messages duration %1$s–%2$s (first delay + visible + gaps).', 'mw-sales-toast' ),
+					/* translators: %d: hours */
+					'durationH'        => _x( '%dh', 'duration hours', 'mw-sales-toast' ),
+					/* translators: 1: hours, 2: minutes */
+					'durationHM'       => _x( '%1$dh %2$dm', 'duration hours minutes', 'mw-sales-toast' ),
+					/* translators: %d: minutes */
+					'durationM'        => _x( '%dm', 'duration minutes', 'mw-sales-toast' ),
+					/* translators: 1: minutes, 2: seconds */
+					'durationMS'       => _x( '%1$dm %2$ds', 'duration minutes seconds', 'mw-sales-toast' ),
+					/* translators: %d: seconds */
+					'durationS'        => _x( '%ds', 'duration seconds', 'mw-sales-toast' ),
+					'cacheRebuild'     => __( 'Rebuild cache', 'mw-sales-toast' ),
+					'cacheRebuilding'  => __( 'Rebuilding cache…', 'mw-sales-toast' ),
+					'cacheRebuildError' => __( 'Could not rebuild the cache. Please try again.', 'mw-sales-toast' ),
 				),
 			)
 		);
@@ -1586,6 +1630,7 @@ class MW_Sales_Toast_Settings {
 
 		if ( $use_wc ) {
 			?>
+			<div class="mwst-product-picker">
 			<select
 				id="<?php echo esc_attr( $id ); ?>"
 				class="wc-product-search"
@@ -1610,6 +1655,7 @@ class MW_Sales_Toast_Settings {
 				}
 				?>
 			</select>
+			</div>
 			<?php
 			return;
 		}
@@ -1680,6 +1726,89 @@ class MW_Sales_Toast_Settings {
 			placeholder="<?php esc_attr_e( 'Category IDs, comma-separated', 'mw-sales-toast' ); ?>"
 		/>
 		<?php
+	}
+
+	/**
+	 * Short duration label (e.g. 2m 18s).
+	 *
+	 * @param int $seconds Seconds.
+	 * @return string
+	 */
+	public static function format_short_duration( $seconds ) {
+		$seconds = max( 0, (int) round( $seconds ) );
+		$h       = (int) floor( $seconds / HOUR_IN_SECONDS );
+		$m       = (int) floor( ( $seconds % HOUR_IN_SECONDS ) / MINUTE_IN_SECONDS );
+		$s       = $seconds % MINUTE_IN_SECONDS;
+
+		if ( $h > 0 ) {
+			return $m > 0
+				? sprintf(
+					/* translators: 1: hours, 2: minutes */
+					_x( '%1$dh %2$dm', 'duration hours minutes', 'mw-sales-toast' ),
+					$h,
+					$m
+				)
+				: sprintf(
+					/* translators: %d: hours */
+					_x( '%dh', 'duration hours', 'mw-sales-toast' ),
+					$h
+				);
+		}
+		if ( $m > 0 ) {
+			return $s > 0
+				? sprintf(
+					/* translators: 1: minutes, 2: seconds */
+					_x( '%1$dm %2$ds', 'duration minutes seconds', 'mw-sales-toast' ),
+					$m,
+					$s
+				)
+				: sprintf(
+					/* translators: %d: minutes */
+					_x( '%dm', 'duration minutes', 'mw-sales-toast' ),
+					$m
+				);
+		}
+
+		return sprintf(
+			/* translators: %d: seconds */
+			_x( '%ds', 'duration seconds', 'mw-sales-toast' ),
+			$s
+		);
+	}
+
+	/**
+	 * Estimated time to show max_events toasts (delay + visible + gaps, ±jitter).
+	 *
+	 * @param array $s Settings.
+	 * @return string
+	 */
+	public static function cycle_estimate_text( $s ) {
+		$n        = max( 1, min( 30, (int) ( $s['max_events'] ?? 8 ) ) );
+		$delay    = max( 1, min( 120, (int) ( $s['delay'] ?? 6 ) ) );
+		$duration = max( 2, min( 60, (int) ( $s['duration'] ?? 7 ) ) );
+		$gap      = max( 1, min( 300, (int) ( $s['gap'] ?? 12 ) ) );
+		$jitter   = max( 0, min( 50, (int) ( $s['jitter'] ?? 0 ) ) );
+		$j        = $jitter / 100;
+		$gaps     = $n - 1;
+
+		$nominal = $delay + ( $n * $duration ) + ( $gaps * $gap );
+		$min     = ( $delay * ( 1 - $j ) ) + ( $n * $duration ) + ( $gaps * $gap * ( 1 - $j ) );
+		$max     = ( $delay * ( 1 + $j ) ) + ( $n * $duration ) + ( $gaps * $gap * ( 1 + $j ) );
+
+		if ( $jitter > 0 ) {
+			return sprintf(
+				/* translators: 1: min duration, 2: max duration */
+				__( 'Estimated messages duration %1$s–%2$s (first delay + visible + gaps).', 'mw-sales-toast' ),
+				self::format_short_duration( $min ),
+				self::format_short_duration( $max )
+			);
+		}
+
+		return sprintf(
+			/* translators: %s: duration label */
+			__( 'Estimated messages duration %s (first delay + visible + gaps).', 'mw-sales-toast' ),
+			self::format_short_duration( $nominal )
+		);
 	}
 
 	/**
@@ -1767,7 +1896,7 @@ class MW_Sales_Toast_Settings {
 	/**
 	 * In-admin link that switches to another settings tab.
 	 *
-	 * @param string $tab   Tab id (general, message, design, timing, demo, statistics, support, account).
+	 * @param string $tab   Tab id (general, message, design, timing, statistics, support, account).
 	 * @param string $label Link text.
 	 * @return string Safe HTML anchor.
 	 */
@@ -1796,7 +1925,7 @@ class MW_Sales_Toast_Settings {
 		$saved    = isset( $_GET['settings-updated'] ) && 'true' === $_GET['settings-updated']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$transfer = isset( $_GET['mwst_transfer'] ) ? sanitize_key( wp_unslash( $_GET['mwst_transfer'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-		$allowed_tabs = array( 'general', 'message', 'design', 'timing', 'demo', 'statistics', 'support', 'account' );
+		$allowed_tabs = array( 'general', 'message', 'design', 'timing', 'statistics', 'support', 'account' );
 		$current_tab  = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'general'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		// Legacy Contact tab now lives under Support → Contact.
 		if ( 'contact' === $current_tab ) {
@@ -1805,6 +1934,10 @@ class MW_Sales_Toast_Settings {
 		// Legacy License tab → Account.
 		if ( 'license' === $current_tab ) {
 			$current_tab = 'account';
+		}
+		// Legacy Demo data tab → Message & privacy → Purchases.
+		if ( 'demo' === $current_tab ) {
+			$current_tab = 'message';
 		}
 		if ( ! in_array( $current_tab, $allowed_tabs, true ) ) {
 			$current_tab = 'general';
@@ -1844,7 +1977,7 @@ class MW_Sales_Toast_Settings {
 							?>
 						</p>
 						<div class="mwst-header__title-row">
-							<h1><?php esc_html_e( 'Sales Toast', 'mw-sales-toast' ); ?></h1>
+							<h1><?php esc_html_e( 'MW Proof', 'mw-sales-toast' ); ?></h1>
 							<span class="mwst-header__version">v<?php echo esc_html( MW_SALES_TOAST_VERSION ); ?></span>
 						</div>
 						<p class="mwst-header__desc">
@@ -1872,6 +2005,24 @@ class MW_Sales_Toast_Settings {
 							<dt><?php esc_html_e( 'Source', 'mw-sales-toast' ); ?></dt>
 							<dd><?php echo esc_html( $source_labels[ $s['source'] ] ?? $s['source'] ); ?></dd>
 						</div>
+						<div class="mwst-header__metric">
+							<dt><?php esc_html_e( 'Cached', 'mw-sales-toast' ); ?></dt>
+							<dd>
+								<span
+									id="mwst-header-events"
+									class="mwst-header__status <?php echo (int) $status['events'] > 0 ? 'is-ok' : 'is-bad'; ?>"
+									data-max="<?php echo esc_attr( (string) (int) $s['max_cached_orders'] ); ?>"
+									aria-label="<?php echo esc_attr( sprintf(
+										/* translators: 1: current cached events, 2: max cached orders */
+										__( '%1$s of %2$s cached events', 'mw-sales-toast' ),
+										number_format_i18n( (int) $status['events'] ),
+										number_format_i18n( (int) $s['max_cached_orders'] )
+									) ); ?>"
+								>
+									<?php echo esc_html( number_format_i18n( (int) $status['events'] ) . '/' . number_format_i18n( (int) $s['max_cached_orders'] ) ); ?>
+								</span>
+							</dd>
+						</div>
 					</dl>
 				</div>
 			</header>
@@ -1881,7 +2032,7 @@ class MW_Sales_Toast_Settings {
 					<span class="mwst-notice__icon" aria-hidden="true">✓</span>
 					<div class="mwst-notice__body">
 						<strong><?php esc_html_e( 'Settings saved', 'mw-sales-toast' ); ?></strong>
-						<p><?php esc_html_e( 'Your Sales Toast settings were updated. The sales cache was cleared and will rebuild with the new options.', 'mw-sales-toast' ); ?></p>
+						<p><?php esc_html_e( 'Your MW Proof settings were updated. The sales cache was cleared and will rebuild with the new options.', 'mw-sales-toast' ); ?></p>
 					</div>
 					<button type="button" class="mwst-notice__dismiss" id="mwst-dismiss-notice" aria-label="<?php esc_attr_e( 'Dismiss', 'mw-sales-toast' ); ?>">×</button>
 				</div>
@@ -1900,7 +2051,7 @@ class MW_Sales_Toast_Settings {
 					),
 					'invalid'  => array(
 						'title' => __( 'Import failed', 'mw-sales-toast' ),
-						'body'  => __( 'That file is not a Sales Toast settings or theme export.', 'mw-sales-toast' ),
+						'body'  => __( 'That file is not an MW Proof settings or theme export.', 'mw-sales-toast' ),
 						'ok'    => false,
 					),
 					'empty'    => array(
@@ -1929,7 +2080,7 @@ class MW_Sales_Toast_Settings {
 			<?php endif; ?>
 
 			<?php if ( 0 === (int) $status['events'] && in_array( $s['source'], array( 'real_orders', 'real_then_demo' ), true ) && ! empty( $status['wc_active'] ) ) : ?>
-				<div class="mwst-notice mwst-notice--warn" role="status">
+				<div class="mwst-notice mwst-notice--warn" role="status" id="mwst-empty-cache-notice">
 					<span class="mwst-notice__icon" aria-hidden="true">!</span>
 					<div class="mwst-notice__body">
 						<strong><?php esc_html_e( 'No toast events cached', 'mw-sales-toast' ); ?></strong>
@@ -1946,7 +2097,7 @@ class MW_Sales_Toast_Settings {
 				</div>
 			<?php endif; ?>
 
-			<form method="post" action="options.php">
+			<form method="post" action="options.php" id="mwst-settings-form">
 				<?php settings_fields( 'mw_sales_toast' ); ?>
 
 				<div class="mwst-layout">
@@ -1956,7 +2107,6 @@ class MW_Sales_Toast_Settings {
 							<button type="button" class="mwst-tabs__btn<?php echo 'message' === $current_tab ? ' is-active' : ''; ?>" role="tab" aria-selected="<?php echo 'message' === $current_tab ? 'true' : 'false'; ?>" data-tab="message"><?php esc_html_e( 'Message & privacy', 'mw-sales-toast' ); ?></button>
 							<button type="button" class="mwst-tabs__btn<?php echo 'design' === $current_tab ? ' is-active' : ''; ?>" role="tab" aria-selected="<?php echo 'design' === $current_tab ? 'true' : 'false'; ?>" data-tab="design"><?php esc_html_e( 'Design', 'mw-sales-toast' ); ?></button>
 							<button type="button" class="mwst-tabs__btn<?php echo 'timing' === $current_tab ? ' is-active' : ''; ?>" role="tab" aria-selected="<?php echo 'timing' === $current_tab ? 'true' : 'false'; ?>" data-tab="timing"><?php esc_html_e( 'Timing & cache', 'mw-sales-toast' ); ?></button>
-							<button type="button" class="mwst-tabs__btn<?php echo 'demo' === $current_tab ? ' is-active' : ''; ?>" role="tab" aria-selected="<?php echo 'demo' === $current_tab ? 'true' : 'false'; ?>" data-tab="demo"><?php esc_html_e( 'Demo data', 'mw-sales-toast' ); ?></button>
 							<button type="button" class="mwst-tabs__btn<?php echo 'statistics' === $current_tab ? ' is-active' : ''; ?>" role="tab" aria-selected="<?php echo 'statistics' === $current_tab ? 'true' : 'false'; ?>" data-tab="statistics"><?php esc_html_e( 'Statistics', 'mw-sales-toast' ); ?></button>
 							<button type="button" class="mwst-tabs__btn<?php echo 'support' === $current_tab ? ' is-active' : ''; ?>" role="tab" aria-selected="<?php echo 'support' === $current_tab ? 'true' : 'false'; ?>" data-tab="support"><?php esc_html_e( 'Support', 'mw-sales-toast' ); ?></button>
 							<button type="button" class="mwst-tabs__btn<?php echo 'account' === $current_tab ? ' is-active' : ''; ?>" role="tab" aria-selected="<?php echo 'account' === $current_tab ? 'true' : 'false'; ?>" data-tab="account">
@@ -1988,55 +2138,38 @@ class MW_Sales_Toast_Settings {
 											</select>
 											<p class="description">
 												<?php
-												echo ! empty( $status['wc_active'] )
-													? esc_html__( 'Demo mode can fill gaps when order volume is low. Real orders require WooCommerce.', 'mw-sales-toast' )
-													: esc_html__( 'WooCommerce is not active — demo toasts still work (catalog products when available, otherwise a generic label).', 'mw-sales-toast' );
+												if ( ! empty( $status['wc_active'] ) ) {
+													printf(
+														/* translators: %s: Message & privacy tab link */
+														esc_html__( 'Demo mode can fill gaps when order volume is low. Real orders require WooCommerce. Edit simulated names and times under %s → Purchases.', 'mw-sales-toast' ),
+														self::tab_link( 'message', __( 'Message & privacy', 'mw-sales-toast' ) )
+													);
+												} else {
+													printf(
+														/* translators: %s: Message & privacy tab link */
+														esc_html__( 'WooCommerce is not active — demo toasts still work (catalog products when available, otherwise a generic label). Edit simulated names and times under %s → Purchases.', 'mw-sales-toast' ),
+														self::tab_link( 'message', __( 'Message & privacy', 'mw-sales-toast' ) )
+													);
+												}
 												?>
 											</p>
 										</div>
 									</div>
-									<div class="mwst-field">
-										<div class="mwst-field__label"><label for="mwst-event-delivery"><?php esc_html_e( 'Event delivery', 'mw-sales-toast' ); ?></label></div>
-										<div class="mwst-field__control">
-											<select id="mwst-event-delivery" name="<?php echo esc_attr( $opt ); ?>[event_delivery]">
-												<option value="rest" <?php selected( $s['event_delivery'] ?? 'rest', 'rest' ); ?>><?php esc_html_e( 'REST API — fetch with nonce (default)', 'mw-sales-toast' ); ?></option>
-												<option value="inline" <?php selected( $s['event_delivery'] ?? 'rest', 'inline' ); ?>><?php esc_html_e( 'Inline — embed JSON in the page (no REST)', 'mw-sales-toast' ); ?></option>
-											</select>
-											<p class="description"><?php esc_html_e( 'Inline disables the notifications REST route and prints events into the page script. Good for removing a public API; events refresh only when the HTML does (watch full-page caches).', 'mw-sales-toast' ); ?></p>
+									<details class="mwst-fold" id="mwst-delivery-fold" <?php echo ( 'inline' === ( $s['event_delivery'] ?? 'rest' ) ) ? 'open' : ''; ?>>
+										<summary><?php esc_html_e( 'Advanced', 'mw-sales-toast' ); ?></summary>
+										<div class="mwst-fold__body">
+											<div class="mwst-field">
+												<div class="mwst-field__label"><label for="mwst-event-delivery"><?php esc_html_e( 'Event delivery', 'mw-sales-toast' ); ?></label></div>
+												<div class="mwst-field__control">
+													<select id="mwst-event-delivery" name="<?php echo esc_attr( $opt ); ?>[event_delivery]">
+														<option value="rest" <?php selected( $s['event_delivery'] ?? 'rest', 'rest' ); ?>><?php esc_html_e( 'REST API — fetch with nonce (default)', 'mw-sales-toast' ); ?></option>
+														<option value="inline" <?php selected( $s['event_delivery'] ?? 'rest', 'inline' ); ?>><?php esc_html_e( 'Inline — embed JSON in the page (no REST)', 'mw-sales-toast' ); ?></option>
+													</select>
+													<p class="description"><?php esc_html_e( 'Inline disables the notifications REST route and prints events into the page script. Good for removing a public API; events refresh only when the HTML does (watch full-page caches).', 'mw-sales-toast' ); ?></p>
+												</div>
+											</div>
 										</div>
-									</div>
-									<div class="mwst-field">
-										<div class="mwst-field__label"><label for="mwst-cache-minutes"><?php esc_html_e( 'Cache lifetime', 'mw-sales-toast' ); ?></label></div>
-										<div class="mwst-field__control">
-											<input id="mwst-cache-minutes" type="number" min="1" max="120" class="small-text" name="<?php echo esc_attr( $opt ); ?>[cache_minutes]" value="<?php echo esc_attr( (string) (int) $s['cache_minutes'] ); ?>" />
-											<span class="mwst-hint"><?php esc_html_e( 'minutes', 'mw-sales-toast' ); ?></span>
-											<p class="description">
-												<?php
-												printf(
-													/* translators: %s: current cache expiry status, e.g. "Expires in 3 minutes" */
-													esc_html__( 'How long sales events stay cached before a rebuild is needed. %s', 'mw-sales-toast' ),
-													esc_html( $status['ttl'] )
-												);
-												?>
-											</p>
-										</div>
-									</div>
-									<div class="mwst-field">
-										<div class="mwst-field__label"><label for="mwst-cron-minutes"><?php esc_html_e( 'Cron interval', 'mw-sales-toast' ); ?></label></div>
-										<div class="mwst-field__control">
-											<input id="mwst-cron-minutes" type="number" min="1" max="120" class="small-text" name="<?php echo esc_attr( $opt ); ?>[cron_minutes]" value="<?php echo esc_attr( (string) (int) $s['cron_minutes'] ); ?>" />
-											<span class="mwst-hint"><?php esc_html_e( 'minutes', 'mw-sales-toast' ); ?></span>
-											<p class="description">
-												<?php
-												printf(
-													/* translators: %s: next cron run status, e.g. "Next run in 3 minutes" */
-													esc_html__( 'How often WP-Cron rebuilds the sales cache in the background. %s', 'mw-sales-toast' ),
-													esc_html( $status['cron'] )
-												);
-												?>
-											</p>
-										</div>
-									</div>
+									</details>
 								</div>
 							</div>
 
@@ -2316,7 +2449,7 @@ class MW_Sales_Toast_Settings {
 							<div class="mwst-card mwst-type-opt" id="mwst-type-sale-opt" <?php echo ! empty( $s['type_sale'] ) ? '' : 'hidden'; ?>>
 								<div class="mwst-card__head">
 									<h2><?php esc_html_e( 'Purchases', 'mw-sales-toast' ); ?></h2>
-									<p><?php esc_html_e( 'Template, fallback name, and stock for purchase toasts. Preview updates live in the sidebar.', 'mw-sales-toast' ); ?></p>
+									<p><?php esc_html_e( 'Template, fallback name, stock, and simulated names for purchase toasts.', 'mw-sales-toast' ); ?></p>
 								</div>
 								<div class="mwst-card__body">
 									<div class="mwst-field">
@@ -2368,13 +2501,33 @@ class MW_Sales_Toast_Settings {
 											<p class="description"><?php esc_html_e( 'Hide stock above this quantity so high inventory does not look odd.', 'mw-sales-toast' ); ?></p>
 										</div>
 									</div>
+									<details class="mwst-fold" id="mwst-demo-fold">
+										<summary><?php esc_html_e( 'Simulated names & times', 'mw-sales-toast' ); ?></summary>
+										<div class="mwst-fold__body">
+											<p class="description"><?php esc_html_e( 'Used when Data source is Demo only or Real + demo fill (General tab). Edit anytime — they stay saved even if Real orders only is selected.', 'mw-sales-toast' ); ?></p>
+											<div class="mwst-field">
+												<div class="mwst-field__label"><label for="mwst-people"><?php esc_html_e( 'Demo people', 'mw-sales-toast' ); ?></label></div>
+												<div class="mwst-field__control">
+													<textarea id="mwst-people" name="<?php echo esc_attr( $opt ); ?>[demo_people]" rows="6" class="large-text code"><?php echo esc_textarea( $s['demo_people'] ); ?></textarea>
+													<p class="description"><?php esc_html_e( 'One per line: Name, City', 'mw-sales-toast' ); ?></p>
+												</div>
+											</div>
+											<div class="mwst-field">
+												<div class="mwst-field__label"><label for="mwst-whens"><?php esc_html_e( 'Demo times', 'mw-sales-toast' ); ?></label></div>
+												<div class="mwst-field__control">
+													<textarea id="mwst-whens" name="<?php echo esc_attr( $opt ); ?>[demo_whens]" rows="4" class="large-text code"><?php echo esc_textarea( $s['demo_whens'] ); ?></textarea>
+													<p class="description"><?php esc_html_e( 'One per line, shown as-is (e.g. “just now”). No automatic “ago” is added.', 'mw-sales-toast' ); ?></p>
+												</div>
+											</div>
+										</div>
+									</details>
 								</div>
 							</div>
 
 							<div class="mwst-card mwst-type-opt" id="mwst-type-viewing-opt" <?php echo ! empty( $s['type_viewing'] ) ? '' : 'hidden'; ?>>
 								<div class="mwst-card__head">
 									<h2><?php esc_html_e( 'Viewing now', 'mw-sales-toast' ); ?></h2>
-									<p><?php esc_html_e( 'Show how many people are looking at a product. Simulated counts stay stable for about 15 minutes; Live counts unique visitors on product pages (no IPs stored).', 'mw-sales-toast' ); ?></p>
+									<p><?php esc_html_e( 'Show how many people are looking at a product. Simulated picks a stable count in your range; Live counts unique visitors on product pages (no IPs stored).', 'mw-sales-toast' ); ?></p>
 								</div>
 								<div class="mwst-card__body">
 									<div class="mwst-field">
@@ -2392,29 +2545,30 @@ class MW_Sales_Toast_Settings {
 										<div class="mwst-field__label"><label for="mwst-viewing-mode"><?php esc_html_e( 'Count mode', 'mw-sales-toast' ); ?></label></div>
 										<div class="mwst-field__control">
 											<select id="mwst-viewing-mode" name="<?php echo esc_attr( $opt ); ?>[viewing_mode]">
-												<option value="simulated" <?php selected( $s['viewing_mode'], 'simulated' ); ?>><?php esc_html_e( 'Simulated — random in a range (no tracking)', 'mw-sales-toast' ); ?></option>
+												<option value="simulated" <?php selected( $s['viewing_mode'], 'simulated' ); ?>><?php esc_html_e( 'Simulated — set a range (no tracking)', 'mw-sales-toast' ); ?></option>
 												<option value="live" <?php selected( $s['viewing_mode'], 'live' ); ?>><?php esc_html_e( 'Live — unique visitors on this product (last N minutes)', 'mw-sales-toast' ); ?></option>
 											</select>
 										</div>
 									</div>
 									<div class="mwst-field">
-										<div class="mwst-field__label"><?php esc_html_e( 'Range', 'mw-sales-toast' ); ?></div>
+										<div class="mwst-field__label"><?php esc_html_e( 'Count', 'mw-sales-toast' ); ?></div>
 										<div class="mwst-field__control">
 											<div class="mwst-inline-nums">
-												<label>
+												<label id="mwst-viewing-min-wrap" <?php echo ( 'live' === ( $s['viewing_mode'] ?? '' ) ) ? 'hidden' : ''; ?>>
 													<?php esc_html_e( 'Min', 'mw-sales-toast' ); ?>
-													<input type="number" min="1" max="99" class="small-text" name="<?php echo esc_attr( $opt ); ?>[viewing_min]" value="<?php echo esc_attr( (string) (int) $s['viewing_min'] ); ?>" />
+													<input id="mwst-viewing-min" type="number" min="1" max="99" class="small-text" name="<?php echo esc_attr( $opt ); ?>[viewing_min]" value="<?php echo esc_attr( (string) (int) $s['viewing_min'] ); ?>" />
 												</label>
-												<label>
+												<label id="mwst-viewing-max-wrap">
 													<?php esc_html_e( 'Max', 'mw-sales-toast' ); ?>
-													<input type="number" min="1" max="99" class="small-text" name="<?php echo esc_attr( $opt ); ?>[viewing_max]" value="<?php echo esc_attr( (string) (int) $s['viewing_max'] ); ?>" />
+													<input id="mwst-viewing-max" type="number" min="1" max="99" class="small-text" name="<?php echo esc_attr( $opt ); ?>[viewing_max]" value="<?php echo esc_attr( (string) (int) $s['viewing_max'] ); ?>" />
 												</label>
-												<label>
+												<label id="mwst-viewing-window-wrap" <?php echo ( 'live' === ( $s['viewing_mode'] ?? '' ) ) ? '' : 'hidden'; ?>>
 													<?php esc_html_e( 'Live window', 'mw-sales-toast' ); ?>
 													<input type="number" min="2" max="30" class="small-text" name="<?php echo esc_attr( $opt ); ?>[viewing_window]" value="<?php echo esc_attr( (string) (int) $s['viewing_window'] ); ?>" />
 												</label>
 											</div>
-											<p class="description"><?php esc_html_e( 'Simulated stays between min and max. Live uses real unique pings, then clamps to max. Window is minutes.', 'mw-sales-toast' ); ?></p>
+											<p class="description" id="mwst-viewing-count-desc" <?php echo ( 'live' === ( $s['viewing_mode'] ?? '' ) ) ? 'hidden' : ''; ?>><?php esc_html_e( 'Each product gets a stable count in this range.', 'mw-sales-toast' ); ?></p>
+											<p class="description" id="mwst-viewing-live-desc" <?php echo ( 'live' === ( $s['viewing_mode'] ?? '' ) ) ? '' : 'hidden'; ?>><?php esc_html_e( 'Uses real unique pings, then clamps to max. Window is minutes. Product targeting follows Include / Exclude on the General tab.', 'mw-sales-toast' ); ?></p>
 										</div>
 									</div>
 									<div class="mwst-field" id="mwst-viewing-products-field" <?php echo ( 'live' === ( $s['viewing_mode'] ?? '' ) ) ? 'hidden' : ''; ?>>
@@ -2429,7 +2583,7 @@ class MW_Sales_Toast_Settings {
 												true
 											);
 											?>
-											<p class="description"><?php esc_html_e( 'Simulated only. Leave empty for random catalog products. Live uses real visitors and follows Include / Exclude products on the General tab.', 'mw-sales-toast' ); ?></p>
+											<p class="description"><?php esc_html_e( 'Leave empty for random catalog products.', 'mw-sales-toast' ); ?></p>
 										</div>
 									</div>
 								</div>
@@ -2558,13 +2712,6 @@ class MW_Sales_Toast_Settings {
 											<input id="mwst-mute" type="number" min="0" max="720" class="small-text" name="<?php echo esc_attr( $opt ); ?>[mute_hours]" value="<?php echo esc_attr( (string) $s['mute_hours'] ); ?>" />
 											<span class="mwst-hint"><?php esc_html_e( 'hours', 'mw-sales-toast' ); ?></span>
 											<p class="description"><?php esc_html_e( '0 = only hide the current toast; dismiss does not mute future ones.', 'mw-sales-toast' ); ?></p>
-										</div>
-									</div>
-									<div class="mwst-field">
-										<div class="mwst-field__label"><label for="mwst-session"><?php esc_html_e( 'Max per session', 'mw-sales-toast' ); ?></label></div>
-										<div class="mwst-field__control">
-											<input id="mwst-session" type="number" min="1" max="100" class="small-text" name="<?php echo esc_attr( $opt ); ?>[max_per_session]" value="<?php echo esc_attr( (string) $s['max_per_session'] ); ?>" />
-											<p class="description"><?php esc_html_e( 'Stop showing toasts after this many in one browser visit. Resets when the visitor starts a new session.', 'mw-sales-toast' ); ?></p>
 										</div>
 									</div>
 									<div class="mwst-field">
@@ -2767,11 +2914,11 @@ class MW_Sales_Toast_Settings {
 								</div>
 							</div>
 
-							<div class="mwst-card" id="mwst-custom-css-card">
-								<div class="mwst-card__head">
+							<details class="mwst-card mwst-fold mwst-fold--card" id="mwst-custom-css-card" <?php echo ( '' !== trim( (string) ( $s['custom_css'] ?? '' ) ) ) ? 'open' : ''; ?>>
+								<summary class="mwst-card__head">
 									<h2><?php esc_html_e( 'Custom CSS', 'mw-sales-toast' ); ?></h2>
 									<p><?php esc_html_e( 'Advanced overrides. Loaded after the base toast styles.', 'mw-sales-toast' ); ?></p>
-								</div>
+								</summary>
 								<div class="mwst-card__body">
 									<div class="mwst-field mwst-field--editor">
 										<div class="mwst-field__label"><label for="mwst-custom-css"><?php esc_html_e( 'CSS', 'mw-sales-toast' ); ?></label></div>
@@ -2836,7 +2983,7 @@ class MW_Sales_Toast_Settings {
 										</div>
 									</div>
 								</div>
-							</div>
+							</details>
 
 							<div class="mwst-card" id="mwst-theme-json">
 								<div class="mwst-card__head">
@@ -3000,10 +3147,11 @@ class MW_Sales_Toast_Settings {
 										</div>
 									</div>
 									<div class="mwst-field">
-										<div class="mwst-field__label"><label for="mwst-max"><?php esc_html_e( 'Max events shown', 'mw-sales-toast' ); ?></label></div>
+										<div class="mwst-field__label"><label for="mwst-max"><?php esc_html_e( 'Toasts per visit', 'mw-sales-toast' ); ?></label></div>
 										<div class="mwst-field__control">
-											<input id="mwst-max" type="number" min="1" max="30" name="<?php echo esc_attr( $opt ); ?>[max_events]" value="<?php echo esc_attr( (string) $s['max_events'] ); ?>" class="small-text" />
-											<p class="description"><?php esc_html_e( 'Cap on events returned and cycled in the visitor session.', 'mw-sales-toast' ); ?></p>
+											<input id="mwst-max" type="number" min="1" max="30" name="<?php echo esc_attr( $opt ); ?>[max_events]" value="<?php echo esc_attr( (string) $s['max_events'] ); ?>" class="small-text mwst-timing-input" />
+											<p class="description"><?php esc_html_e( 'How many toasts a visitor sees in one browser session. The list does not repeat. Resets when they open a new tab or window.', 'mw-sales-toast' ); ?></p>
+											<p class="mwst-cycle-estimate" id="mwst-cycle-estimate" role="status" aria-live="polite"><?php echo esc_html( self::cycle_estimate_text( $s ) ); ?></p>
 										</div>
 									</div>
 								</div>
@@ -3016,9 +3164,42 @@ class MW_Sales_Toast_Settings {
 								</div>
 								<div class="mwst-card__body">
 									<div class="mwst-field">
+										<div class="mwst-field__label"><label for="mwst-cache-minutes"><?php esc_html_e( 'Cache lifetime', 'mw-sales-toast' ); ?></label></div>
+										<div class="mwst-field__control">
+											<input id="mwst-cache-minutes" type="number" min="1" max="120" class="small-text" name="<?php echo esc_attr( $opt ); ?>[cache_minutes]" value="<?php echo esc_attr( (string) (int) $s['cache_minutes'] ); ?>" />
+											<span class="mwst-hint"><?php esc_html_e( 'minutes', 'mw-sales-toast' ); ?></span>
+											<p class="description">
+												<?php
+												printf(
+													/* translators: %s: current cache expiry status, e.g. "Expires in 3 minutes" */
+													esc_html__( 'How long the rebuilt event list is kept before it expires. Remaining: %s', 'mw-sales-toast' ),
+													'<span id="mwst-cache-ttl">' . esc_html( $status['ttl'] ) . '</span>'
+												);
+												?>
+											</p>
+										</div>
+									</div>
+									<div class="mwst-field">
+										<div class="mwst-field__label"><label for="mwst-cron-minutes"><?php esc_html_e( 'Cron interval', 'mw-sales-toast' ); ?></label></div>
+										<div class="mwst-field__control">
+											<input id="mwst-cron-minutes" type="number" min="1" max="120" class="small-text" name="<?php echo esc_attr( $opt ); ?>[cron_minutes]" value="<?php echo esc_attr( (string) (int) $s['cron_minutes'] ); ?>" />
+											<span class="mwst-hint"><?php esc_html_e( 'minutes', 'mw-sales-toast' ); ?></span>
+											<p class="description">
+												<?php
+												printf(
+													/* translators: %s: next cron run status, e.g. "Next run in 3 minutes" */
+													esc_html__( 'How often WP-Cron rebuilds the sales cache in the background. %s', 'mw-sales-toast' ),
+													esc_html( $status['cron'] )
+												);
+												?>
+											</p>
+										</div>
+									</div>
+									<div class="mwst-field">
 										<div class="mwst-field__label"><label for="mwst-cached"><?php esc_html_e( 'Max cached orders', 'mw-sales-toast' ); ?></label></div>
 										<div class="mwst-field__control">
 											<input id="mwst-cached" type="number" min="5" max="100" name="<?php echo esc_attr( $opt ); ?>[max_cached_orders]" value="<?php echo esc_attr( (string) $s['max_cached_orders'] ); ?>" class="small-text" />
+											<p class="description"><?php esc_html_e( 'How many recent orders to query when rebuilding. Keep this at least as high as Toasts per visit. Visitors still only see that visit cap.', 'mw-sales-toast' ); ?></p>
 										</div>
 									</div>
 									<div class="mwst-field">
@@ -3028,30 +3209,23 @@ class MW_Sales_Toast_Settings {
 											<span class="mwst-hint"><?php esc_html_e( 'days', 'mw-sales-toast' ); ?></span>
 										</div>
 									</div>
-								</div>
-							</div>
-						</div>
-
-						<!-- Demo -->
-						<div class="mwst-panel<?php echo 'demo' === $current_tab ? ' is-active' : ''; ?>" id="mwst-panel-demo" role="tabpanel">
-							<div class="mwst-card">
-								<div class="mwst-card__head">
-									<h2><?php esc_html_e( 'Simulated social proof', 'mw-sales-toast' ); ?></h2>
-									<p><?php esc_html_e( 'Useful for low-traffic stores or staging.', 'mw-sales-toast' ); ?></p>
-								</div>
-								<div class="mwst-card__body">
 									<div class="mwst-field">
-										<div class="mwst-field__label"><label for="mwst-people"><?php esc_html_e( 'Demo people', 'mw-sales-toast' ); ?></label></div>
+										<div class="mwst-field__label"><?php esc_html_e( 'Rebuild', 'mw-sales-toast' ); ?></div>
 										<div class="mwst-field__control">
-											<textarea id="mwst-people" name="<?php echo esc_attr( $opt ); ?>[demo_people]" rows="8" class="large-text code"><?php echo esc_textarea( $s['demo_people'] ); ?></textarea>
-											<p class="description"><?php esc_html_e( 'One per line: Name, City', 'mw-sales-toast' ); ?></p>
-										</div>
-									</div>
-									<div class="mwst-field">
-										<div class="mwst-field__label"><label for="mwst-whens"><?php esc_html_e( 'Demo times', 'mw-sales-toast' ); ?></label></div>
-										<div class="mwst-field__control">
-											<textarea id="mwst-whens" name="<?php echo esc_attr( $opt ); ?>[demo_whens]" rows="5" class="large-text code"><?php echo esc_textarea( $s['demo_whens'] ); ?></textarea>
-											<p class="description"><?php esc_html_e( 'One per line, shown as-is (e.g. “just now”). No automatic “ago” is added.', 'mw-sales-toast' ); ?></p>
+											<div class="mwst-cache-actions">
+												<button type="button" class="button" id="mwst-cache-rebuild"><?php esc_html_e( 'Rebuild cache', 'mw-sales-toast' ); ?></button>
+												<p class="description mwst-cache-rebuild-status" id="mwst-cache-rebuild-status" role="status" aria-live="polite">
+													<?php
+													printf(
+														/* translators: 1: current/max cached events, 2: expiry status */
+														esc_html__( 'Currently cached: %1$s. %2$s', 'mw-sales-toast' ),
+														esc_html( number_format_i18n( (int) $status['events'] ) . '/' . number_format_i18n( (int) $s['max_cached_orders'] ) ),
+														esc_html( $status['ttl'] )
+													);
+													?>
+												</p>
+											</div>
+											<p class="description"><?php esc_html_e( 'Clears and rebuilds the sales event cache now, using saved settings. Save first if you changed lookback, source, or filters.', 'mw-sales-toast' ); ?></p>
 										</div>
 									</div>
 								</div>
@@ -3073,6 +3247,7 @@ class MW_Sales_Toast_Settings {
 							'purchases'   => 0,
 							'delta'       => array(),
 							'products'    => array(),
+							'types'       => array(),
 							'hasData'     => false,
 							'attrWindow'  => 30,
 						);
@@ -3130,6 +3305,52 @@ class MW_Sales_Toast_Settings {
 											<span class="mwst-stats-kpi__delta" data-stat-delta="atc"><?php echo esc_html( $stats_seed['delta']['atc']['label'] ?? __( 'vs prior', 'mw-sales-toast' ) ); ?></span>
 										</div>
 									</div>
+								</div>
+							</div>
+
+							<div class="mwst-card" id="mwst-stats-types">
+								<div class="mwst-card__head">
+									<h2><?php esc_html_e( 'By toast type', 'mw-sales-toast' ); ?></h2>
+									<p><?php esc_html_e( 'Impressions and clicks for each type in the same range. Carts and purchases stay in Overview.', 'mw-sales-toast' ); ?></p>
+								</div>
+								<div class="mwst-card__body">
+									<div class="mwst-stats-table-wrap">
+										<table class="mwst-stats-table">
+											<thead>
+												<tr>
+													<th scope="col"><?php esc_html_e( 'Type', 'mw-sales-toast' ); ?></th>
+													<th scope="col" class="is-num"><?php esc_html_e( 'Impressions', 'mw-sales-toast' ); ?></th>
+													<th scope="col" class="is-num"><?php esc_html_e( 'Clicks', 'mw-sales-toast' ); ?></th>
+													<th scope="col" class="is-num"><?php esc_html_e( 'CTR', 'mw-sales-toast' ); ?></th>
+												</tr>
+											</thead>
+											<tbody id="mwst-stats-types-body">
+												<?php
+												$stats_types = isset( $stats_seed['types'] ) && is_array( $stats_seed['types'] ) ? $stats_seed['types'] : array();
+												if ( empty( $stats_types ) && class_exists( 'MW_Sales_Toast_Settings' ) ) {
+													foreach ( MW_Sales_Toast_Settings::type_defs() as $type_id => $type_def ) {
+														$stats_types[] = array(
+															'id'          => $type_id,
+															'label'       => $type_def['label'],
+															'impressions' => 0,
+															'clicks'      => 0,
+															'ctr'         => 0,
+														);
+													}
+												}
+												foreach ( $stats_types as $row ) :
+													?>
+													<tr>
+														<th scope="row"><?php echo esc_html( (string) ( $row['label'] ?? $row['id'] ?? '' ) ); ?></th>
+														<td class="is-num"><?php echo esc_html( number_format_i18n( (int) ( $row['impressions'] ?? 0 ) ) ); ?></td>
+														<td class="is-num"><?php echo esc_html( number_format_i18n( (int) ( $row['clicks'] ?? 0 ) ) ); ?></td>
+														<td class="is-num"><?php echo esc_html( (string) ( $row['ctr'] ?? 0 ) ); ?>%</td>
+													</tr>
+												<?php endforeach; ?>
+											</tbody>
+										</table>
+									</div>
+									<p class="description"><?php esc_html_e( 'Type split is recorded on new storefront visits. Older totals stay in Overview only.', 'mw-sales-toast' ); ?></p>
 								</div>
 							</div>
 
@@ -3208,7 +3429,7 @@ class MW_Sales_Toast_Settings {
 							<div class="mwst-card" id="mwst-stats-products">
 								<div class="mwst-card__head">
 									<h2><?php esc_html_e( 'Per-product performance', 'mw-sales-toast' ); ?></h2>
-									<p><?php esc_html_e( 'Top products by toast impressions in the selected range.', 'mw-sales-toast' ); ?></p>
+									<p><?php esc_html_e( 'Top products by toast impressions in the selected range (all types combined).', 'mw-sales-toast' ); ?></p>
 								</div>
 								<div class="mwst-card__body">
 									<div class="mwst-stats-table-wrap">
@@ -3241,7 +3462,7 @@ class MW_Sales_Toast_Settings {
 								</div>
 								<div class="mwst-card__body">
 									<ul class="mwst-stats-privacy">
-										<li><?php esc_html_e( 'Counts only: impressions, dismissals, mutes, clicks, soft-attributed carts/orders.', 'mw-sales-toast' ); ?></li>
+										<li><?php esc_html_e( 'Counts only: impressions, dismissals, mutes, clicks, toast type, soft-attributed carts/orders.', 'mw-sales-toast' ); ?></li>
 										<li><?php esc_html_e( 'Product IDs only — never customer names, emails, or cities.', 'mw-sales-toast' ); ?></li>
 										<li><?php esc_html_e( 'No cross-site tracking pixels; data stays on your WordPress site (90 days).', 'mw-sales-toast' ); ?></li>
 									</ul>
@@ -3274,9 +3495,10 @@ class MW_Sales_Toast_Settings {
 												<p>
 													<?php
 													printf(
-														/* translators: 1: General tab link, 2: Message & privacy tab link */
-														esc_html__( 'Confirm Enable is on under %1$s, then check Events in the page header (must be above 0). Try a private window — dismissing a toast can mute future ones. Also check Show on, Hide on cart & checkout, and Disable on mobile in %1$s, plus Mute after dismiss in %2$s.', 'mw-sales-toast' ),
+														/* translators: 1: General tab link, 2: Timing & cache tab link, 3: Message & privacy tab link */
+														esc_html__( 'Confirm Enable is on under %1$s, then check cached events under %2$s → Order cache (must be above 0; use Rebuild cache if empty). Try a private window — dismissing a toast can mute future ones. Also check Show on, Hide on cart & checkout, and Disable on mobile in %1$s, plus Mute after dismiss in %3$s.', 'mw-sales-toast' ),
 														self::tab_link( 'general', __( 'General', 'mw-sales-toast' ) ),
+														self::tab_link( 'timing', __( 'Timing & cache', 'mw-sales-toast' ) ),
 														self::tab_link( 'message', __( 'Message & privacy', 'mw-sales-toast' ) )
 													);
 													?>
@@ -3290,7 +3512,7 @@ class MW_Sales_Toast_Settings {
 													<?php
 													printf(
 														/* translators: 1: General tab link, 2: Message & privacy tab link, 3: Timing & cache tab link */
-														esc_html__( 'Only processing and completed orders are used. Set Data source under %1$s to Real orders (or Real + demo fill). Checkout consent in %2$s hides customers who declined; admin/legacy orders without a choice can still appear. Check Lookback window in %3$s, then Save so the cache rebuilds.', 'mw-sales-toast' ),
+														esc_html__( 'Only processing and completed orders are used. Set Data source under %1$s to Real orders (or Real + demo fill). Checkout consent in %2$s hides customers who declined; admin/legacy orders without a choice can still appear. Check Lookback window in %3$s, then Save or use Rebuild cache so the list refreshes.', 'mw-sales-toast' ),
 														self::tab_link( 'general', __( 'General', 'mw-sales-toast' ) ),
 														self::tab_link( 'message', __( 'Message & privacy', 'mw-sales-toast' ) ),
 														self::tab_link( 'timing', __( 'Timing & cache', 'mw-sales-toast' ) )
@@ -3310,10 +3532,10 @@ class MW_Sales_Toast_Settings {
 												<p>
 													<?php
 													printf(
-														/* translators: 1: General tab link, 2: Demo data tab link */
-														esc_html__( 'Choose the source in %1$s. Edit demo people and times anytime in %2$s (even if Real orders only is selected — they simply won’t show until you switch source).', 'mw-sales-toast' ),
+														/* translators: 1: General tab link, 2: Message & privacy tab link */
+														esc_html__( 'Choose the source in %1$s. Edit demo people and times under %2$s → Purchases → Simulated names & times (even if Real orders only is selected — they simply won’t show until you switch source).', 'mw-sales-toast' ),
 														self::tab_link( 'general', __( 'General', 'mw-sales-toast' ) ),
-														self::tab_link( 'demo', __( 'Demo data', 'mw-sales-toast' ) )
+														self::tab_link( 'message', __( 'Message & privacy', 'mw-sales-toast' ) )
 													);
 													?>
 												</p>
@@ -3367,9 +3589,9 @@ class MW_Sales_Toast_Settings {
 												<p>
 													<?php
 													printf(
-														/* translators: %s: General tab link */
-														esc_html__( 'Order queries run on WP-Cron and order hooks, not on every page view. Cache lifetime and cron interval are under %s. Visitors fetch a small REST payload; an empty response means no toast loop runs.', 'mw-sales-toast' ),
-														self::tab_link( 'general', __( 'General', 'mw-sales-toast' ) )
+														/* translators: %s: Timing & cache tab link */
+														esc_html__( 'Order queries run on WP-Cron and order hooks, not on every page view. Cache lifetime and cron interval (default 15 minutes each — keep them the same) are under %s → Order cache. Visitors fetch a small REST payload; an empty response means no toast loop runs.', 'mw-sales-toast' ),
+														self::tab_link( 'timing', __( 'Timing & cache', 'mw-sales-toast' ) )
 													);
 													?>
 												</p>
@@ -3409,11 +3631,11 @@ class MW_Sales_Toast_Settings {
 												<p>
 													<?php
 													printf(
-														/* translators: 1: Design tab link, 2: Timing & cache tab link, 3: Demo data tab link */
-														esc_html__( 'Click a toast in the sidebar preview. Tune colors in %1$s and cadence in %2$s, then Save. For a quiet store, use Demo only or Real + demo fill and edit people/times in %3$s.', 'mw-sales-toast' ),
+														/* translators: 1: Design tab link, 2: Timing & cache tab link, 3: Message & privacy tab link */
+														esc_html__( 'Click a toast in the sidebar preview. Tune colors in %1$s and cadence in %2$s, then Save. For a quiet store, use Demo only or Real + demo fill and edit people/times in %3$s → Purchases.', 'mw-sales-toast' ),
 														self::tab_link( 'design', __( 'Design', 'mw-sales-toast' ) ),
 														self::tab_link( 'timing', __( 'Timing & cache', 'mw-sales-toast' ) ),
-														self::tab_link( 'demo', __( 'Demo data', 'mw-sales-toast' ) )
+														self::tab_link( 'message', __( 'Message & privacy', 'mw-sales-toast' ) )
 													);
 													?>
 												</p>
@@ -3425,10 +3647,10 @@ class MW_Sales_Toast_Settings {
 												<p>
 													<?php
 													printf(
-														/* translators: 1: Timing & cache tab link, 2: Demo data tab link */
-														esc_html__( 'In %1$s, use Natural time labels and raise Jitter so delays feel less mechanical. Keep Demo times in %2$s to a short recent band (just now, a few minutes ago…) and put freshest phrases first.', 'mw-sales-toast' ),
+														/* translators: 1: Timing & cache tab link, 2: Message & privacy tab link */
+														esc_html__( 'In %1$s, use Natural time labels and raise Jitter so delays feel less mechanical. Keep Demo times in %2$s → Purchases to a short recent band (just now, a few minutes ago…) and put freshest phrases first.', 'mw-sales-toast' ),
 														self::tab_link( 'timing', __( 'Timing & cache', 'mw-sales-toast' ) ),
-														self::tab_link( 'demo', __( 'Demo data', 'mw-sales-toast' ) )
+														self::tab_link( 'message', __( 'Message & privacy', 'mw-sales-toast' ) )
 													);
 													?>
 												</p>
@@ -3440,9 +3662,23 @@ class MW_Sales_Toast_Settings {
 												<p>
 													<?php
 													printf(
-														/* translators: %s: General tab link */
-														esc_html__( 'Open this settings page once, or deactivate and re-activate the plugin so the cache cron is scheduled. New orders also trigger a debounced rebuild. Adjust Cache lifetime and Cron interval under %s → Status.', 'mw-sales-toast' ),
-														self::tab_link( 'general', __( 'General', 'mw-sales-toast' ) )
+														/* translators: %s: Timing & cache tab link */
+														esc_html__( 'Open this settings page once, or deactivate and re-activate the plugin so the cache cron is scheduled. New orders also trigger a debounced rebuild. Use Rebuild cache under %s → Order cache for an immediate refresh. Cache lifetime and cron interval default to 15 minutes — keep those two values the same.', 'mw-sales-toast' ),
+														self::tab_link( 'timing', __( 'Timing & cache', 'mw-sales-toast' ) )
+													);
+													?>
+												</p>
+											</div>
+										</details>
+										<details class="mwst-faq__item">
+											<summary><?php esc_html_e( 'What’s the difference between cache lifetime and cron interval?', 'mw-sales-toast' ); ?></summary>
+											<div class="mwst-faq__answer">
+												<p>
+													<?php
+													printf(
+														/* translators: %s: Timing & cache tab link */
+														esc_html__( 'Both default to 15 minutes and should usually match. Cache lifetime is how long the rebuilt event list is reused. Cron interval is how often WP-Cron rebuilds that list in the background (WP-Cron only runs when someone visits the site). They are not synced to the same second. If lifetime is shorter than cron, the list can expire and the next visitor may trigger a rebuild. New orders also rebuild. Set them under %s → Order cache, or click Rebuild cache to refresh now. Toasts per visit (Timing) is how many unique toasts a session shows — the list does not repeat.', 'mw-sales-toast' ),
+														self::tab_link( 'timing', __( 'Timing & cache', 'mw-sales-toast' ) )
 													);
 													?>
 												</p>
@@ -3473,7 +3709,7 @@ class MW_Sales_Toast_Settings {
 										<?php
 										printf(
 											/* translators: %s: plugin version */
-											esc_html__( 'MW Sales Toast %s — setup guide, features, and how the cache works.', 'mw-sales-toast' ),
+											esc_html__( 'MW Proof %s — setup guide, features, and how the cache works.', 'mw-sales-toast' ),
 											esc_html( MW_SALES_TOAST_VERSION )
 										);
 										?>
@@ -3488,7 +3724,7 @@ class MW_Sales_Toast_Settings {
 													<?php
 													printf(
 														/* translators: %s: General tab link */
-														esc_html__( '%s — enable toasts, data source, event delivery (REST or inline), position, where they appear, targeting, cache lifetime, cron, sound, and mobile.', 'mw-sales-toast' ),
+														esc_html__( '%s — enable toasts, data source, event delivery (REST or inline), position, where they appear, targeting, sound, and mobile.', 'mw-sales-toast' ),
 														self::tab_link( 'general', __( 'General', 'mw-sales-toast' ) )
 													);
 													?>
@@ -3497,7 +3733,7 @@ class MW_Sales_Toast_Settings {
 													<?php
 													printf(
 														/* translators: %s: Message & privacy tab link */
-														esc_html__( '%s — toast types (purchases, viewing now, reviews, CTA/coupon), message templates, fallback name, stock display, hide names, checkout consent, mute, and session limits.', 'mw-sales-toast' ),
+														esc_html__( '%s — toast types (purchases, viewing now, reviews, CTA/coupon), purchase templates, simulated names & times, fallback name, stock display, hide names, checkout consent, mute, and session limits.', 'mw-sales-toast' ),
 														self::tab_link( 'message', __( 'Message & privacy', 'mw-sales-toast' ) )
 													);
 													?>
@@ -3515,7 +3751,7 @@ class MW_Sales_Toast_Settings {
 													<?php
 													printf(
 														/* translators: %s: Timing & cache tab link */
-														esc_html__( '%s — triggers, delay, visible time, gap, jitter, time label style, max events, cached orders, and lookback days.', 'mw-sales-toast' ),
+														esc_html__( '%s — triggers, delay, visible time, gap, jitter, estimated loop duration, toasts per visit, cache lifetime, cron (default 15 min each), rebuild, and lookback days.', 'mw-sales-toast' ),
 														self::tab_link( 'timing', __( 'Timing & cache', 'mw-sales-toast' ) )
 													);
 													?>
@@ -3523,17 +3759,8 @@ class MW_Sales_Toast_Settings {
 												<li>
 													<?php
 													printf(
-														/* translators: %s: Demo data tab link */
-														esc_html__( '%s — demo people and time phrases for Demo / Real + demo fill sources.', 'mw-sales-toast' ),
-														self::tab_link( 'demo', __( 'Demo data', 'mw-sales-toast' ) )
-													);
-													?>
-												</li>
-												<li>
-													<?php
-													printf(
 														/* translators: %s: Statistics tab link */
-														esc_html__( '%s — toast impressions, clicks, CTR, and per-product performance.', 'mw-sales-toast' ),
+														esc_html__( '%s — toast impressions, clicks, CTR, by type, and per-product performance.', 'mw-sales-toast' ),
 														self::tab_link( 'statistics', __( 'Statistics', 'mw-sales-toast' ) )
 													);
 													?>
@@ -3591,15 +3818,15 @@ class MW_Sales_Toast_Settings {
 											<p>
 												<?php
 												printf(
-													/* translators: %s: General tab link */
-													esc_html__( 'Recent orders are rebuilt into a short-lived cache via WP-Cron and order hooks — not on every page view. Cache lifetime and cron interval live under %s → Status. Visitors load events from a REST endpoint; the front-end script shows one toast at a time after your chosen trigger, then follows delay / duration / gap.', 'mw-sales-toast' ),
-													self::tab_link( 'general', __( 'General', 'mw-sales-toast' ) )
+													/* translators: %s: Timing & cache tab link */
+													esc_html__( 'Recent orders are queried in the background (WP-Cron, default every 15 minutes) and on new orders — not on every page view. The result is stored for the cache lifetime (also 15 minutes by default). Keep lifetime and cron the same. Both live under %s → Order cache, with a Rebuild cache button. Visitors load a small REST payload and see one toast at a time after your trigger, then delay / visible time / gap (jitter randomizes waits, not which sales).', 'mw-sales-toast' ),
+													self::tab_link( 'timing', __( 'Timing & cache', 'mw-sales-toast' ) )
 												);
 												?>
 											</p>
-											<pre class="mwst-docs__code" aria-hidden="true">WooCommerce order / WP-Cron
+											<pre class="mwst-docs__code" aria-hidden="true">WooCommerce order / WP-Cron (15 min default)
         ↓
-  rebuild cache (transient)
+  rebuild cache (transient, 15 min default)
         ↓
   GET /wp-json/mw-st/v1/notifications
         ↓
@@ -3616,6 +3843,8 @@ class MW_Sales_Toast_Settings {
 											<p>
 												<?php
 												echo self::tab_link( 'general', __( 'Open General to change source →', 'mw-sales-toast' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+												echo ' · ';
+												echo self::tab_link( 'message', __( 'Edit simulated names →', 'mw-sales-toast' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 												?>
 											</p>
 										</section>
@@ -3624,6 +3853,7 @@ class MW_Sales_Toast_Settings {
 											<h3><?php esc_html_e( 'Message, types & privacy', 'mw-sales-toast' ); ?></h3>
 											<ul>
 												<li><?php esc_html_e( 'Purchase tokens: {name}, {city}, {product}, {stock}, {stock_label}.', 'mw-sales-toast' ); ?></li>
+												<li><?php esc_html_e( 'Simulated names & times: under Purchases; used for Demo only and Real + demo fill.', 'mw-sales-toast' ); ?></li>
 												<li><?php esc_html_e( 'Viewing now: {count}, {people}, {product}. Simulated range or live unique visitors on the product page (no IPs).', 'mw-sales-toast' ); ?></li>
 												<li><?php esc_html_e( 'Reviews: {name}, {rating}, {stars}, {product}, {excerpt} from approved WooCommerce reviews.', 'mw-sales-toast' ); ?></li>
 												<li><?php esc_html_e( 'CTA / coupon: promo line, optional code (click to copy), and button URL.', 'mw-sales-toast' ); ?></li>
@@ -3641,15 +3871,20 @@ class MW_Sales_Toast_Settings {
 										</section>
 
 										<section class="mwst-docs__section">
-											<h3><?php esc_html_e( 'Timing & labels', 'mw-sales-toast' ); ?></h3>
+											<h3><?php esc_html_e( 'Timing & cache', 'mw-sales-toast' ); ?></h3>
 											<ul>
 												<li><strong><?php esc_html_e( 'Triggers', 'mw-sales-toast' ); ?></strong> — <?php esc_html_e( 'Page load, scroll depth, exit intent, add to cart, inactivity, or a CSS click selector. The first match starts the loop.', 'mw-sales-toast' ); ?></li>
 												<li><strong><?php esc_html_e( 'First delay', 'mw-sales-toast' ); ?></strong> — <?php esc_html_e( 'Wait after page load before the first toast (when Page load is a trigger).', 'mw-sales-toast' ); ?></li>
 												<li><strong><?php esc_html_e( 'Visible for', 'mw-sales-toast' ); ?></strong> — <?php esc_html_e( 'How long each toast stays on screen.', 'mw-sales-toast' ); ?></li>
 												<li><strong><?php esc_html_e( 'Gap after hide', 'mw-sales-toast' ); ?></strong> — <?php esc_html_e( 'Quiet time after a toast hides before the next one.', 'mw-sales-toast' ); ?></li>
-												<li><strong><?php esc_html_e( 'Jitter', 'mw-sales-toast' ); ?></strong> — <?php esc_html_e( 'Randomizes delay and gap so the rhythm feels less robotic.', 'mw-sales-toast' ); ?></li>
+												<li><strong><?php esc_html_e( 'Jitter', 'mw-sales-toast' ); ?></strong> — <?php esc_html_e( 'Randomizes delay and gap (±%) so the rhythm feels less robotic. Visible time is never jittered. Does not shuffle which events appear.', 'mw-sales-toast' ); ?></li>
 												<li><strong><?php esc_html_e( 'Time label', 'mw-sales-toast' ); ?></strong> — <?php esc_html_e( 'Natural (just now…) or Exact (2 minutes ago) for real orders; demo lines are shown as written.', 'mw-sales-toast' ); ?></li>
-												<li><strong><?php esc_html_e( 'Lookback / max events', 'mw-sales-toast' ); ?></strong> — <?php esc_html_e( 'How far back orders are considered and how many cycle in a visit.', 'mw-sales-toast' ); ?></li>
+												<li><strong><?php esc_html_e( 'Toasts per visit', 'mw-sales-toast' ); ?></strong> — <?php esc_html_e( 'How many unique toasts a visitor sees in one session (newest first). The list does not repeat. The estimate under this field is delay + visible + gaps for that count.', 'mw-sales-toast' ); ?></li>
+												<li><strong><?php esc_html_e( 'Cache lifetime', 'mw-sales-toast' ); ?></strong> — <?php esc_html_e( 'How long the rebuilt list is kept (default 15 minutes). Remaining time is shown next to the field.', 'mw-sales-toast' ); ?></li>
+												<li><strong><?php esc_html_e( 'Cron interval', 'mw-sales-toast' ); ?></strong> — <?php esc_html_e( 'How often WP-Cron rebuilds the list (default 15 minutes). Keep this equal to cache lifetime.', 'mw-sales-toast' ); ?></li>
+												<li><strong><?php esc_html_e( 'Max cached orders', 'mw-sales-toast' ); ?></strong> — <?php esc_html_e( 'How many recent WooCommerce orders are queried during a rebuild. Keep this ≥ Toasts per visit.', 'mw-sales-toast' ); ?></li>
+												<li><strong><?php esc_html_e( 'Lookback', 'mw-sales-toast' ); ?></strong> — <?php esc_html_e( 'How far back orders are considered.', 'mw-sales-toast' ); ?></li>
+												<li><strong><?php esc_html_e( 'Rebuild cache', 'mw-sales-toast' ); ?></strong> — <?php esc_html_e( 'Clears and rebuilds the list immediately from saved settings.', 'mw-sales-toast' ); ?></li>
 												<li><strong><?php esc_html_e( 'Mute after dismiss', 'mw-sales-toast' ); ?></strong> — <?php esc_html_e( 'Closing with × can mute future toasts for N hours (0 = current toast only).', 'mw-sales-toast' ); ?></li>
 											</ul>
 											<p>
@@ -3673,7 +3908,7 @@ class MW_Sales_Toast_Settings {
 													<?php
 													printf(
 														/* translators: %s: General tab link */
-														esc_html__( 'Events are printed into the page as JSON (mwSalesToast.events). The REST route is not registered. Choose this under %s → Event delivery. No refetch until the next full page load — beware full-page caches serving stale events.', 'mw-sales-toast' ),
+														esc_html__( 'Events are printed into the page as JSON (mwSalesToast.events). The REST route is not registered. Choose this under %s → Advanced. No refetch until the next full page load — beware full-page caches serving stale events.', 'mw-sales-toast' ),
 														self::tab_link( 'general', __( 'General', 'mw-sales-toast' ) )
 													);
 													?>
@@ -3688,7 +3923,7 @@ class MW_Sales_Toast_Settings {
 													<?php
 													printf(
 														/* translators: %s: General tab link */
-														esc_html__( 'No toasts: Enable on, Events above 0 in the header, not muted — start in %s.', 'mw-sales-toast' ),
+														esc_html__( 'No toasts: Enable on, cached events above 0 under Timing & cache → Order cache, not muted — start in %s.', 'mw-sales-toast' ),
 														self::tab_link( 'general', __( 'General', 'mw-sales-toast' ) )
 													);
 													?>
@@ -3703,7 +3938,7 @@ class MW_Sales_Toast_Settings {
 													);
 													?>
 												</li>
-												<li><?php esc_html_e( 'Cron not scheduled: open this settings page once or re-activate the plugin.', 'mw-sales-toast' ); ?></li>
+												<li><?php esc_html_e( 'Cron not scheduled: open this settings page once or re-activate the plugin. Use Rebuild cache for an immediate refresh.', 'mw-sales-toast' ); ?></li>
 												<li>
 													<?php
 													printf(
@@ -3723,7 +3958,7 @@ class MW_Sales_Toast_Settings {
 								<div class="mwst-card__head">
 									<h2><?php esc_html_e( 'Contact', 'mw-sales-toast' ); ?></h2>
 									<p>
-										<?php esc_html_e( 'Questions, bugs, or setup help for MW Sales Toast. We usually reply within 1–2 business days.', 'mw-sales-toast' ); ?>
+										<?php esc_html_e( 'Questions, bugs, or setup help for MW Proof. We usually reply within 1–2 business days.', 'mw-sales-toast' ); ?>
 									</p>
 								</div>
 								<div class="mwst-card__body">
@@ -3813,7 +4048,7 @@ class MW_Sales_Toast_Settings {
 									<div class="mwst-field">
 										<div class="mwst-field__label"><?php esc_html_e( 'Email updates', 'mw-sales-toast' ); ?></div>
 										<div class="mwst-field__control">
-											<?php self::toggle( $opt, 'newsletter', $s, 'mwst-newsletter', __( 'Subscribe to the Sales Toast newsletter', 'mw-sales-toast' ) ); ?>
+											<?php self::toggle( $opt, 'newsletter', $s, 'mwst-newsletter', __( 'Subscribe to the MW Proof newsletter', 'mw-sales-toast' ) ); ?>
 											<p class="description">
 												<?php
 												printf(
@@ -3872,6 +4107,9 @@ class MW_Sales_Toast_Settings {
 				<div class="mwst-save<?php echo in_array( $current_tab, $nonsave_tabs, true ) ? ' is-nonsave-tab' : ''; ?>" id="mwst-save-bar">
 					<p class="mwst-save__hint" id="mwst-save-hint"><?php esc_html_e( 'Changes apply after save. The front-end cache rebuilds automatically.', 'mw-sales-toast' ); ?></p>
 					<div class="mwst-save__actions">
+						<button type="button" class="button-link mwst-save__revert" id="mwst-save-revert" hidden>
+							<?php esc_html_e( 'Cancel changes', 'mw-sales-toast' ); ?>
+						</button>
 						<span class="mwst-save__spinner" id="mwst-save-spinner" hidden aria-hidden="true"></span>
 						<?php submit_button( __( 'Save settings', 'mw-sales-toast' ), 'primary', 'submit', false ); ?>
 					</div>

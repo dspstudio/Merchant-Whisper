@@ -37,6 +37,20 @@ class MW_Sales_Toast_Analytics {
 	);
 
 	/**
+	 * Toast types stored on impression/click/dismiss beacons.
+	 *
+	 * @var array<int, string>
+	 */
+	const TOAST_TYPES = array( 'sale', 'viewing', 'review', 'cta' );
+
+	/**
+	 * Beacon events that may carry a toast type.
+	 *
+	 * @var array<int, string>
+	 */
+	const TYPED_EVENTS = array( 'impression', 'click', 'dismiss', 'auto_hide', 'muted' );
+
+	/**
 	 * Boot hooks.
 	 */
 	public static function init() {
@@ -88,7 +102,7 @@ class MW_Sales_Toast_Analytics {
 				array( 'status' => 403 )
 			);
 		}
-		if ( ! wp_verify_nonce( $nonce, MW_Sales_Toast_REST::NONCE_ACTION ) ) {
+		if ( ! class_exists( 'MW_Sales_Toast_REST' ) || ! MW_Sales_Toast_REST::verify_nonce( $nonce ) ) {
 			return new WP_Error(
 				'mw_st_analytics_nonce_invalid',
 				__( 'Invalid or expired analytics nonce.', 'mw-sales-toast' ),
@@ -99,7 +113,7 @@ class MW_Sales_Toast_Analytics {
 	}
 
 	/**
-	 * POST beacon — { event, productId?, source?, reason? }.
+	 * POST beacon — { event, productId?, source?, type?, reason? }.
 	 *
 	 * @param WP_REST_Request $request Request.
 	 * @return WP_REST_Response|WP_Error
@@ -136,7 +150,8 @@ class MW_Sales_Toast_Analytics {
 		}
 
 		$product_id = isset( $params['productId'] ) ? absint( $params['productId'] ) : 0;
-		self::track( $event, $product_id );
+		$type       = isset( $params['type'] ) ? (string) $params['type'] : '';
+		self::track( $event, $product_id, $type );
 
 		if ( 'click' === $event && $product_id > 0 ) {
 			self::set_attr_cookie( $product_id );
@@ -150,8 +165,9 @@ class MW_Sales_Toast_Analytics {
 	 *
 	 * @param string $event      Event key.
 	 * @param int    $product_id Optional product ID.
+	 * @param string $type       Optional toast type (sale|viewing|review|cta).
 	 */
-	public static function track( $event, $product_id = 0 ) {
+	public static function track( $event, $product_id = 0, $type = '' ) {
 		if ( ! self::is_enabled() || ! in_array( $event, self::EVENTS, true ) ) {
 			return;
 		}
@@ -166,6 +182,7 @@ class MW_Sales_Toast_Analytics {
 			$data[ $day ] = array(
 				'totals'   => array(),
 				'products' => array(),
+				'types'    => array(),
 			);
 		}
 		if ( ! isset( $data[ $day ]['totals'] ) || ! is_array( $data[ $day ]['totals'] ) ) {
@@ -173,6 +190,9 @@ class MW_Sales_Toast_Analytics {
 		}
 		if ( ! isset( $data[ $day ]['products'] ) || ! is_array( $data[ $day ]['products'] ) ) {
 			$data[ $day ]['products'] = array();
+		}
+		if ( ! isset( $data[ $day ]['types'] ) || ! is_array( $data[ $day ]['types'] ) ) {
+			$data[ $day ]['types'] = array();
 		}
 
 		$data[ $day ]['totals'][ $event ] = (int) ( $data[ $day ]['totals'][ $event ] ?? 0 ) + 1;
@@ -186,8 +206,29 @@ class MW_Sales_Toast_Analytics {
 			$data[ $day ]['products'][ $key ][ $event ] = (int) ( $data[ $day ]['products'][ $key ][ $event ] ?? 0 ) + 1;
 		}
 
+		if ( in_array( $event, self::TYPED_EVENTS, true ) ) {
+			$type_key = self::sanitize_toast_type( $type );
+			if ( '' !== $type_key ) {
+				if ( ! isset( $data[ $day ]['types'][ $type_key ] ) || ! is_array( $data[ $day ]['types'][ $type_key ] ) ) {
+					$data[ $day ]['types'][ $type_key ] = array();
+				}
+				$data[ $day ]['types'][ $type_key ][ $event ] = (int) ( $data[ $day ]['types'][ $type_key ][ $event ] ?? 0 ) + 1;
+			}
+		}
+
 		$data = self::prune_data( $data );
 		update_option( self::OPTION, $data, false );
+	}
+
+	/**
+	 * Allowlisted toast type, or empty if unknown.
+	 *
+	 * @param string $raw Raw type.
+	 * @return string
+	 */
+	public static function sanitize_toast_type( $raw ) {
+		$key = sanitize_key( (string) $raw );
+		return in_array( $key, self::TOAST_TYPES, true ) ? $key : '';
 	}
 
 	/**
@@ -448,6 +489,24 @@ class MW_Sales_Toast_Analytics {
 		);
 		$products = array_slice( $products, 0, 20 );
 
+		$types = array();
+		$defs  = class_exists( 'MW_Sales_Toast_Settings' ) ? MW_Sales_Toast_Settings::type_defs() : array();
+		foreach ( self::TOAST_TYPES as $type_id ) {
+			$counts = isset( $current['types'][ $type_id ] ) && is_array( $current['types'][ $type_id ] )
+				? $current['types'][ $type_id ]
+				: array();
+			$t_imp  = (int) ( $counts['impression'] ?? 0 );
+			$t_clk  = (int) ( $counts['click'] ?? 0 );
+			$label  = isset( $defs[ $type_id ]['label'] ) ? (string) $defs[ $type_id ]['label'] : $type_id;
+			$types[] = array(
+				'id'          => $type_id,
+				'label'       => $label,
+				'impressions' => $t_imp,
+				'clicks'      => $t_clk,
+				'ctr'         => $t_imp > 0 ? round( ( $t_clk / $t_imp ) * 100, 1 ) : 0.0,
+			);
+		}
+
 		return array(
 			'days'         => $days,
 			'impressions'  => $impressions,
@@ -463,6 +522,7 @@ class MW_Sales_Toast_Analytics {
 				'ctr'         => self::delta_pp( $ctr, $p_ctr ),
 				'atc'         => self::delta_pct( $atc, $p_atc ),
 			),
+			'types'        => $types,
 			'products'     => $products,
 			'attrWindow'   => self::ATTR_WINDOW_SEC / 60,
 			'hasData'      => $impressions > 0 || $clicks > 0 || $atc > 0 || $purchase > 0,
@@ -488,11 +548,12 @@ class MW_Sales_Toast_Analytics {
 	 * @param array $data   Option data.
 	 * @param int   $days   Length.
 	 * @param int   $offset Days back before window starts.
-	 * @return array{totals:array,products:array}
+	 * @return array{totals:array,products:array,types:array}
 	 */
 	private static function sum_range( $data, $days, $offset ) {
 		$totals   = array();
 		$products = array();
+		$types    = array();
 		$end      = time() - ( $offset * DAY_IN_SECONDS );
 		$start    = $end - ( ( $days - 1 ) * DAY_IN_SECONDS );
 
@@ -515,11 +576,27 @@ class MW_Sales_Toast_Analytics {
 					$products[ $pid ][ $key ] = (int) ( $products[ $pid ][ $key ] ?? 0 ) + (int) $count;
 				}
 			}
+			foreach ( (array) ( $data[ $day ]['types'] ?? array() ) as $type_id => $counts ) {
+				if ( ! is_array( $counts ) ) {
+					continue;
+				}
+				$type_id = self::sanitize_toast_type( (string) $type_id );
+				if ( '' === $type_id ) {
+					continue;
+				}
+				if ( ! isset( $types[ $type_id ] ) ) {
+					$types[ $type_id ] = array();
+				}
+				foreach ( $counts as $key => $count ) {
+					$types[ $type_id ][ $key ] = (int) ( $types[ $type_id ][ $key ] ?? 0 ) + (int) $count;
+				}
+			}
 		}
 
 		return array(
 			'totals'   => $totals,
 			'products' => $products,
+			'types'    => $types,
 		);
 	}
 

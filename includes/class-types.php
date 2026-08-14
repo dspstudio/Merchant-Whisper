@@ -333,12 +333,11 @@ class MW_Sales_Toast_Types {
 			return 0;
 		}
 
-		// Stable for ~15 minutes so the number does not jump every page load.
-		$bucket = (int) floor( time() / 900 );
-		$hash   = crc32( (string) $product_id . '|' . $bucket );
-		if ( $hash < 0 ) {
-			$hash = (int) sprintf( '%u', $hash ) % 2147483647;
+		if ( $min === $max ) {
+			return $min;
 		}
+
+		$hash = abs( crc32( 'mwst-viewing-' . (int) $product_id ) );
 		return $min + ( $hash % ( $max - $min + 1 ) );
 	}
 

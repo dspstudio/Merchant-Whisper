@@ -13,11 +13,13 @@
     if (!analyticsCfg || !cfg.nonce) return;
     var body = {
       event: eventName,
-      pageType: analyticsCfg.pageType || 'other'
+      pageType: analyticsCfg.pageType || 'other',
+      _mwst_nonce: cfg.nonce || ''
     };
     if (payload) {
       if (payload.productId) body.productId = Number(payload.productId) || 0;
       if (payload.source) body.source = String(payload.source);
+      if (payload.type) body.type = String(payload.type);
       if (payload.reason) body.reason = String(payload.reason);
       if (payload.dwellMs != null) body.dwellMs = Number(payload.dwellMs) || 0;
     }
@@ -173,7 +175,8 @@
     if (!event) return {};
     return {
       productId: event.productId || 0,
-      source: event.demo ? 'demo' : 'real'
+      source: event.demo ? 'demo' : 'real',
+      type: eventType(event)
     };
   }
 

@@ -1,7 +1,7 @@
 <?php
 /**
- * Plugin Name: MW Sales Toast
- * Description: Recent-sale social-proof toasts for WooCommerce — cached real orders, privacy controls, and optional demo fill.
+ * Plugin Name: MW Proof
+ * Description: Social proof for WooCommerce — recent purchases, viewing counts, reviews, and promo notices. Cached real orders, privacy controls, optional demo fill.
  * Version: 2.2.0
  * Author: MWV3
  * Requires at least: 5.8
@@ -12,6 +12,7 @@
 defined( 'ABSPATH' ) || exit;
 
 define( 'MW_SALES_TOAST_VERSION', '2.2.0' );
+define( 'MW_SALES_TOAST_NAME', 'MW Proof' );
 define( 'MW_SALES_TOAST_FILE', __FILE__ );
 define( 'MW_SALES_TOAST_URL', plugin_dir_url( __FILE__ ) );
 define( 'MW_SALES_TOAST_PATH', plugin_dir_path( __FILE__ ) );
@@ -20,7 +21,7 @@ define( 'MW_SALES_TOAST_TRANSIENT', 'mw_st_sales_cache' );
 define( 'MW_SALES_TOAST_CRON', 'mw_st_update_sales_cache' );
 define( 'MW_SALES_TOAST_CONSENT_META', '_mw_st_allow_public' );
 /** Bump when cached event shape / eligibility rules change. */
-define( 'MW_SALES_TOAST_CACHE_SCHEMA', 10 );
+define( 'MW_SALES_TOAST_CACHE_SCHEMA', 11 );
 
 require_once MW_SALES_TOAST_PATH . 'includes/class-settings.php';
 require_once MW_SALES_TOAST_PATH . 'includes/class-transfer.php';
@@ -48,7 +49,7 @@ function mw_sales_toast_cron_schedules( $schedules ) {
 		'interval' => $seconds,
 		'display'  => sprintf(
 			/* translators: %d: minutes */
-			__( 'Every %d minutes (MW Sales Toast)', 'mw-sales-toast' ),
+			__( 'Every %d minutes (MW Proof)', 'mw-sales-toast' ),
 			$minutes
 		),
 	);

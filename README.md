@@ -1,6 +1,6 @@
-# MW Sales Toast
+# MW Proof
 
-**Version 2.2.0** — Recent-purchase social-proof toasts for WooCommerce: cached real orders, privacy controls, and optional demo fill.
+**Version 2.2.0** — Social proof for WooCommerce: cached real orders, privacy controls, and optional demo fill.
 
 Requires WordPress 5.8+, PHP 7.2+. WooCommerce is required for real orders; demo mode can run without it.
 
@@ -37,7 +37,7 @@ Requires WordPress 5.8+, PHP 7.2+. WooCommerce is required for real orders; demo
 ### Message & session controls
 - Message template with `{name}`, `{city}`, `{product}`
 - Fallback name
-- Max toasts per session (`sessionStorage`)
+- Toasts per visit (`sessionStorage`, no repeats)
 - Mute after dismiss via `localStorage` (hours; `0` = dismiss current only)
 - Optional disable below 768px viewport width
 
@@ -52,7 +52,7 @@ Requires WordPress 5.8+, PHP 7.2+. WooCommerce is required for real orders; demo
 
 ### Extra toast types
 - **Purchases** — recent orders (default; uncheck to run only extra types)
-- **Viewing now** — “X people are viewing {product}”. Simulated range (stable ~15 min) or live unique visitors on the product page (session token, no IPs). Simulated can pin specific products; live follows General include/exclude
+- **Viewing now** — “X people are viewing {product}”. Simulated uses an admin-set count, or live unique visitors on the product page (session token, no IPs). Simulated can pin specific products; live follows General include/exclude
 - **Reviews** — approved WooCommerce product reviews (min stars, excerpt, `{stars}`)
 - **CTA / coupon** — promo line, copyable coupon chip, optional button URL; once per session optional
 - Types rotate in the same toast loop
@@ -86,6 +86,7 @@ Requires WordPress 5.8+, PHP 7.2+. WooCommerce is required for real orders; demo
 
 ### Statistics
 - Aggregate impressions, clicks, CTR, and soft-attributed carts/purchases
+- Breakdown by toast type (purchases, viewing now, reviews, CTA) on new storefront visits
 - Per-product table; no names, emails, or IPs stored
 
 ### Import / export
@@ -103,7 +104,7 @@ Visitor JS ──► GET mw-st/v1/notifications ──────┘──► t
 
 ## Settings
 
-**WooCommerce → Sales Toast** (falls back to **Settings → Sales Toast** if WooCommerce is inactive). Capability: `manage_woocommerce` (or `manage_options` without WC).
+**WooCommerce → MW Proof** (falls back to **Settings → MW Proof** if WooCommerce is inactive). Capability: `manage_woocommerce` (or `manage_options` without WC).
 
 | Setting | Purpose |
 |---------|---------|
@@ -121,11 +122,10 @@ Visitor JS ──► GET mw-st/v1/notifications ──────┘──► t
 | Hide names | Always use fallback name |
 | Require checkout consent | Privacy gate for real orders |
 | Mute after dismiss (hours) | localStorage mute TTL |
-| Max toasts per session | Cap FOMO fatigue |
 | Timing | Delay / interval / visible for (seconds) |
 | Triggers | Page load, scroll, exit intent, add to cart, inactivity, click |
-| Max events shown | Cap returned/cycled events |
-| Max cached orders | Cap rebuild query size |
+| Toasts per visit | Unique toasts in one session (no repeats) |
+| Max cached orders | Rebuild query size (keep ≥ toasts per visit) |
 | Order lookback (days) | Query window (default 30) |
 | Demo people / times | Simulated social proof |
 | URL include / exclude | Path rules for where toasts appear |
@@ -146,8 +146,8 @@ Visitor JS ──► GET mw-st/v1/notifications ──────┘──► t
 ## Installation
 
 1. Place this folder in `wp-content/plugins/mw-sales-toast`.
-2. Activate **MW Sales Toast** (re-activate after upgrading to 2.0 so cron is scheduled).
-3. Configure **WooCommerce → Sales Toast**.
+2. Activate **MW Proof** (re-activate after upgrading to 2.0 so cron is scheduled).
+3. Configure **WooCommerce → MW Proof**.
 4. Confirm toasts appear after the configured delay when the REST endpoint returns events.
 
 ## File structure

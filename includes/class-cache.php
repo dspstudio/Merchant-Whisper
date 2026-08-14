@@ -30,11 +30,66 @@ class MW_Sales_Toast_Cache {
 	public static function init() {
 		add_action( MW_SALES_TOAST_CRON, array( __CLASS__, 'rebuild' ) );
 		add_action( 'admin_init', array( __CLASS__, 'ensure_cron' ) );
+		add_action( 'wp_ajax_mw_st_rebuild_cache', array( __CLASS__, 'ajax_rebuild' ) );
 
 		add_action( 'woocommerce_new_order', array( __CLASS__, 'invalidate' ), 20 );
 		add_action( 'woocommerce_order_status_processing', array( __CLASS__, 'invalidate' ), 20 );
 		add_action( 'woocommerce_order_status_completed', array( __CLASS__, 'invalidate' ), 20 );
 		add_action( 'woocommerce_payment_complete', array( __CLASS__, 'invalidate' ), 20 );
+	}
+
+	/**
+	 * Admin AJAX: drop the sales transient and rebuild immediately.
+	 */
+	public static function ajax_rebuild() {
+		$cap = class_exists( 'MW_Sales_Toast_Settings' )
+			? MW_Sales_Toast_Settings::capability()
+			: ( class_exists( 'WooCommerce' ) ? 'manage_woocommerce' : 'manage_options' );
+		if ( ! current_user_can( $cap ) ) {
+			wp_send_json_error( array( 'message' => __( 'You do not have permission to rebuild the cache.', 'mw-sales-toast' ) ), 403 );
+		}
+
+		check_ajax_referer( 'mw_st_rebuild_cache', 'nonce' );
+
+		delete_transient( 'mw_st_rebuild_lock' );
+		delete_transient( MW_SALES_TOAST_TRANSIENT );
+		$events = self::rebuild();
+		$count  = is_array( $events ) ? count( $events ) : 0;
+		$max    = 40;
+		if ( class_exists( 'MW_Sales_Toast_Settings' ) ) {
+			$settings = MW_Sales_Toast_Settings::get();
+			$max      = max( 5, min( 100, (int) ( $settings['max_cached_orders'] ?? 40 ) ) );
+		}
+
+		$ttl     = __( 'Cached', 'mw-sales-toast' );
+		$timeout = get_option( '_transient_timeout_' . MW_SALES_TOAST_TRANSIENT );
+		if ( $timeout ) {
+			$remaining = max( 0, (int) $timeout - time() );
+			$ttl       = sprintf(
+				/* translators: %s: human time difference */
+				__( 'Expires in %s', 'mw-sales-toast' ),
+				human_time_diff( time(), time() + $remaining )
+			);
+		}
+
+		if ( $count > 0 ) {
+			$message = sprintf(
+				/* translators: %d: number of cached toast events */
+				_n( 'Cache rebuilt: %d event.', 'Cache rebuilt: %d events.', $count, 'mw-sales-toast' ),
+				$count
+			);
+		} else {
+			$message = __( 'Cache rebuilt: no events found.', 'mw-sales-toast' );
+		}
+
+		wp_send_json_success(
+			array(
+				'events'  => $count,
+				'max'     => $max,
+				'ttl'     => $ttl,
+				'message' => $message,
+			)
+		);
 	}
 
 	/**
@@ -55,7 +110,7 @@ class MW_Sales_Toast_Cache {
 	 */
 	public static function cache_ttl_seconds( $settings = null ) {
 		$settings = is_array( $settings ) ? $settings : MW_Sales_Toast_Settings::get();
-		$minutes  = self::clamp_minutes( $settings['cache_minutes'] ?? 60 );
+		$minutes  = self::clamp_minutes( $settings['cache_minutes'] ?? 15 );
 		return $minutes * MINUTE_IN_SECONDS;
 	}
 
@@ -70,7 +125,7 @@ class MW_Sales_Toast_Cache {
 			return (int) self::$cron_interval_override;
 		}
 		$settings = is_array( $settings ) ? $settings : MW_Sales_Toast_Settings::get();
-		$minutes  = self::clamp_minutes( $settings['cron_minutes'] ?? 60 );
+		$minutes  = self::clamp_minutes( $settings['cron_minutes'] ?? 15 );
 		return $minutes * MINUTE_IN_SECONDS;
 	}
 
