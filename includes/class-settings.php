@@ -2095,6 +2095,27 @@ class MW_Sales_Toast_Settings {
 		);
 		?>
 		<div class="wrap mwst-admin" id="mwst-admin">
+			<script>
+			(function () {
+				var root = document.getElementById('mwst-admin');
+				if (!root) {
+					return;
+				}
+				var mode = 'system';
+				try {
+					mode = window.localStorage.getItem('mw_st_admin_theme') || 'system';
+				} catch (e) {
+					mode = 'system';
+				}
+				if (mode !== 'light' && mode !== 'dark') {
+					mode = 'system';
+				}
+				root.setAttribute('data-mwst-theme', mode);
+				var dark = mode === 'dark' || (mode === 'system' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+				root.classList.toggle('is-dark', dark);
+				document.body.classList.toggle('mwst-settings-dark', dark);
+			})();
+			</script>
 			<?php
 			if ( class_exists( 'MW_Sales_Toast_Transfer' ) ) {
 				MW_Sales_Toast_Transfer::render_import_form( 'settings', 'account' );
@@ -2130,6 +2151,20 @@ class MW_Sales_Toast_Settings {
 					</div>
 				</div>
 				<div class="mwst-header__aside">
+					<div class="mwst-theme" role="group" aria-label="<?php esc_attr_e( 'Admin appearance', 'mw-sales-toast' ); ?>">
+						<button type="button" class="mwst-theme__btn is-active" data-theme="system" aria-pressed="true" title="<?php esc_attr_e( 'System', 'mw-sales-toast' ); ?>">
+							<span class="screen-reader-text"><?php esc_html_e( 'System', 'mw-sales-toast' ); ?></span>
+							<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="12" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M8 19h8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+						</button>
+						<button type="button" class="mwst-theme__btn" data-theme="light" aria-pressed="false" title="<?php esc_attr_e( 'Light', 'mw-sales-toast' ); ?>">
+							<span class="screen-reader-text"><?php esc_html_e( 'Light', 'mw-sales-toast' ); ?></span>
+							<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.7"/><path d="M12 3v2M12 19v2M5 12H3M21 12h-2M6.2 6.2l1.4 1.4M16.4 16.4l1.4 1.4M6.2 17.8l1.4-1.4M16.4 7.6l1.4-1.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+						</button>
+						<button type="button" class="mwst-theme__btn" data-theme="dark" aria-pressed="false" title="<?php esc_attr_e( 'Dark', 'mw-sales-toast' ); ?>">
+							<span class="screen-reader-text"><?php esc_html_e( 'Dark', 'mw-sales-toast' ); ?></span>
+							<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M16.5 13.5A7 7 0 0 1 10.5 5a7 7 0 1 0 6 8.5z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+						</button>
+					</div>
 					<span
 						id="mwst-status-badge"
 						class="mwst-badge <?php echo $enabled ? 'mwst-badge--on' : 'mwst-badge--off'; ?>"

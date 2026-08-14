@@ -33,6 +33,8 @@
   border: 1px solid var(--mw-st-border);
   border-radius: var(--mw-st-radius);
   box-shadow: var(--mw-st-shadow);
+  color-scheme: light;
+  forced-color-adjust: none;
   backdrop-filter: blur(14px) saturate(140%);
   -webkit-backdrop-filter: blur(14px) saturate(140%);
   opacity: 0;

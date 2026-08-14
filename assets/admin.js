@@ -8,6 +8,74 @@
 
 	var cfg = window.mwSalesToastAdmin || {};
 	var i18n = cfg.i18n || {};
+	var THEME_KEY = 'mw_st_admin_theme';
+	var themeMedia = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+	var lastSparkSeries = [];
+
+	function readAdminTheme() {
+		var mode = 'system';
+		try {
+			mode = window.localStorage.getItem(THEME_KEY) || 'system';
+		} catch (e) {
+			mode = 'system';
+		}
+		return mode === 'light' || mode === 'dark' ? mode : 'system';
+	}
+
+	function adminThemeIsDark(mode) {
+		if (mode === 'dark') {
+			return true;
+		}
+		if (mode === 'light') {
+			return false;
+		}
+		return !!(themeMedia && themeMedia.matches);
+	}
+
+	function applyAdminTheme(mode, persist) {
+		if (mode !== 'light' && mode !== 'dark') {
+			mode = 'system';
+		}
+		if (persist) {
+			try {
+				window.localStorage.setItem(THEME_KEY, mode);
+			} catch (e) {
+				/* ignore */
+			}
+		}
+		root.setAttribute('data-mwst-theme', mode);
+		var dark = adminThemeIsDark(mode);
+		root.classList.toggle('is-dark', dark);
+		document.body.classList.toggle('mwst-settings-dark', dark);
+		root.querySelectorAll('.mwst-theme__btn').forEach(function (btn) {
+			var on = btn.getAttribute('data-theme') === mode;
+			btn.classList.toggle('is-active', on);
+			btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+		});
+		if (lastSparkSeries.length && typeof renderSparkline === 'function') {
+			renderSparkline(lastSparkSeries);
+		}
+	}
+
+	applyAdminTheme(readAdminTheme(), false);
+	root.querySelectorAll('.mwst-theme__btn').forEach(function (btn) {
+		btn.addEventListener('click', function () {
+			applyAdminTheme(btn.getAttribute('data-theme') || 'system', true);
+		});
+	});
+	if (themeMedia) {
+		var onThemeMedia = function () {
+			if (readAdminTheme() === 'system') {
+				applyAdminTheme('system', false);
+			}
+		};
+		if (themeMedia.addEventListener) {
+			themeMedia.addEventListener('change', onThemeMedia);
+		} else if (themeMedia.addListener) {
+			themeMedia.addListener(onThemeMedia);
+		}
+	}
+
 	var designDefaults = cfg.designDefaults || {};
 	var elementorThemeCfg = cfg.elementorTheme || {};
 	var tabs = root.querySelectorAll('.mwst-tabs__btn');
@@ -358,8 +426,11 @@
 
 		settingsForm.addEventListener(
 			'input',
-			function () {
+			function (event) {
 				if (restoringForm) {
+					return;
+				}
+				if (event && event.target && event.target.closest && event.target.closest('#mwst-analytics-enabled, #mwst-analytics-attr')) {
 					return;
 				}
 				userTouchedForm = true;
@@ -369,8 +440,11 @@
 		);
 		settingsForm.addEventListener(
 			'change',
-			function () {
+			function (event) {
 				if (restoringForm) {
+					return;
+				}
+				if (event && event.target && event.target.closest && event.target.closest('#mwst-analytics-enabled, #mwst-analytics-attr')) {
 					return;
 				}
 				userTouchedForm = true;
@@ -2618,12 +2692,35 @@
 		});
 	}
 
+	function chartColor(name, fallback) {
+		var raw = '';
+		try {
+			raw = window.getComputedStyle(root).getPropertyValue('--mwst-chart-' + name).trim();
+		} catch (e) {
+			raw = '';
+		}
+		return raw || fallback;
+	}
+
+	function chartHexRgba(hex, alpha) {
+		var h = String(hex || '').replace('#', '');
+		if (h.length === 3) {
+			h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+		}
+		if (h.length !== 6) {
+			return 'rgba(148, 163, 184, ' + alpha + ')';
+		}
+		var n = parseInt(h, 16);
+		return 'rgba(' + ((n >> 16) & 255) + ', ' + ((n >> 8) & 255) + ', ' + (n & 255) + ', ' + alpha + ')';
+	}
+
 	function renderSparkline(series) {
 		var canvas = root.querySelector('#mwst-stats-spark-canvas');
 		if (!canvas || typeof window.Chart === 'undefined') {
 			return;
 		}
 		series = Array.isArray(series) ? series : [];
+		lastSparkSeries = series;
 		if (statsChart) {
 			statsChart.destroy();
 			statsChart = null;
@@ -2631,6 +2728,16 @@
 		if (!series.length) {
 			return;
 		}
+		var dark = root.classList.contains('is-dark');
+		var axisColor = dark ? '#94a3b8' : '#64748b';
+		var gridColor = dark ? 'rgba(148, 163, 184, 0.12)' : 'rgba(15, 23, 42, 0.06)';
+		var cImp = chartColor('imp', '#475569');
+		var cClk = chartColor('clk', '#d97706');
+		var cHide = chartColor('hide', '#ea580c');
+		var cDismiss = chartColor('dismiss', '#e11d48');
+		var cCart = chartColor('cart', '#0891b2');
+		var cOrder = chartColor('order', '#16a34a');
+		var cRev = chartColor('rev', '#7c3aed');
 		var labels = series.map(function (p) {
 			return p.day || '';
 		});
@@ -2664,8 +2771,8 @@
 						type: 'bar',
 						label: i18n.statsImpressions || 'Impressions',
 						data: seriesValues(series, 'impressions'),
-						backgroundColor: 'rgba(51, 65, 85, 0.22)',
-						hoverBackgroundColor: 'rgba(51, 65, 85, 0.38)',
+						backgroundColor: chartHexRgba(cImp, dark ? 0.38 : 0.22),
+						hoverBackgroundColor: chartHexRgba(cImp, dark ? 0.52 : 0.38),
 						borderRadius: 3,
 						maxBarThickness: 28,
 						hidden: !chartSeriesOn.impressions,
@@ -2677,43 +2784,43 @@
 						key: 'clicks',
 						label: i18n.statsClicks || 'Clicks',
 						data: seriesValues(series, 'clicks'),
-						color: '#c4a35a',
-						fill: 'rgba(196, 163, 90, 0.14)',
+						color: cClk,
+						fill: chartHexRgba(cClk, 0.14),
 						order: 1
 					}),
 					lineDs({
 						key: 'autoHide',
 						label: i18n.statsAutoHide || 'Auto-hid',
 						data: seriesValues(series, 'autoHide'),
-						color: '#94a3b8',
+						color: cHide,
 						order: 2
 					}),
 					lineDs({
 						key: 'dismissed',
 						label: i18n.statsDismissed || 'Dismissed',
 						data: seriesValues(series, 'dismissed'),
-						color: '#64748b',
+						color: cDismiss,
 						order: 3
 					}),
 					lineDs({
 						key: 'atc',
 						label: i18n.statsCarts || 'Carts',
 						data: seriesValues(series, 'atc'),
-						color: '#0f766e',
+						color: cCart,
 						order: 4
 					}),
 					lineDs({
 						key: 'purchases',
 						label: i18n.statsOrders || 'Orders',
 						data: seriesValues(series, 'purchases'),
-						color: '#16a34a',
+						color: cOrder,
 						order: 5
 					}),
 					lineDs({
 						key: 'revenue',
 						label: i18n.statsRevenue || 'Revenue',
 						data: seriesValues(series, 'revenue'),
-						color: '#7c3aed',
+						color: cRev,
 						axis: 'y2',
 						order: 6
 					})
@@ -2728,7 +2835,7 @@
 				plugins: {
 					legend: { display: false },
 					tooltip: {
-						backgroundColor: '#0f172a',
+						backgroundColor: dark ? '#020617' : '#0f172a',
 						titleFont: { size: 12, weight: '600' },
 						bodyFont: { size: 12 },
 						padding: 10,
@@ -2760,7 +2867,7 @@
 							autoSkip: true,
 							maxTicksLimit: many ? 8 : 12,
 							font: { size: 11 },
-							color: '#64748b'
+							color: axisColor
 						}
 					},
 					y: {
@@ -2768,9 +2875,9 @@
 						ticks: {
 							precision: 0,
 							font: { size: 11 },
-							color: '#64748b'
+							color: axisColor
 						},
-						grid: { color: 'rgba(15, 23, 42, 0.06)' },
+						grid: { color: gridColor },
 						border: { display: false }
 					},
 					y2: {
@@ -2783,7 +2890,7 @@
 						border: { display: false },
 						ticks: {
 							font: { size: 11 },
-							color: '#7c3aed',
+							color: cRev,
 							callback: function (value) {
 								return formatChartMoney(value);
 							}
@@ -3260,12 +3367,15 @@
 	var analyticsToggle = root.querySelector('#mwst-analytics-enabled');
 	if (analyticsToggle) {
 		analyticsToggle.addEventListener('change', function () {
+			if (analyticsToggle.getAttribute('aria-busy') === 'true') {
+				return;
+			}
 			var on = analyticsToggle.checked;
 			var body = new window.FormData();
 			body.append('action', analyticsUi.actionSet || 'mw_st_analytics_set');
 			body.append('nonce', analyticsUi.nonce || '');
 			body.append('enabled', on ? '1' : '0');
-			analyticsToggle.disabled = true;
+			analyticsToggle.setAttribute('aria-busy', 'true');
 			window
 				.fetch(analyticsUi.ajaxUrl || (cfg.cache && cfg.cache.ajaxUrl) || '', {
 					method: 'POST',
@@ -3285,8 +3395,6 @@
 							typeof inner.enabled !== 'undefined' ? !!inner.enabled : on
 						);
 						setCollectionStatus(inner.message || '', true);
-						userTouchedForm = false;
-						captureSaveSnapshot(true);
 					} else {
 						analyticsToggle.checked = !on;
 						setCollectionStatus(
@@ -3300,7 +3408,7 @@
 					setCollectionStatus(i18n.statsResetError || 'Could not save.', false);
 				})
 				.then(function () {
-					analyticsToggle.disabled = false;
+					analyticsToggle.removeAttribute('aria-busy');
 				});
 		});
 	}
