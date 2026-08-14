@@ -450,6 +450,9 @@
 .mwst-card__head h2 {
 	margin: 0 0 4px;
 	padding: 0;
+	display: flex;
+	align-items: center;
+	gap: 8px;
 	font-size: 14px;
 	font-weight: 600;
 	color: var(--mwst-text);
@@ -1719,9 +1722,28 @@
 }
 
 .mwst-preset__label {
+	display: flex;
+	align-items: center;
+	gap: 6px;
 	font-size: 13px;
 	font-weight: 600;
 	color: var(--mwst-text);
+}
+
+.mwst-type-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 18px;
+	height: 18px;
+	font-size: 18px;
+	line-height: 1;
+	color: var(--mwst-muted);
+}
+
+.mwst-preset.is-active .mwst-type-icon,
+.mwst-card__head h2 .mwst-type-icon {
+	color: var(--mwst-accent);
 }
 
 .mwst-preset__desc {

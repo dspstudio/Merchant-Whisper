@@ -724,25 +724,55 @@ class MW_Sales_Toast_Settings {
 		return array(
 			'sale'    => array(
 				'key'   => 'type_sale',
+				'icon'  => 'dashicons-cart',
 				'label' => __( 'Purchases', 'mw-sales-toast' ),
 				'desc'  => __( 'Recent orders', 'mw-sales-toast' ),
 			),
 			'viewing' => array(
 				'key'   => 'type_viewing',
+				'icon'  => 'dashicons-visibility',
 				'label' => __( 'Viewing now', 'mw-sales-toast' ),
 				'desc'  => __( '“X people are viewing this”', 'mw-sales-toast' ),
 			),
 			'review'  => array(
 				'key'   => 'type_review',
+				'icon'  => 'dashicons-star-filled',
 				'label' => __( 'Reviews', 'mw-sales-toast' ),
 				'desc'  => __( 'Approved product reviews', 'mw-sales-toast' ),
 			),
 			'cta'     => array(
 				'key'   => 'type_cta',
+				'icon'  => 'dashicons-tickets-alt',
 				'label' => __( 'CTA / coupon', 'mw-sales-toast' ),
 				'desc'  => __( 'Promo line with optional code', 'mw-sales-toast' ),
 			),
 		);
+	}
+
+	/**
+	 * Dashicon markup for a toast type.
+	 *
+	 * @param string $type_id sale|viewing|review|cta.
+	 * @return string
+	 */
+	private static function type_icon_html( $type_id ) {
+		$defs = self::type_defs();
+		$icon = isset( $defs[ $type_id ]['icon'] ) ? (string) $defs[ $type_id ]['icon'] : '';
+		return self::dashicon_html( $icon );
+	}
+
+	/**
+	 * Dashicon markup.
+	 *
+	 * @param string $icon Dashicon class, e.g. dashicons-cart.
+	 * @return string
+	 */
+	private static function dashicon_html( $icon ) {
+		$icon = sanitize_html_class( (string) $icon );
+		if ( '' === $icon ) {
+			return '';
+		}
+		return '<span class="dashicons ' . esc_attr( $icon ) . ' mwst-type-icon" aria-hidden="true"></span>';
 	}
 
 	/**
@@ -1460,7 +1490,7 @@ class MW_Sales_Toast_Settings {
 			wp_add_inline_style( 'mw-sales-toast', $design_css );
 		}
 
-		$admin_style_deps = array( 'mw-sales-toast' );
+		$admin_style_deps = array( 'mw-sales-toast', 'dashicons' );
 		if ( class_exists( 'WooCommerce' ) ) {
 			wp_enqueue_style( 'woocommerce_admin_styles' );
 			$admin_style_deps[] = 'woocommerce_admin_styles';
@@ -2116,11 +2146,11 @@ class MW_Sales_Toast_Settings {
 
 						<!-- General -->
 						<div class="mwst-panel<?php echo 'general' === $current_tab ? ' is-active' : ''; ?>" id="mwst-panel-general" role="tabpanel">
-							<div class="mwst-card mwst-card--accent">
-								<div class="mwst-card__head">
-									<h2><?php esc_html_e( 'Status', 'mw-sales-toast' ); ?></h2>
+							<details class="mwst-card mwst-card--accent mwst-fold mwst-fold--card" id="mwst-card-status" open>
+								<summary class="mwst-card__head">
+									<h2><?php echo self::dashicon_html( 'dashicons-yes-alt' ); ?><?php esc_html_e( 'Status', 'mw-sales-toast' ); ?></h2>
 									<p><?php esc_html_e( 'Master switch for front-end toasts.', 'mw-sales-toast' ); ?></p>
-								</div>
+								</summary>
 								<div class="mwst-card__body">
 									<div class="mwst-field">
 										<div class="mwst-field__label"><?php esc_html_e( 'Enable', 'mw-sales-toast' ); ?></div>
@@ -2155,29 +2185,24 @@ class MW_Sales_Toast_Settings {
 											</p>
 										</div>
 									</div>
-									<details class="mwst-fold" id="mwst-delivery-fold" <?php echo ( 'inline' === ( $s['event_delivery'] ?? 'rest' ) ) ? 'open' : ''; ?>>
-										<summary><?php esc_html_e( 'Advanced', 'mw-sales-toast' ); ?></summary>
-										<div class="mwst-fold__body">
-											<div class="mwst-field">
-												<div class="mwst-field__label"><label for="mwst-event-delivery"><?php esc_html_e( 'Event delivery', 'mw-sales-toast' ); ?></label></div>
-												<div class="mwst-field__control">
-													<select id="mwst-event-delivery" name="<?php echo esc_attr( $opt ); ?>[event_delivery]">
-														<option value="rest" <?php selected( $s['event_delivery'] ?? 'rest', 'rest' ); ?>><?php esc_html_e( 'REST API — fetch with nonce (default)', 'mw-sales-toast' ); ?></option>
-														<option value="inline" <?php selected( $s['event_delivery'] ?? 'rest', 'inline' ); ?>><?php esc_html_e( 'Inline — embed JSON in the page (no REST)', 'mw-sales-toast' ); ?></option>
-													</select>
-													<p class="description"><?php esc_html_e( 'Inline disables the notifications REST route and prints events into the page script. Good for removing a public API; events refresh only when the HTML does (watch full-page caches).', 'mw-sales-toast' ); ?></p>
-												</div>
-											</div>
+									<div class="mwst-field">
+										<div class="mwst-field__label"><label for="mwst-event-delivery"><?php esc_html_e( 'Event delivery', 'mw-sales-toast' ); ?></label></div>
+										<div class="mwst-field__control">
+											<select id="mwst-event-delivery" name="<?php echo esc_attr( $opt ); ?>[event_delivery]">
+												<option value="rest" <?php selected( $s['event_delivery'] ?? 'rest', 'rest' ); ?>><?php esc_html_e( 'REST API — fetch with nonce (default)', 'mw-sales-toast' ); ?></option>
+												<option value="inline" <?php selected( $s['event_delivery'] ?? 'rest', 'inline' ); ?>><?php esc_html_e( 'Inline — embed JSON in the page (no REST)', 'mw-sales-toast' ); ?></option>
+											</select>
+											<p class="description"><?php esc_html_e( 'Inline disables the notifications REST route and prints events into the page script. Good for removing a public API; events refresh only when the HTML does (watch full-page caches).', 'mw-sales-toast' ); ?></p>
 										</div>
-									</details>
+									</div>
 								</div>
-							</div>
+							</details>
 
-							<div class="mwst-card">
-								<div class="mwst-card__head">
-									<h2><?php esc_html_e( 'Where toasts appear', 'mw-sales-toast' ); ?></h2>
+							<details class="mwst-card mwst-fold mwst-fold--card" id="mwst-card-placement">
+								<summary class="mwst-card__head">
+									<h2><?php echo self::dashicon_html( 'dashicons-layout' ); ?><?php esc_html_e( 'Where toasts appear', 'mw-sales-toast' ); ?></h2>
 									<p><?php esc_html_e( 'Control placement and which pages can show notifications.', 'mw-sales-toast' ); ?></p>
-								</div>
+								</summary>
 								<div class="mwst-card__body">
 									<div class="mwst-field">
 										<div class="mwst-field__label">
@@ -2292,13 +2317,13 @@ class MW_Sales_Toast_Settings {
 										</div>
 									</div>
 								</div>
-							</div>
+							</details>
 
-							<div class="mwst-card" id="mwst-targeting">
-								<div class="mwst-card__head">
-									<h2><?php esc_html_e( 'Advanced targeting', 'mw-sales-toast' ); ?></h2>
+							<details class="mwst-card mwst-fold mwst-fold--card" id="mwst-targeting">
+								<summary class="mwst-card__head">
+									<h2><?php echo self::dashicon_html( 'dashicons-filter' ); ?><?php esc_html_e( 'Advanced targeting', 'mw-sales-toast' ); ?></h2>
 									<p><?php esc_html_e( 'URL rules, product/category filters, PDP matching, and role exclusions.', 'mw-sales-toast' ); ?></p>
-								</div>
+								</summary>
 								<div class="mwst-card__body">
 									<fieldset class="mwst-targeting-fields">
 										<div class="mwst-field">
@@ -2392,13 +2417,13 @@ class MW_Sales_Toast_Settings {
 										</div>
 									</fieldset>
 								</div>
-							</div>
+							</details>
 
-							<div class="mwst-card">
-								<div class="mwst-card__head">
-									<h2><?php esc_html_e( 'Sound', 'mw-sales-toast' ); ?></h2>
+							<details class="mwst-card mwst-fold mwst-fold--card" id="mwst-card-sound">
+								<summary class="mwst-card__head">
+									<h2><?php echo self::dashicon_html( 'dashicons-controls-volumeon' ); ?><?php esc_html_e( 'Sound', 'mw-sales-toast' ); ?></h2>
 									<p><?php esc_html_e( 'Optional audio cue when a toast appears.', 'mw-sales-toast' ); ?></p>
-								</div>
+								</summary>
 								<div class="mwst-card__body">
 									<div class="mwst-field">
 										<div class="mwst-field__label"><?php esc_html_e( 'Pop sound', 'mw-sales-toast' ); ?></div>
@@ -2410,16 +2435,16 @@ class MW_Sales_Toast_Settings {
 										</div>
 									</div>
 								</div>
-							</div>
+							</details>
 						</div>
 
 						<!-- Message & privacy -->
 						<div class="mwst-panel<?php echo 'message' === $current_tab ? ' is-active' : ''; ?>" id="mwst-panel-message" role="tabpanel">
-							<div class="mwst-card">
-								<div class="mwst-card__head">
-									<h2><?php esc_html_e( 'Toast types', 'mw-sales-toast' ); ?></h2>
+							<details class="mwst-card mwst-fold mwst-fold--card" id="mwst-card-types" open>
+								<summary class="mwst-card__head">
+									<h2><?php echo self::dashicon_html( 'dashicons-screenoptions' ); ?><?php esc_html_e( 'Toast types', 'mw-sales-toast' ); ?></h2>
 									<p><?php esc_html_e( 'Mix purchase social proof with viewing counts, reviews, and a promo toast. Types rotate in the same loop.', 'mw-sales-toast' ); ?></p>
-								</div>
+								</summary>
 								<div class="mwst-card__body">
 									<div class="mwst-field">
 										<div class="mwst-field__label"><?php esc_html_e( 'Include', 'mw-sales-toast' ); ?></div>
@@ -2435,7 +2460,7 @@ class MW_Sales_Toast_Settings {
 															data-type="<?php echo esc_attr( $type_id ); ?>"
 															<?php checked( ! empty( $s[ $type['key'] ] ) ); ?>
 														/>
-														<span class="mwst-preset__label"><?php echo esc_html( $type['label'] ); ?></span>
+														<span class="mwst-preset__label"><?php echo self::type_icon_html( $type_id ); ?><?php echo esc_html( $type['label'] ); ?></span>
 														<span class="mwst-preset__desc"><?php echo esc_html( $type['desc'] ); ?></span>
 													</label>
 												<?php endforeach; ?>
@@ -2444,13 +2469,13 @@ class MW_Sales_Toast_Settings {
 										</div>
 									</div>
 								</div>
-							</div>
+							</details>
 
-							<div class="mwst-card mwst-type-opt" id="mwst-type-sale-opt" <?php echo ! empty( $s['type_sale'] ) ? '' : 'hidden'; ?>>
-								<div class="mwst-card__head">
-									<h2><?php esc_html_e( 'Purchases', 'mw-sales-toast' ); ?></h2>
+							<details class="mwst-card mwst-fold mwst-fold--card mwst-type-opt" id="mwst-type-sale-opt" <?php echo ! empty( $s['type_sale'] ) ? '' : 'hidden'; ?>>
+								<summary class="mwst-card__head">
+									<h2><?php echo self::type_icon_html( 'sale' ); ?><?php esc_html_e( 'Purchases', 'mw-sales-toast' ); ?></h2>
 									<p><?php esc_html_e( 'Template, fallback name, stock, and simulated names for purchase toasts.', 'mw-sales-toast' ); ?></p>
-								</div>
+								</summary>
 								<div class="mwst-card__body">
 									<div class="mwst-field">
 										<div class="mwst-field__label"><label for="mwst-template"><?php esc_html_e( 'Template', 'mw-sales-toast' ); ?></label></div>
@@ -2522,13 +2547,13 @@ class MW_Sales_Toast_Settings {
 										</div>
 									</details>
 								</div>
-							</div>
+							</details>
 
-							<div class="mwst-card mwst-type-opt" id="mwst-type-viewing-opt" <?php echo ! empty( $s['type_viewing'] ) ? '' : 'hidden'; ?>>
-								<div class="mwst-card__head">
-									<h2><?php esc_html_e( 'Viewing now', 'mw-sales-toast' ); ?></h2>
+							<details class="mwst-card mwst-fold mwst-fold--card mwst-type-opt" id="mwst-type-viewing-opt" <?php echo ! empty( $s['type_viewing'] ) ? '' : 'hidden'; ?>>
+								<summary class="mwst-card__head">
+									<h2><?php echo self::type_icon_html( 'viewing' ); ?><?php esc_html_e( 'Viewing now', 'mw-sales-toast' ); ?></h2>
 									<p><?php esc_html_e( 'Show how many people are looking at a product. Simulated picks a stable count in your range; Live counts unique visitors on product pages (no IPs stored).', 'mw-sales-toast' ); ?></p>
-								</div>
+								</summary>
 								<div class="mwst-card__body">
 									<div class="mwst-field">
 										<div class="mwst-field__label"><label for="mwst-viewing-template"><?php esc_html_e( 'Template', 'mw-sales-toast' ); ?></label></div>
@@ -2587,13 +2612,13 @@ class MW_Sales_Toast_Settings {
 										</div>
 									</div>
 								</div>
-							</div>
+							</details>
 
-							<div class="mwst-card mwst-type-opt" id="mwst-type-review-opt" <?php echo ! empty( $s['type_review'] ) ? '' : 'hidden'; ?>>
-								<div class="mwst-card__head">
-									<h2><?php esc_html_e( 'Reviews', 'mw-sales-toast' ); ?></h2>
+							<details class="mwst-card mwst-fold mwst-fold--card mwst-type-opt" id="mwst-type-review-opt" <?php echo ! empty( $s['type_review'] ) ? '' : 'hidden'; ?>>
+								<summary class="mwst-card__head">
+									<h2><?php echo self::type_icon_html( 'review' ); ?><?php esc_html_e( 'Reviews', 'mw-sales-toast' ); ?></h2>
 									<p><?php esc_html_e( 'Approved WooCommerce product reviews. Demo source (or Real + demo fill) can add simulated reviews when volume is low.', 'mw-sales-toast' ); ?></p>
-								</div>
+								</summary>
 								<div class="mwst-card__body">
 									<div class="mwst-field">
 										<div class="mwst-field__label"><label for="mwst-review-template"><?php esc_html_e( 'Template', 'mw-sales-toast' ); ?></label></div>
@@ -2635,13 +2660,13 @@ class MW_Sales_Toast_Settings {
 										</div>
 									</div>
 								</div>
-							</div>
+							</details>
 
-							<div class="mwst-card mwst-type-opt" id="mwst-type-cta-opt" <?php echo ! empty( $s['type_cta'] ) ? '' : 'hidden'; ?>>
-								<div class="mwst-card__head">
-									<h2><?php esc_html_e( 'CTA / coupon', 'mw-sales-toast' ); ?></h2>
+							<details class="mwst-card mwst-fold mwst-fold--card mwst-type-opt" id="mwst-type-cta-opt" <?php echo ! empty( $s['type_cta'] ) ? '' : 'hidden'; ?>>
+								<summary class="mwst-card__head">
+									<h2><?php echo self::type_icon_html( 'cta' ); ?><?php esc_html_e( 'CTA / coupon', 'mw-sales-toast' ); ?></h2>
 									<p><?php esc_html_e( 'A promo toast with an optional coupon chip (click to copy) and button.', 'mw-sales-toast' ); ?></p>
-								</div>
+								</summary>
 								<div class="mwst-card__body">
 									<div class="mwst-field">
 										<div class="mwst-field__label"><label for="mwst-cta-message"><?php esc_html_e( 'Message', 'mw-sales-toast' ); ?></label></div>
@@ -2676,13 +2701,13 @@ class MW_Sales_Toast_Settings {
 										</div>
 									</div>
 								</div>
-							</div>
+							</details>
 
-							<div class="mwst-card">
-								<div class="mwst-card__head">
-									<h2><?php esc_html_e( 'Privacy', 'mw-sales-toast' ); ?></h2>
+							<details class="mwst-card mwst-fold mwst-fold--card" id="mwst-card-privacy">
+								<summary class="mwst-card__head">
+									<h2><?php echo self::dashicon_html( 'dashicons-shield' ); ?><?php esc_html_e( 'Privacy', 'mw-sales-toast' ); ?></h2>
 									<p><?php esc_html_e( 'Keep customer data minimal and consent-aware.', 'mw-sales-toast' ); ?></p>
-								</div>
+								</summary>
 								<div class="mwst-card__body">
 									<div class="mwst-field">
 										<div class="mwst-field__label"><?php esc_html_e( 'Hide names', 'mw-sales-toast' ); ?></div>
@@ -2698,13 +2723,13 @@ class MW_Sales_Toast_Settings {
 										</div>
 									</div>
 								</div>
-							</div>
+							</details>
 
-							<div class="mwst-card">
-								<div class="mwst-card__head">
-									<h2><?php esc_html_e( 'Session limits', 'mw-sales-toast' ); ?></h2>
+							<details class="mwst-card mwst-fold mwst-fold--card" id="mwst-card-session">
+								<summary class="mwst-card__head">
+									<h2><?php echo self::dashicon_html( 'dashicons-clock' ); ?><?php esc_html_e( 'Session limits', 'mw-sales-toast' ); ?></h2>
 									<p><?php esc_html_e( 'Reduce fatigue so toasts stay helpful, not noisy.', 'mw-sales-toast' ); ?></p>
-								</div>
+								</summary>
 								<div class="mwst-card__body">
 									<div class="mwst-field">
 										<div class="mwst-field__label"><label for="mwst-mute"><?php esc_html_e( 'Mute after dismiss', 'mw-sales-toast' ); ?></label></div>
@@ -2721,16 +2746,16 @@ class MW_Sales_Toast_Settings {
 										</div>
 									</div>
 								</div>
-							</div>
+							</details>
 						</div>
 
 						<!-- Design -->
 						<div class="mwst-panel<?php echo 'design' === $current_tab ? ' is-active' : ''; ?>" id="mwst-panel-design" role="tabpanel">
-							<div class="mwst-card">
-								<div class="mwst-card__head">
-									<h2><?php esc_html_e( 'Colors & shape', 'mw-sales-toast' ); ?></h2>
+							<details class="mwst-card mwst-fold mwst-fold--card" id="mwst-card-design" open>
+								<summary class="mwst-card__head">
+									<h2><?php echo self::dashicon_html( 'dashicons-art' ); ?><?php esc_html_e( 'Colors & shape', 'mw-sales-toast' ); ?></h2>
 									<p><?php esc_html_e( 'Quick controls map to CSS variables. Preview updates live — save to apply on the storefront.', 'mw-sales-toast' ); ?></p>
-								</div>
+								</summary>
 								<div class="mwst-card__body">
 									<?php
 									$elementor_active = self::is_elementor_active();
@@ -2912,11 +2937,11 @@ class MW_Sales_Toast_Settings {
 										</div>
 									</div>
 								</div>
-							</div>
+							</details>
 
 							<details class="mwst-card mwst-fold mwst-fold--card" id="mwst-custom-css-card" <?php echo ( '' !== trim( (string) ( $s['custom_css'] ?? '' ) ) ) ? 'open' : ''; ?>>
 								<summary class="mwst-card__head">
-									<h2><?php esc_html_e( 'Custom CSS', 'mw-sales-toast' ); ?></h2>
+									<h2><?php echo self::dashicon_html( 'dashicons-editor-code' ); ?><?php esc_html_e( 'Custom CSS', 'mw-sales-toast' ); ?></h2>
 									<p><?php esc_html_e( 'Advanced overrides. Loaded after the base toast styles.', 'mw-sales-toast' ); ?></p>
 								</summary>
 								<div class="mwst-card__body">
@@ -2985,11 +3010,11 @@ class MW_Sales_Toast_Settings {
 								</div>
 							</details>
 
-							<div class="mwst-card" id="mwst-theme-json">
-								<div class="mwst-card__head">
-									<h2><?php esc_html_e( 'Theme JSON', 'mw-sales-toast' ); ?></h2>
+							<details class="mwst-card mwst-fold mwst-fold--card" id="mwst-theme-json">
+								<summary class="mwst-card__head">
+									<h2><?php echo self::dashicon_html( 'dashicons-media-code' ); ?><?php esc_html_e( 'Theme JSON', 'mw-sales-toast' ); ?></h2>
 									<p><?php esc_html_e( 'Reuse colors, layout, and custom CSS across stores. Does not change targeting, privacy, or demo data.', 'mw-sales-toast' ); ?></p>
-								</div>
+								</summary>
 								<div class="mwst-card__body">
 									<?php
 									if ( class_exists( 'MW_Sales_Toast_Transfer' ) ) {
@@ -2998,16 +3023,16 @@ class MW_Sales_Toast_Settings {
 									?>
 									<p class="description"><?php esc_html_e( 'Import applies immediately. Elementor Site Kit sync is included when that toggle is on.', 'mw-sales-toast' ); ?></p>
 								</div>
-							</div>
+							</details>
 						</div>
 
 						<!-- Timing & cache -->
 						<div class="mwst-panel<?php echo 'timing' === $current_tab ? ' is-active' : ''; ?>" id="mwst-panel-timing" role="tabpanel">
-							<div class="mwst-card">
-								<div class="mwst-card__head">
-									<h2><?php esc_html_e( 'Triggers', 'mw-sales-toast' ); ?></h2>
+							<details class="mwst-card mwst-fold mwst-fold--card" id="mwst-card-triggers" open>
+								<summary class="mwst-card__head">
+									<h2><?php echo self::dashicon_html( 'dashicons-controls-forward' ); ?><?php esc_html_e( 'Triggers', 'mw-sales-toast' ); ?></h2>
 									<p><?php esc_html_e( 'When the first toast may appear. Select one or more — the first match starts the loop. Later toasts still follow duration and gap.', 'mw-sales-toast' ); ?></p>
-								</div>
+								</summary>
 								<div class="mwst-card__body">
 									<div class="mwst-field">
 										<div class="mwst-field__label"><?php esc_html_e( 'Start when', 'mw-sales-toast' ); ?></div>
@@ -3062,13 +3087,13 @@ class MW_Sales_Toast_Settings {
 										</div>
 									</div>
 								</div>
-							</div>
+							</details>
 
-							<div class="mwst-card">
-								<div class="mwst-card__head">
-									<h2><?php esc_html_e( 'Timing', 'mw-sales-toast' ); ?></h2>
+							<details class="mwst-card mwst-fold mwst-fold--card" id="mwst-card-timing">
+								<summary class="mwst-card__head">
+									<h2><?php echo self::dashicon_html( 'dashicons-backup' ); ?><?php esc_html_e( 'Timing', 'mw-sales-toast' ); ?></h2>
 									<p><?php esc_html_e( 'Show a toast, then wait a quiet gap before the next one. Pick a preset or fine-tune custom values.', 'mw-sales-toast' ); ?></p>
-								</div>
+								</summary>
 								<div class="mwst-card__body">
 									<div class="mwst-field">
 										<div class="mwst-field__label"><?php esc_html_e( 'Preset', 'mw-sales-toast' ); ?></div>
@@ -3155,13 +3180,13 @@ class MW_Sales_Toast_Settings {
 										</div>
 									</div>
 								</div>
-							</div>
+							</details>
 
-							<div class="mwst-card">
-								<div class="mwst-card__head">
-									<h2><?php esc_html_e( 'Order cache', 'mw-sales-toast' ); ?></h2>
+							<details class="mwst-card mwst-fold mwst-fold--card" id="mwst-card-cache">
+								<summary class="mwst-card__head">
+									<h2><?php echo self::dashicon_html( 'dashicons-database' ); ?><?php esc_html_e( 'Order cache', 'mw-sales-toast' ); ?></h2>
 									<p><?php esc_html_e( 'Real orders are rebuilt on a schedule — not on every page view.', 'mw-sales-toast' ); ?></p>
-								</div>
+								</summary>
 								<div class="mwst-card__body">
 									<div class="mwst-field">
 										<div class="mwst-field__label"><label for="mwst-cache-minutes"><?php esc_html_e( 'Cache lifetime', 'mw-sales-toast' ); ?></label></div>
@@ -3229,7 +3254,7 @@ class MW_Sales_Toast_Settings {
 										</div>
 									</div>
 								</div>
-							</div>
+							</details>
 						</div>
 
 						<!-- Statistics -->
@@ -3908,7 +3933,7 @@ class MW_Sales_Toast_Settings {
 													<?php
 													printf(
 														/* translators: %s: General tab link */
-														esc_html__( 'Events are printed into the page as JSON (mwSalesToast.events). The REST route is not registered. Choose this under %s → Advanced. No refetch until the next full page load — beware full-page caches serving stale events.', 'mw-sales-toast' ),
+														esc_html__( 'Events are printed into the page as JSON (mwSalesToast.events). The REST route is not registered. Choose this under %s → Event delivery. No refetch until the next full page load — beware full-page caches serving stale events.', 'mw-sales-toast' ),
 														self::tab_link( 'general', __( 'General', 'mw-sales-toast' ) )
 													);
 													?>
