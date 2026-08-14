@@ -354,6 +354,7 @@
     hide();
     clearGapTimer();
     clearHideTimer();
+    detachTriggers();
   }
 
   function pauseHideTimer() {
@@ -590,7 +591,226 @@
       track('skipped', { reason: 'session_cap' });
       return;
     }
-    window.setTimeout(next, withJitter(delay));
+    attachTriggers();
+  }
+
+  var loopStarted = false;
+  var pageLoadTimer = null;
+  var triggerCleanups = [];
+
+  function addCleanup(fn) {
+    triggerCleanups.push(fn);
+  }
+
+  function detachTriggers() {
+    if (pageLoadTimer) {
+      window.clearTimeout(pageLoadTimer);
+      pageLoadTimer = null;
+    }
+    while (triggerCleanups.length) {
+      try {
+        triggerCleanups.pop()();
+      } catch (e) {
+        /* ignore */
+      }
+    }
+  }
+
+  function beginLoop(reason) {
+    if (loopStarted || stopped || !events.length) return;
+    if (isMuted()) {
+      track('skipped', { reason: 'mute' });
+      detachTriggers();
+      return;
+    }
+    if (sessionCapReached()) {
+      track('skipped', { reason: 'session_cap' });
+      detachTriggers();
+      return;
+    }
+    loopStarted = true;
+    detachTriggers();
+    if (reason === 'page_load') {
+      next();
+      return;
+    }
+    var wait = reason === 'exit_intent' ? 60 : 350;
+    window.setTimeout(next, wait);
+  }
+
+  function scrollPercent() {
+    var el = document.documentElement;
+    var top = window.pageYOffset || el.scrollTop || 0;
+    var max = (el.scrollHeight || 0) - (el.clientHeight || 0);
+    if (max <= 0) return 100;
+    return (top / max) * 100;
+  }
+
+  function attachTriggers() {
+    var t = cfg.triggers || {};
+    var any =
+      t.pageLoad ||
+      t.scroll ||
+      t.exitIntent ||
+      t.addToCart ||
+      t.inactivity ||
+      t.click;
+    if (!any) {
+      t.pageLoad = true;
+    }
+
+    if (t.pageLoad) {
+      pageLoadTimer = window.setTimeout(function () {
+        pageLoadTimer = null;
+        beginLoop('page_load');
+      }, withJitter(delay));
+    }
+
+    if (t.scroll) {
+      var pct = Math.max(1, Math.min(100, Number(t.scrollPercent) || 50));
+      var onScroll = function () {
+        if (scrollPercent() >= pct) {
+          beginLoop('scroll');
+        }
+      };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      addCleanup(function () {
+        window.removeEventListener('scroll', onScroll);
+      });
+      onScroll();
+    }
+
+    if (t.exitIntent) {
+      var coarse = false;
+      try {
+        coarse = window.matchMedia('(pointer: coarse)').matches;
+      } catch (e) {
+        coarse = 'ontouchstart' in window;
+      }
+      if (!coarse) {
+        var onOut = function (e) {
+          if (!e) return;
+          if (e.relatedTarget) return;
+          if (typeof e.clientY === 'number' && e.clientY > 16) return;
+          beginLoop('exit_intent');
+        };
+        document.addEventListener('mouseout', onOut);
+        addCleanup(function () {
+          document.removeEventListener('mouseout', onOut);
+        });
+      }
+    }
+
+    if (t.addToCart) {
+      var onCart = function () {
+        beginLoop('add_to_cart');
+      };
+      document.body.addEventListener('added_to_cart', onCart);
+      document.addEventListener('added_to_cart', onCart);
+      document.body.addEventListener('wc-blocks_added_to_cart', onCart);
+      document.addEventListener('wc-blocks_added_to_cart', onCart);
+      window.addEventListener('wc-blocks_added_to_cart', onCart);
+      addCleanup(function () {
+        document.body.removeEventListener('added_to_cart', onCart);
+        document.removeEventListener('added_to_cart', onCart);
+        document.body.removeEventListener('wc-blocks_added_to_cart', onCart);
+        document.removeEventListener('wc-blocks_added_to_cart', onCart);
+        window.removeEventListener('wc-blocks_added_to_cart', onCart);
+      });
+      if (window.jQuery && window.jQuery.fn) {
+        window.jQuery(document.body).on('added_to_cart.mwst', onCart);
+        addCleanup(function () {
+          try {
+            window.jQuery(document.body).off('added_to_cart.mwst', onCart);
+          } catch (e) {
+            /* ignore */
+          }
+        });
+      }
+      try {
+        var params = new URLSearchParams(window.location.search);
+        if (params.has('add-to-cart') || params.has('added-to-cart')) {
+          beginLoop('add_to_cart');
+        }
+      } catch (e) {
+        /* ignore */
+      }
+      if (typeof window.fetch === 'function') {
+        var origFetch = window.fetch;
+        window.fetch = function () {
+          var req = arguments[0];
+          var url = '';
+          try {
+            url = typeof req === 'string' ? req : String((req && req.url) || '');
+          } catch (err) {
+            url = '';
+          }
+          return origFetch.apply(this, arguments).then(function (res) {
+            if (
+              res &&
+              res.ok &&
+              /\/wc\/store(?:\/v\d+)?\/cart\/add-item/i.test(url)
+            ) {
+              beginLoop('add_to_cart');
+            }
+            return res;
+          });
+        };
+      }
+      if (window.wp && window.wp.apiFetch && typeof window.wp.apiFetch.use === 'function') {
+        window.wp.apiFetch.use(function (options, next) {
+          return next(options).then(function (result) {
+            var path = String((options && (options.path || options.url)) || '');
+            if (/\/wc\/store(?:\/v\d+)?\/cart\/add-item/i.test(path)) {
+              beginLoop('add_to_cart');
+            }
+            return result;
+          });
+        });
+      }
+    }
+
+    if (t.inactivity) {
+      var idleMs = Math.max(5, Number(t.idleSeconds) || 20) * 1000;
+      var idleTimer = null;
+      var bumpIdle = function () {
+        if (idleTimer) window.clearTimeout(idleTimer);
+        idleTimer = window.setTimeout(function () {
+          idleTimer = null;
+          beginLoop('inactivity');
+        }, idleMs);
+      };
+      var idleEvts = ['pointerdown', 'keydown', 'scroll', 'touchstart', 'mousemove'];
+      idleEvts.forEach(function (name) {
+        window.addEventListener(name, bumpIdle, { passive: true });
+      });
+      addCleanup(function () {
+        if (idleTimer) window.clearTimeout(idleTimer);
+        idleEvts.forEach(function (name) {
+          window.removeEventListener(name, bumpIdle);
+        });
+      });
+      bumpIdle();
+    }
+
+    if (t.click && t.clickSelector) {
+      var sel = String(t.clickSelector || '').trim();
+      if (sel) {
+        var onClick = function (e) {
+          try {
+            if (e.target && e.target.closest && e.target.closest(sel)) {
+              beginLoop('click');
+            }
+          } catch (err) {
+            /* invalid selector */
+          }
+        };
+        document.addEventListener('click', onClick, true);
+        addCleanup(function () {
+          document.removeEventListener('click', onClick, true);
+        });
+      }
+    }
   }
 
   function boot(list) {

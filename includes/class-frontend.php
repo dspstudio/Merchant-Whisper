@@ -470,6 +470,7 @@ class MW_Sales_Toast_Frontend {
 			'whenStyle'            => ( 'exact' === ( $settings['when_style'] ?? '' ) ) ? 'exact' : 'natural',
 			'matchProductPage'     => ! empty( $settings['match_product_page'] ),
 			'currentProductId'     => $current_product_id,
+			'triggers'             => MW_Sales_Toast_Settings::triggers_config( $settings ),
 			'analytics'            => false,
 			'refetchMs'            => 0,
 			'i18n'                 => array(

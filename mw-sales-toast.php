@@ -2,7 +2,7 @@
 /**
  * Plugin Name: MW Sales Toast
  * Description: Recent-sale social-proof toasts for WooCommerce — cached real orders, privacy controls, and optional demo fill.
- * Version: 2.0.9
+ * Version: 2.1.0
  * Author: MWV3
  * Requires at least: 5.8
  * Requires PHP: 7.2
@@ -11,7 +11,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'MW_SALES_TOAST_VERSION', '2.0.9' );
+define( 'MW_SALES_TOAST_VERSION', '2.1.0' );
 define( 'MW_SALES_TOAST_FILE', __FILE__ );
 define( 'MW_SALES_TOAST_URL', plugin_dir_url( __FILE__ ) );
 define( 'MW_SALES_TOAST_PATH', plugin_dir_path( __FILE__ ) );

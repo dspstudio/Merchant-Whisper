@@ -41,6 +41,10 @@
 	var delayInput = root.querySelector('#mwst-delay');
 	var durationInputField = root.querySelector('#mwst-duration');
 	var gapInput = root.querySelector('#mwst-gap');
+	var triggerInputs = root.querySelectorAll('.mwst-trigger-input');
+	var triggerScrollOpt = root.querySelector('#mwst-trigger-scroll-opt');
+	var triggerIdleOpt = root.querySelector('#mwst-trigger-idle-opt');
+	var triggerClickOpt = root.querySelector('#mwst-trigger-click-opt');
 	var whenStyle = root.querySelector('#mwst-when-style');
 	var stockDisplay = root.querySelector('#mwst-stock-display');
 	var stockThreshold = root.querySelector('#mwst-stock-threshold');
@@ -421,6 +425,44 @@
 			if (gapInput) {
 				gapInput.value = selected.getAttribute('data-gap') || gapInput.value;
 			}
+		}
+	}
+
+	function syncTriggerOptions() {
+		var selected = {};
+		var checkedCount = 0;
+		triggerInputs.forEach(function (input) {
+			var key = input.getAttribute('data-trigger') || '';
+			if (key) {
+				selected[key] = !!input.checked;
+			}
+			if (input.checked) {
+				checkedCount += 1;
+			}
+			var label = input.closest('.mwst-preset');
+			if (label) {
+				label.classList.toggle('is-active', !!input.checked);
+			}
+		});
+		if (checkedCount < 1) {
+			var pageLoad = root.querySelector('.mwst-trigger-input[data-trigger="page_load"]');
+			if (pageLoad) {
+				pageLoad.checked = true;
+				selected.page_load = true;
+				var pageLabel = pageLoad.closest('.mwst-preset');
+				if (pageLabel) {
+					pageLabel.classList.add('is-active');
+				}
+			}
+		}
+		if (triggerScrollOpt) {
+			triggerScrollOpt.hidden = !selected.scroll;
+		}
+		if (triggerIdleOpt) {
+			triggerIdleOpt.hidden = !selected.inactivity;
+		}
+		if (triggerClickOpt) {
+			triggerClickOpt.hidden = !selected.click;
 		}
 	}
 
@@ -1359,6 +1401,10 @@
 		input.addEventListener('change', syncTimingPreset);
 	});
 
+	triggerInputs.forEach(function (input) {
+		input.addEventListener('change', syncTriggerOptions);
+	});
+
 	syncBadge();
 	syncStockThresholdState();
 	syncExcludeHomeState();
@@ -1426,6 +1472,7 @@
 	syncImageFit();
 	syncElementorThemeUi();
 	syncTimingPreset();
+	syncTriggerOptions();
 
 	/* Statistics date range — live aggregates when analytics payload exists. */
 	var analyticsData = cfg.analytics || null;

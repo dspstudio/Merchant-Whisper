@@ -42,6 +42,15 @@ class MW_Sales_Toast_Settings {
 			'duration'               => 7,
 			'gap'                    => 12,
 			'jitter'                 => 20,
+			'trigger_page_load'      => 1,
+			'trigger_scroll'         => 0,
+			'trigger_exit_intent'    => 0,
+			'trigger_add_to_cart'    => 0,
+			'trigger_inactivity'     => 0,
+			'trigger_click'          => 0,
+			'trigger_scroll_percent' => 50,
+			'trigger_idle_seconds'   => 20,
+			'trigger_click_selector' => '',
 			'max_events'             => 8,
 			'max_cached_orders'      => 40,
 			'cache_minutes'          => 60,
@@ -582,6 +591,97 @@ class MW_Sales_Toast_Settings {
 	}
 
 	/**
+	 * When the first toast may start (any selected trigger; first match wins).
+	 *
+	 * @return array<string, array{key:string,label:string,desc:string}>
+	 */
+	public static function trigger_defs() {
+		return array(
+			'page_load'   => array(
+				'key'   => 'trigger_page_load',
+				'label' => __( 'Page load', 'mw-sales-toast' ),
+				'desc'  => __( 'After First delay below', 'mw-sales-toast' ),
+			),
+			'scroll'      => array(
+				'key'   => 'trigger_scroll',
+				'label' => __( 'Scroll', 'mw-sales-toast' ),
+				'desc'  => __( 'After the visitor scrolls down the page', 'mw-sales-toast' ),
+			),
+			'exit_intent' => array(
+				'key'   => 'trigger_exit_intent',
+				'label' => __( 'Exit intent', 'mw-sales-toast' ),
+				'desc'  => __( 'When the cursor leaves toward the top (desktop)', 'mw-sales-toast' ),
+			),
+			'add_to_cart' => array(
+				'key'   => 'trigger_add_to_cart',
+				'label' => __( 'Add to cart', 'mw-sales-toast' ),
+				'desc'  => __( 'After a WooCommerce add-to-cart', 'mw-sales-toast' ),
+			),
+			'inactivity'  => array(
+				'key'   => 'trigger_inactivity',
+				'label' => __( 'Inactivity', 'mw-sales-toast' ),
+				'desc'  => __( 'After no mouse, keyboard, or scroll', 'mw-sales-toast' ),
+			),
+			'click'       => array(
+				'key'   => 'trigger_click',
+				'label' => __( 'Click', 'mw-sales-toast' ),
+				'desc'  => __( 'When a matching element is clicked', 'mw-sales-toast' ),
+			),
+		);
+	}
+
+	/**
+	 * Sanitize a CSS selector used as a click trigger.
+	 *
+	 * @param mixed $raw Raw.
+	 * @return string
+	 */
+	public static function sanitize_css_selector( $raw ) {
+		$sel = sanitize_text_field( (string) $raw );
+		$sel = preg_replace( '/[^\w\s\-.#\[\]=\'"~,>+*:()]/u', '', $sel );
+		$sel = is_string( $sel ) ? trim( preg_replace( '/\s+/', ' ', $sel ) ) : '';
+		if ( strlen( $sel ) > 240 ) {
+			$sel = substr( $sel, 0, 240 );
+		}
+		return $sel;
+	}
+
+	/**
+	 * Front-end trigger payload.
+	 *
+	 * @param array|null $settings Settings.
+	 * @return array<string, mixed>
+	 */
+	public static function triggers_config( $settings = null ) {
+		$s = $settings ? $settings : self::get();
+
+		$cfg = array(
+			'pageLoad'      => ! empty( $s['trigger_page_load'] ),
+			'scroll'        => ! empty( $s['trigger_scroll'] ),
+			'scrollPercent' => max( 1, min( 100, (int) ( $s['trigger_scroll_percent'] ?? 50 ) ) ),
+			'exitIntent'    => ! empty( $s['trigger_exit_intent'] ),
+			'addToCart'     => ! empty( $s['trigger_add_to_cart'] ),
+			'inactivity'    => ! empty( $s['trigger_inactivity'] ),
+			'idleSeconds'   => max( 5, min( 180, (int) ( $s['trigger_idle_seconds'] ?? 20 ) ) ),
+			'click'         => ! empty( $s['trigger_click'] ),
+			'clickSelector' => (string) ( $s['trigger_click_selector'] ?? '' ),
+		);
+
+		if (
+			empty( $cfg['pageLoad'] )
+			&& empty( $cfg['scroll'] )
+			&& empty( $cfg['exitIntent'] )
+			&& empty( $cfg['addToCart'] )
+			&& empty( $cfg['inactivity'] )
+			&& empty( $cfg['click'] )
+		) {
+			$cfg['pageLoad'] = true;
+		}
+
+		return $cfg;
+	}
+
+	/**
 	 * Design theme presets (colors + radius). Keeps palettes coherent.
 	 *
 	 * @return array<string, array<string, mixed>>
@@ -770,6 +870,23 @@ class MW_Sales_Toast_Settings {
 		$merged['url_exclude'] = isset( $merged['url_exclude'] ) ? (string) $merged['url_exclude'] : '';
 		$merged['match_product_page'] = empty( $merged['match_product_page'] ) ? 0 : 1;
 
+		foreach ( array( 'trigger_page_load', 'trigger_scroll', 'trigger_exit_intent', 'trigger_add_to_cart', 'trigger_inactivity', 'trigger_click' ) as $trig_key ) {
+			$merged[ $trig_key ] = empty( $merged[ $trig_key ] ) ? 0 : 1;
+		}
+		$merged['trigger_scroll_percent'] = max( 1, min( 100, (int) ( $merged['trigger_scroll_percent'] ?? 50 ) ) );
+		$merged['trigger_idle_seconds']   = max( 5, min( 180, (int) ( $merged['trigger_idle_seconds'] ?? 20 ) ) );
+		$merged['trigger_click_selector'] = self::sanitize_css_selector( $merged['trigger_click_selector'] ?? '' );
+		if (
+			empty( $merged['trigger_page_load'] )
+			&& empty( $merged['trigger_scroll'] )
+			&& empty( $merged['trigger_exit_intent'] )
+			&& empty( $merged['trigger_add_to_cart'] )
+			&& empty( $merged['trigger_inactivity'] )
+			&& empty( $merged['trigger_click'] )
+		) {
+			$merged['trigger_page_load'] = 1;
+		}
+
 		$presets = self::timing_presets();
 		$preset  = isset( $merged['timing_preset'] ) ? $merged['timing_preset'] : 'balanced';
 		if ( isset( $presets[ $preset ] ) && 'custom' !== $preset ) {
@@ -856,6 +973,12 @@ class MW_Sales_Toast_Settings {
 			'sound_enabled',
 			'newsletter',
 			'use_elementor_theme',
+			'trigger_page_load',
+			'trigger_scroll',
+			'trigger_exit_intent',
+			'trigger_add_to_cart',
+			'trigger_inactivity',
+			'trigger_click',
 		);
 		foreach ( $checks as $key ) {
 			$out[ $key ] = empty( $input[ $key ] ) ? 0 : 1;
@@ -922,6 +1045,51 @@ class MW_Sales_Toast_Settings {
 		}
 
 		$out['jitter'] = max( 0, min( 50, (int) ( $input['jitter'] ?? $defaults['jitter'] ) ) );
+
+		if (
+			empty( $out['trigger_page_load'] )
+			&& empty( $out['trigger_scroll'] )
+			&& empty( $out['trigger_exit_intent'] )
+			&& empty( $out['trigger_add_to_cart'] )
+			&& empty( $out['trigger_inactivity'] )
+			&& empty( $out['trigger_click'] )
+		) {
+			$out['trigger_page_load'] = 1;
+		}
+
+		$out['trigger_scroll_percent'] = max(
+			1,
+			min(
+				100,
+				(int) (
+					array_key_exists( 'trigger_scroll_percent', $input )
+						? $input['trigger_scroll_percent']
+						: ( ( is_array( $saved_opts ) && isset( $saved_opts['trigger_scroll_percent'] ) )
+							? $saved_opts['trigger_scroll_percent']
+							: $defaults['trigger_scroll_percent'] )
+				)
+			)
+		);
+		$out['trigger_idle_seconds'] = max(
+			5,
+			min(
+				180,
+				(int) (
+					array_key_exists( 'trigger_idle_seconds', $input )
+						? $input['trigger_idle_seconds']
+						: ( ( is_array( $saved_opts ) && isset( $saved_opts['trigger_idle_seconds'] ) )
+							? $saved_opts['trigger_idle_seconds']
+							: $defaults['trigger_idle_seconds'] )
+				)
+			)
+		);
+		$out['trigger_click_selector'] = self::sanitize_css_selector(
+			array_key_exists( 'trigger_click_selector', $input )
+				? $input['trigger_click_selector']
+				: ( ( is_array( $saved_opts ) && isset( $saved_opts['trigger_click_selector'] ) )
+					? $saved_opts['trigger_click_selector']
+					: $defaults['trigger_click_selector'] )
+		);
 
 		$when_styles = array( 'natural', 'exact' );
 		$out['when_style'] = in_array( $input['when_style'] ?? '', $when_styles, true )
@@ -2365,6 +2533,67 @@ class MW_Sales_Toast_Settings {
 						<div class="mwst-panel<?php echo 'timing' === $current_tab ? ' is-active' : ''; ?>" id="mwst-panel-timing" role="tabpanel">
 							<div class="mwst-card">
 								<div class="mwst-card__head">
+									<h2><?php esc_html_e( 'Triggers', 'mw-sales-toast' ); ?></h2>
+									<p><?php esc_html_e( 'When the first toast may appear. Select one or more — the first match starts the loop. Later toasts still follow duration and gap.', 'mw-sales-toast' ); ?></p>
+								</div>
+								<div class="mwst-card__body">
+									<div class="mwst-field">
+										<div class="mwst-field__label"><?php esc_html_e( 'Start when', 'mw-sales-toast' ); ?></div>
+										<div class="mwst-field__control">
+											<div class="mwst-presets mwst-presets--triggers" role="group" aria-label="<?php esc_attr_e( 'Toast triggers', 'mw-sales-toast' ); ?>">
+												<?php foreach ( self::trigger_defs() as $trig_id => $trig ) : ?>
+													<label class="mwst-preset<?php echo ! empty( $s[ $trig['key'] ] ) ? ' is-active' : ''; ?>">
+														<input
+															type="checkbox"
+															name="<?php echo esc_attr( $opt ); ?>[<?php echo esc_attr( $trig['key'] ); ?>]"
+															value="1"
+															class="mwst-trigger-input"
+															data-trigger="<?php echo esc_attr( $trig_id ); ?>"
+															<?php checked( ! empty( $s[ $trig['key'] ] ) ); ?>
+														/>
+														<span class="mwst-preset__label"><?php echo esc_html( $trig['label'] ); ?></span>
+														<span class="mwst-preset__desc"><?php echo esc_html( $trig['desc'] ); ?></span>
+													</label>
+												<?php endforeach; ?>
+											</div>
+											<p class="description"><?php esc_html_e( 'If none are selected, Page load is used. Exit intent is desktop-only. Add to cart needs WooCommerce.', 'mw-sales-toast' ); ?></p>
+										</div>
+									</div>
+									<div class="mwst-field mwst-trigger-opt" id="mwst-trigger-scroll-opt" <?php echo ! empty( $s['trigger_scroll'] ) ? '' : 'hidden'; ?>>
+										<div class="mwst-field__label"><label for="mwst-trigger-scroll-percent"><?php esc_html_e( 'Scroll depth', 'mw-sales-toast' ); ?></label></div>
+										<div class="mwst-field__control">
+											<input id="mwst-trigger-scroll-percent" type="number" min="1" max="100" class="small-text" name="<?php echo esc_attr( $opt ); ?>[trigger_scroll_percent]" value="<?php echo esc_attr( (string) (int) $s['trigger_scroll_percent'] ); ?>" />
+											<span class="mwst-hint">%</span>
+											<p class="description"><?php esc_html_e( 'Start after this percent of the page has been scrolled. Short pages that cannot scroll count as 100%.', 'mw-sales-toast' ); ?></p>
+										</div>
+									</div>
+									<div class="mwst-field mwst-trigger-opt" id="mwst-trigger-idle-opt" <?php echo ! empty( $s['trigger_inactivity'] ) ? '' : 'hidden'; ?>>
+										<div class="mwst-field__label"><label for="mwst-trigger-idle-seconds"><?php esc_html_e( 'Idle time', 'mw-sales-toast' ); ?></label></div>
+										<div class="mwst-field__control">
+											<input id="mwst-trigger-idle-seconds" type="number" min="5" max="180" class="small-text" name="<?php echo esc_attr( $opt ); ?>[trigger_idle_seconds]" value="<?php echo esc_attr( (string) (int) $s['trigger_idle_seconds'] ); ?>" />
+											<span class="mwst-hint"><?php esc_html_e( 'seconds', 'mw-sales-toast' ); ?></span>
+											<p class="description"><?php esc_html_e( 'No pointer, keyboard, or scroll activity for this long.', 'mw-sales-toast' ); ?></p>
+										</div>
+									</div>
+									<div class="mwst-field mwst-trigger-opt" id="mwst-trigger-click-opt" <?php echo ! empty( $s['trigger_click'] ) ? '' : 'hidden'; ?>>
+										<div class="mwst-field__label"><label for="mwst-trigger-click-selector"><?php esc_html_e( 'Click selector', 'mw-sales-toast' ); ?></label></div>
+										<div class="mwst-field__control">
+											<input
+												id="mwst-trigger-click-selector"
+												type="text"
+												class="regular-text"
+												name="<?php echo esc_attr( $opt ); ?>[trigger_click_selector]"
+												value="<?php echo esc_attr( (string) $s['trigger_click_selector'] ); ?>"
+												placeholder="<?php esc_attr_e( '.add-to-wishlist, #cta-button', 'mw-sales-toast' ); ?>"
+											/>
+											<p class="description"><?php esc_html_e( 'CSS selector. A click on a matching element starts the toast loop.', 'mw-sales-toast' ); ?></p>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="mwst-card">
+								<div class="mwst-card__head">
 									<h2><?php esc_html_e( 'Timing', 'mw-sales-toast' ); ?></h2>
 									<p><?php esc_html_e( 'Show a toast, then wait a quiet gap before the next one. Pick a preset or fine-tune custom values.', 'mw-sales-toast' ); ?></p>
 								</div>
@@ -2424,7 +2653,7 @@ class MW_Sales_Toast_Settings {
 													<input type="number" min="1" max="300" id="mwst-gap" name="<?php echo esc_attr( $opt ); ?>[gap]" value="<?php echo esc_attr( (string) $s['gap'] ); ?>" class="small-text mwst-timing-input" />
 												</label>
 											</div>
-											<p class="description"><?php esc_html_e( 'Seconds. Gap is the quiet time after a toast hides before the next one appears.', 'mw-sales-toast' ); ?></p>
+											<p class="description"><?php esc_html_e( 'Seconds. First delay applies when Page load is a trigger. Gap is the quiet time after a toast hides before the next one appears.', 'mw-sales-toast' ); ?></p>
 										</div>
 									</div>
 									<div class="mwst-field">
@@ -2432,7 +2661,7 @@ class MW_Sales_Toast_Settings {
 										<div class="mwst-field__control">
 											<input id="mwst-jitter" type="number" min="0" max="50" class="small-text" name="<?php echo esc_attr( $opt ); ?>[jitter]" value="<?php echo esc_attr( (string) (int) $s['jitter'] ); ?>" />
 											<span class="mwst-hint">%</span>
-											<p class="description"><?php esc_html_e( 'Randomizes first delay and gap by up to this percent so the rhythm feels less robotic. 0 = exact timing. Visible duration is never jittered.', 'mw-sales-toast' ); ?></p>
+											<p class="description"><?php esc_html_e( 'Randomizes page-load delay and gap by up to this percent so the rhythm feels less robotic. 0 = exact timing. Visible duration is never jittered.', 'mw-sales-toast' ); ?></p>
 										</div>
 									</div>
 									<div class="mwst-field">
@@ -2822,6 +3051,20 @@ class MW_Sales_Toast_Settings {
 											</div>
 										</details>
 										<details class="mwst-faq__item">
+											<summary><?php esc_html_e( 'Can I wait for scroll, exit intent, or add to cart instead of page load?', 'mw-sales-toast' ); ?></summary>
+											<div class="mwst-faq__answer">
+												<p>
+													<?php
+													printf(
+														/* translators: %s: Timing & cache tab link */
+														esc_html__( 'Yes. Under %s → Triggers, choose Page load, Scroll, Exit intent, Add to cart, Inactivity, and/or Click. The first match starts the toast loop; duration and gap still apply after that. Uncheck Page load if you only want a behavioral trigger.', 'mw-sales-toast' ),
+														self::tab_link( 'timing', __( 'Timing & cache', 'mw-sales-toast' ) )
+													);
+													?>
+												</p>
+											</div>
+										</details>
+										<details class="mwst-faq__item">
 											<summary><?php esc_html_e( 'How do I preview before going live?', 'mw-sales-toast' ); ?></summary>
 											<div class="mwst-faq__answer">
 												<p>
@@ -2933,7 +3176,7 @@ class MW_Sales_Toast_Settings {
 													<?php
 													printf(
 														/* translators: %s: Timing & cache tab link */
-														esc_html__( '%s — delay, visible time, gap, jitter, time label style, max events, cached orders, and lookback days.', 'mw-sales-toast' ),
+														esc_html__( '%s — triggers, delay, visible time, gap, jitter, time label style, max events, cached orders, and lookback days.', 'mw-sales-toast' ),
 														self::tab_link( 'timing', __( 'Timing & cache', 'mw-sales-toast' ) )
 													);
 													?>
@@ -3010,7 +3253,7 @@ class MW_Sales_Toast_Settings {
 												<?php
 												printf(
 													/* translators: %s: General tab link */
-													esc_html__( 'Recent orders are rebuilt into a short-lived cache via WP-Cron and order hooks — not on every page view. Cache lifetime and cron interval live under %s → Status. Visitors load events from a REST endpoint; the front-end script shows one toast at a time with your delay / duration / gap.', 'mw-sales-toast' ),
+													esc_html__( 'Recent orders are rebuilt into a short-lived cache via WP-Cron and order hooks — not on every page view. Cache lifetime and cron interval live under %s → Status. Visitors load events from a REST endpoint; the front-end script shows one toast at a time after your chosen trigger, then follows delay / duration / gap.', 'mw-sales-toast' ),
 													self::tab_link( 'general', __( 'General', 'mw-sales-toast' ) )
 												);
 												?>
@@ -3058,7 +3301,8 @@ class MW_Sales_Toast_Settings {
 										<section class="mwst-docs__section">
 											<h3><?php esc_html_e( 'Timing & labels', 'mw-sales-toast' ); ?></h3>
 											<ul>
-												<li><strong><?php esc_html_e( 'First delay', 'mw-sales-toast' ); ?></strong> — <?php esc_html_e( 'Wait after page load before the first toast.', 'mw-sales-toast' ); ?></li>
+												<li><strong><?php esc_html_e( 'Triggers', 'mw-sales-toast' ); ?></strong> — <?php esc_html_e( 'Page load, scroll depth, exit intent, add to cart, inactivity, or a CSS click selector. The first match starts the loop.', 'mw-sales-toast' ); ?></li>
+												<li><strong><?php esc_html_e( 'First delay', 'mw-sales-toast' ); ?></strong> — <?php esc_html_e( 'Wait after page load before the first toast (when Page load is a trigger).', 'mw-sales-toast' ); ?></li>
 												<li><strong><?php esc_html_e( 'Visible for', 'mw-sales-toast' ); ?></strong> — <?php esc_html_e( 'How long each toast stays on screen.', 'mw-sales-toast' ); ?></li>
 												<li><strong><?php esc_html_e( 'Gap after hide', 'mw-sales-toast' ); ?></strong> — <?php esc_html_e( 'Quiet time after a toast hides before the next one.', 'mw-sales-toast' ); ?></li>
 												<li><strong><?php esc_html_e( 'Jitter', 'mw-sales-toast' ); ?></strong> — <?php esc_html_e( 'Randomizes delay and gap so the rhythm feels less robotic.', 'mw-sales-toast' ); ?></li>

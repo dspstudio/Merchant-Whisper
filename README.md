@@ -1,6 +1,6 @@
 # MW Sales Toast
 
-**Version 2.0.0** — Recent-purchase social-proof toasts for WooCommerce: cached real orders, privacy controls, and optional demo fill.
+**Version 2.1.0** — Recent-purchase social-proof toasts for WooCommerce: cached real orders, privacy controls, and optional demo fill.
 
 Requires WordPress 5.8+, PHP 7.2+. WooCommerce is required for real orders; demo mode can run without it.
 
@@ -40,6 +40,15 @@ Requires WordPress 5.8+, PHP 7.2+. WooCommerce is required for real orders; demo
 - Max toasts per session (`sessionStorage`)
 - Mute after dismiss via `localStorage` (hours; `0` = dismiss current only)
 - Optional disable below 768px viewport width
+
+### Triggers
+- **Page load** — first toast after First delay (default; existing stores keep this)
+- **Scroll** — after a chosen page-depth percent (short pages count as 100%)
+- **Exit intent** — cursor leaving toward the top of the viewport (desktop)
+- **Add to cart** — WooCommerce classic AJAX, Blocks store API, or `?add-to-cart=`
+- **Inactivity** — no pointer/keyboard/scroll for N seconds
+- **Click** — CSS selector; first matching click starts the loop
+- Combine any of the above; the first match starts the loop. Duration and gap still apply after that.
 
 ### Display & UX
 - Corner positions (bottom/top × left/right)
@@ -106,6 +115,7 @@ Visitor JS ──► GET mw-st/v1/notifications ──────┘──► t
 | Mute after dismiss (hours) | localStorage mute TTL |
 | Max toasts per session | Cap FOMO fatigue |
 | Timing | Delay / interval / visible for (seconds) |
+| Triggers | Page load, scroll, exit intent, add to cart, inactivity, click |
 | Max events shown | Cap returned/cycled events |
 | Max cached orders | Cap rebuild query size |
 | Order lookback (days) | Query window (default 30) |
@@ -203,6 +213,9 @@ Terms people may use in **WordPress Admin → Plugins → Add New** or Google:
 5. fomo
 
 ## Changelog
+
+### 2.1.0
+- Triggers: page load, scroll depth, exit intent, add to cart, inactivity, and click selector
 
 ### 2.0.0
 - Modular structure; cached orders; cron + order hooks; REST delivery
