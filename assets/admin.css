@@ -18,7 +18,7 @@
 	--mwst-warn-soft: #fffbeb;
 	--mwst-danger: #b42318;
 	--mwst-tab-bg: rgba(255, 255, 255, 0.96);
-	--mwst-save-bg: rgba(255, 255, 255, 0.92);
+	--mwst-save-bg: rgba(240, 240, 241, 0.88);
 	--mwst-input-bg: #fff;
 	--mwst-toggle-off: #c3c4c7;
 	--mwst-toggle-on: var(--mwst-accent);
@@ -35,9 +35,14 @@
 	--mwst-table-border: #e8ecf1;
 	--mwst-radius: 10px;
 	--mwst-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.04);
-	max-width: 1180px;
+	max-width: 1440px;
 	margin: 0 0 64px;
 	color: var(--mwst-text);
+}
+
+/* Match WP's 20px left inset on #wpcontent so the sidebar isn't flush. */
+#wpcontent {
+	padding-right: 20px;
 }
 
 .mwst-admin *,
@@ -422,7 +427,7 @@
 
 .mwst-layout {
 	display: grid;
-	grid-template-columns: minmax(0, 1fr) 300px;
+	grid-template-columns: minmax(0, 1fr) 400px;
 	gap: 20px;
 	align-items: start;
 	overflow-x: clip;
@@ -519,7 +524,7 @@
 }
 
 .mwst-card__head {
-	padding: 16px 20px 12px;
+	padding: 20px 22px 16px;
 	border-bottom: 1px solid var(--mwst-hairline);
 }
 
@@ -773,13 +778,13 @@
 
 .mwst-fold--card > summary.mwst-card__head {
 	position: relative;
-	padding-right: 40px;
+	padding-right: 44px;
 }
 
 .mwst-fold--card > summary.mwst-card__head::after {
 	position: absolute;
-	top: 22px;
-	right: 20px;
+	top: 26px;
+	right: 22px;
 	margin: 0;
 }
 
@@ -1102,7 +1107,8 @@
 
 .mwst-sample-toast.mw-sales-toast:hover,
 .mwst-sample-toast.mw-sales-toast:focus-visible {
-	box-shadow: 0 0 0 2px #93c5fd;
+	outline: 2px solid #93c5fd;
+	outline-offset: 2px;
 }
 
 .mwst-sample-toast.mw-sales-toast:focus {
@@ -1110,7 +1116,8 @@
 }
 
 .mwst-sample-item.is-previewing .mwst-sample-toast.mw-sales-toast {
-	box-shadow: 0 0 0 2px var(--mwst-accent, #2563eb);
+	outline: 2px solid var(--mwst-accent, #2563eb);
+	outline-offset: 2px;
 }
 
 .mwst-sample-toast .mw-sales-toast__close {
@@ -1230,8 +1237,9 @@
 	background: var(--mwst-save-bg);
 	border: 1px solid var(--mwst-border);
 	border-radius: var(--mwst-radius);
-	box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06);
-	backdrop-filter: blur(8px);
+	box-shadow: 0 8px 28px rgba(0, 0, 0, 0.1), 0 1px 0 rgba(255, 255, 255, 0.4) inset;
+	backdrop-filter: blur(14px);
+	-webkit-backdrop-filter: blur(14px);
 }
 
 .mwst-save__hint {
@@ -1538,7 +1546,7 @@
 }
 
 .mwst-account {
-	padding: 10px 12px 14px;
+	padding: 0;
 }
 
 .mwst-account__hero {
@@ -2105,7 +2113,7 @@
 
 /* Responsive */
 
-@media (max-width: 1100px) {
+@media (max-width: 1400px) {
 	.mwst-layout {
 		grid-template-columns: 1fr;
 	}
@@ -2218,6 +2226,15 @@
 }
 
 /* Statistics */
+
+#mwst-panel-statistics .mwst-card__body,
+#mwst-panel-account .mwst-card__body {
+	padding: 16px 20px 20px;
+}
+
+#mwst-account-newsletter .mwst-field {
+	padding: 0;
+}
 
 .mwst-stats-toolbar {
 	display: flex;
@@ -2754,7 +2771,7 @@
 
 .mwst-stats-privacy {
 	margin: 0;
-	padding: 0 0 0 1.15em;
+	padding: 0;
 }
 
 .mwst-stats-privacy li {
@@ -2943,7 +2960,7 @@
 	--mwst-warn-soft: rgba(245, 158, 11, 0.16);
 	--mwst-danger: #f87171;
 	--mwst-tab-bg: rgba(26, 34, 48, 0.94);
-	--mwst-save-bg: rgba(26, 34, 48, 0.94);
+	--mwst-save-bg: rgba(11, 16, 23, 0.78);
 	--mwst-input-bg: #121826;
 	--mwst-toggle-off: #3a4658;
 	--mwst-toggle-on: #2563eb;
@@ -3045,6 +3062,11 @@ body.mwst-settings-dark #wpbody-content {
 	background: #2563eb;
 	border-color: #1d4ed8;
 	color: #fff;
+}
+
+.mwst-admin.is-dark .mwst-save {
+	border-color: rgba(148, 163, 184, 0.28);
+	box-shadow: 0 10px 32px rgba(0, 0, 0, 0.45), 0 1px 0 rgba(255, 255, 255, 0.06) inset;
 }
 
 .mwst-admin.is-dark .mwst-save.is-dirty:not(.is-saving) {

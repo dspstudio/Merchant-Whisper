@@ -615,7 +615,34 @@
 		});
 	}
 
-	function activateTab(id) {
+	function currentTabId() {
+		for (var i = 0; i < tabs.length; i++) {
+			if (tabs[i].classList.contains('is-active')) {
+				return tabs[i].getAttribute('data-tab') || '';
+			}
+		}
+		return '';
+	}
+
+	function resetTabScroll() {
+		var el = root;
+		var offset = 8;
+		var bar = document.getElementById('wpadminbar');
+		if (bar) {
+			offset += bar.offsetHeight || 0;
+		}
+		var y = 0;
+		var node = el;
+		while (node) {
+			y += node.offsetTop;
+			node = node.offsetParent;
+		}
+		window.scrollTo(0, Math.max(0, y - offset));
+	}
+
+	function activateTab(id, opts) {
+		opts = opts || {};
+		var prev = currentTabId();
 		if (!isValidTab(id)) {
 			id = 'general';
 		}
@@ -654,6 +681,9 @@
 				}
 			}, 0);
 		}
+		if (opts.scroll !== false && id !== prev) {
+			resetTabScroll();
+		}
 	}
 
 	tabs.forEach(function (btn) {
@@ -687,7 +717,7 @@
 			}
 
 			event.preventDefault();
-			activateTab(jumpTab);
+			activateTab(jumpTab, { scroll: false });
 
 			var isInPageAnchor =
 				href.charAt(0) === '#' &&
@@ -2549,7 +2579,7 @@
 	}
 
 	restoreFoldOpen();
-	activateTab(tabFromUrl());
+	activateTab(tabFromUrl(), { scroll: false });
 	refreshProductSelects();
 	root.querySelectorAll(FOLD_CARD_SELECTOR).forEach(function (card) {
 		card.addEventListener('toggle', function () {

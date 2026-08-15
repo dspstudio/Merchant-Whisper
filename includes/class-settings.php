@@ -4147,6 +4147,35 @@ class MW_Sales_Toast_Settings {
 											</div>
 										</details>
 										<details class="mwst-faq__item">
+											<summary>
+												<?php
+												printf(
+													/* translators: 1: current cached events, 2: max cached orders */
+													esc_html__( 'Why is Cached %1$s/%2$s when I have more products?', 'mw-sales-toast' ),
+													number_format_i18n( (int) $status['events'] ),
+													number_format_i18n( (int) $s['max_cached_orders'] )
+												);
+												?>
+											</summary>
+											<div class="mwst-faq__answer">
+												<p>
+													<?php
+													$mix_cap = max( 1, min( 40, (int) ( $s['max_events'] ?? 8 ) + 8 ) );
+													printf(
+														/* translators: 1: current cached events, 2: max cached orders, 3: lookback days, 4: toasts per visit, 5: mixed event list cap, 6: Timing & cache tab link */
+														esc_html__( 'Cached counts toast events, not catalog products. The header shows %1$s of a %2$s-order query ceiling (Max cached orders). Only processing/completed orders in the last %3$s days are considered, one line item per order. Checkout consent can skip customers who declined. Sale events are then limited to Toasts per visit (%4$s); other toast types mix in and the stored list is capped at %5$s. Change those values under %6$s, then Save or Rebuild cache. Real + demo fill only adds demo events when there are fewer than 3 real sales — it does not pad the list to %2$s.', 'mw-sales-toast' ),
+														number_format_i18n( (int) $status['events'] ),
+														number_format_i18n( (int) $s['max_cached_orders'] ),
+														number_format_i18n( (int) $s['lookback_days'] ),
+														number_format_i18n( (int) $s['max_events'] ),
+														number_format_i18n( $mix_cap ),
+														self::tab_link( 'timing', __( 'Timing & cache', 'mw-sales-toast' ) )
+													);
+													?>
+												</p>
+											</div>
+										</details>
+										<details class="mwst-faq__item">
 											<summary><?php esc_html_e( 'What’s the difference between data sources?', 'mw-sales-toast' ); ?></summary>
 											<div class="mwst-faq__answer">
 												<ul>
