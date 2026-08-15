@@ -111,7 +111,7 @@ class MW_Sales_Toast_Transfer {
 	 */
 	public static function handle_export() {
 		if ( ! current_user_can( MW_Sales_Toast_Settings::capability() ) ) {
-			wp_die( esc_html__( 'You do not have permission to export MW Proof settings.', 'mw-sales-toast' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'You do not have permission to export Merchant Whisper settings.', 'mw-sales-toast' ), '', array( 'response' => 403 ) );
 		}
 		check_admin_referer( self::NONCE, 'mw_st_transfer_nonce' );
 
@@ -142,7 +142,7 @@ class MW_Sales_Toast_Transfer {
 	public static function handle_import() {
 		$tab = isset( $_POST['mwst_import_tab'] ) ? sanitize_key( wp_unslash( $_POST['mwst_import_tab'] ) ) : 'account'; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		if ( ! current_user_can( MW_Sales_Toast_Settings::capability() ) ) {
-			wp_die( esc_html__( 'You do not have permission to import MW Proof settings.', 'mw-sales-toast' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'You do not have permission to import Merchant Whisper settings.', 'mw-sales-toast' ), '', array( 'response' => 403 ) );
 		}
 		check_admin_referer( self::NONCE, 'mw_st_transfer_nonce' );
 
@@ -357,7 +357,7 @@ class MW_Sales_Toast_Transfer {
 			: __( 'Import settings', 'mw-sales-toast' );
 		$confirm  = ( 'theme' === $kind )
 			? __( 'Replace the current toast design with this theme file?', 'mw-sales-toast' )
-			: __( 'Replace the current MW Proof settings with this file? Product and category IDs are site-specific.', 'mw-sales-toast' );
+			: __( 'Replace the current Merchant Whisper settings with this file? Product and category IDs are site-specific.', 'mw-sales-toast' );
 		?>
 		<div class="mwst-transfer">
 			<p class="mwst-transfer__export">

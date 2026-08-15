@@ -1,4 +1,4 @@
-# MW Proof
+# Merchant Whisper
 
 **Version 2.2.0** — Social proof for WooCommerce: cached real orders, privacy controls, and optional demo fill.
 
@@ -108,7 +108,7 @@ Visitor JS ──► GET mw-st/v1/notifications ──────┘──► t
 
 ## Settings
 
-**WooCommerce → MW Proof** (falls back to **Settings → MW Proof** if WooCommerce is inactive). Capability: `manage_woocommerce` (or `manage_options` without WC).
+**WooCommerce → Merchant Whisper** (falls back to **Settings → Merchant Whisper** if WooCommerce is inactive). Capability: `manage_woocommerce` (or `manage_options` without WC).
 
 | Setting | Purpose |
 |---------|---------|
@@ -150,8 +150,8 @@ Visitor JS ──► GET mw-st/v1/notifications ──────┘──► t
 ## Installation
 
 1. Place this folder in `wp-content/plugins/mw-sales-toast`.
-2. Activate **MW Proof** (re-activate after upgrading to 2.0 so cron is scheduled).
-3. Configure **WooCommerce → MW Proof**.
+2. Activate **Merchant Whisper** (re-activate after upgrading to 2.0 so cron is scheduled).
+3. Configure **WooCommerce → Merchant Whisper**.
 4. Confirm toasts appear after the configured delay when the REST endpoint returns events.
 
 ## File structure

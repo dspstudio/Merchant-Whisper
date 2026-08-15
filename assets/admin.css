@@ -3106,6 +3106,15 @@ body.mwst-settings-dark #wpbody-content {
 	border-right-color: var(--mwst-hairline);
 }
 
+.mwst-admin.is-dark .mwst-css-editor .CodeMirror-activeline-background {
+	background: rgba(96, 165, 250, 0.08);
+}
+
+.mwst-admin.is-dark .mwst-css-editor .CodeMirror-activeline .CodeMirror-linenumber {
+	color: var(--mwst-text);
+	background: transparent;
+}
+
 .mwst-admin.is-dark .select2-container .select2-selection--multiple,
 .mwst-admin.is-dark .select2-container--default .select2-selection--single {
 	background: var(--mwst-input-bg) !important;

@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: MW Proof
+ * Plugin Name: Merchant Whisper
  * Description: Social proof for WooCommerce — recent purchases, viewing counts, reviews, and promo notices. Cached real orders, privacy controls, optional demo fill.
  * Version: 2.2.0
  * Author: MWV3
@@ -12,7 +12,7 @@
 defined( 'ABSPATH' ) || exit;
 
 define( 'MW_SALES_TOAST_VERSION', '2.2.0' );
-define( 'MW_SALES_TOAST_NAME', 'MW Proof' );
+define( 'MW_SALES_TOAST_NAME', 'Merchant Whisper' );
 define( 'MW_SALES_TOAST_FILE', __FILE__ );
 define( 'MW_SALES_TOAST_URL', plugin_dir_url( __FILE__ ) );
 define( 'MW_SALES_TOAST_PATH', plugin_dir_path( __FILE__ ) );
@@ -49,7 +49,7 @@ function mw_sales_toast_cron_schedules( $schedules ) {
 		'interval' => $seconds,
 		'display'  => sprintf(
 			/* translators: %d: minutes */
-			__( 'Every %d minutes (MW Proof)', 'mw-sales-toast' ),
+			__( 'Every %d minutes (Merchant Whisper)', 'mw-sales-toast' ),
 			$minutes
 		),
 	);

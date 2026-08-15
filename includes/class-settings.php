@@ -684,7 +684,7 @@ class MW_Sales_Toast_Settings {
 				'key'   => 'trigger_exit_intent',
 				'icon'  => 'dashicons-migrate',
 				'label' => __( 'Exit intent', 'mw-sales-toast' ),
-				'desc'  => __( 'When the cursor leaves toward the top (desktop)', 'mw-sales-toast' ),
+				'desc'  => __( 'When the cursor leaves toward the top', 'mw-sales-toast' ),
 			),
 			'add_to_cart' => array(
 				'key'   => 'trigger_add_to_cart',
@@ -1516,8 +1516,8 @@ class MW_Sales_Toast_Settings {
 		$cap = self::capability();
 
 		add_menu_page(
-			__( 'MW Proof', 'mw-sales-toast' ),
-			__( 'MW Proof', 'mw-sales-toast' ),
+			__( 'Merchant Whisper', 'mw-sales-toast' ),
+			__( 'Merchant Whisper', 'mw-sales-toast' ),
 			$cap,
 			'mw-sales-toast',
 			array( __CLASS__, 'render' ),
@@ -1528,7 +1528,7 @@ class MW_Sales_Toast_Settings {
 		// Rename the auto-added first submenu item.
 		add_submenu_page(
 			'mw-sales-toast',
-			__( 'MW Proof', 'mw-sales-toast' ),
+			__( 'Merchant Whisper', 'mw-sales-toast' ),
 			__( 'Settings', 'mw-sales-toast' ),
 			$cap,
 			'mw-sales-toast',
@@ -1538,8 +1538,8 @@ class MW_Sales_Toast_Settings {
 		if ( class_exists( 'WooCommerce' ) ) {
 			add_submenu_page(
 				'woocommerce',
-				__( 'MW Proof', 'mw-sales-toast' ),
-				__( 'MW Proof', 'mw-sales-toast' ),
+				__( 'Merchant Whisper', 'mw-sales-toast' ),
+				__( 'Merchant Whisper', 'mw-sales-toast' ),
 				$cap,
 				'mw-sales-toast',
 				array( __CLASS__, 'render' )
@@ -2331,7 +2331,7 @@ class MW_Sales_Toast_Settings {
 							?>
 						</p>
 						<div class="mwst-header__title-row">
-							<h1><?php esc_html_e( 'MW Proof', 'mw-sales-toast' ); ?></h1>
+							<h1><?php esc_html_e( 'Merchant Whisper', 'mw-sales-toast' ); ?></h1>
 							<span class="mwst-header__version">v<?php echo esc_html( MW_SALES_TOAST_VERSION ); ?></span>
 						</div>
 						<p class="mwst-header__desc">
@@ -2405,7 +2405,7 @@ class MW_Sales_Toast_Settings {
 					<span class="mwst-notice__icon" aria-hidden="true">✓</span>
 					<div class="mwst-notice__body">
 						<strong><?php esc_html_e( 'Settings saved', 'mw-sales-toast' ); ?></strong>
-						<p><?php esc_html_e( 'Your MW Proof settings were updated. The sales cache was cleared and will rebuild with the new options.', 'mw-sales-toast' ); ?></p>
+						<p><?php esc_html_e( 'Your Merchant Whisper settings were updated. The sales cache was cleared and will rebuild with the new options.', 'mw-sales-toast' ); ?></p>
 					</div>
 					<button type="button" class="mwst-notice__dismiss" id="mwst-dismiss-notice" aria-label="<?php esc_attr_e( 'Dismiss', 'mw-sales-toast' ); ?>">×</button>
 				</div>
@@ -2424,7 +2424,7 @@ class MW_Sales_Toast_Settings {
 					),
 					'invalid'  => array(
 						'title' => __( 'Import failed', 'mw-sales-toast' ),
-						'body'  => __( 'That file is not an MW Proof settings or theme export.', 'mw-sales-toast' ),
+						'body'  => __( 'That file is not an Merchant Whisper settings or theme export.', 'mw-sales-toast' ),
 						'ok'    => false,
 					),
 					'empty'    => array(
@@ -4399,7 +4399,7 @@ class MW_Sales_Toast_Settings {
 										<?php
 										printf(
 											/* translators: %s: plugin version */
-											esc_html__( 'MW Proof %s — setup guide, features, and how the cache works.', 'mw-sales-toast' ),
+											esc_html__( 'Merchant Whisper %s — setup guide, features, and how the cache works.', 'mw-sales-toast' ),
 											esc_html( MW_SALES_TOAST_VERSION )
 										);
 										?>
@@ -4649,7 +4649,7 @@ class MW_Sales_Toast_Settings {
 								<div class="mwst-card__head">
 									<h2><?php esc_html_e( 'Contact', 'mw-sales-toast' ); ?></h2>
 									<p>
-										<?php esc_html_e( 'Questions, bugs, or setup help for MW Proof. We usually reply within 1–2 business days.', 'mw-sales-toast' ); ?>
+										<?php esc_html_e( 'Questions, bugs, or setup help for Merchant Whisper. We usually reply within 1–2 business days.', 'mw-sales-toast' ); ?>
 									</p>
 								</div>
 								<div class="mwst-card__body">
@@ -4739,7 +4739,7 @@ class MW_Sales_Toast_Settings {
 									<div class="mwst-field">
 										<div class="mwst-field__label"><?php esc_html_e( 'Email updates', 'mw-sales-toast' ); ?></div>
 										<div class="mwst-field__control">
-											<?php self::toggle( $opt, 'newsletter', $s, 'mwst-newsletter', __( 'Subscribe to the MW Proof newsletter', 'mw-sales-toast' ) ); ?>
+											<?php self::toggle( $opt, 'newsletter', $s, 'mwst-newsletter', __( 'Subscribe to the Merchant Whisper newsletter', 'mw-sales-toast' ) ); ?>
 											<p class="description">
 												<?php
 												printf(

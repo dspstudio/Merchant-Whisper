@@ -1,5 +1,5 @@
 /**
- * Pure sine-wave pop for MW Proof (Web Audio API).
+ * Pure sine-wave pop for Merchant Whisper (Web Audio API).
  */
 (function (window) {
   'use strict';
