@@ -1705,6 +1705,36 @@
 		return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
 	}
 
+	function closeBgOverlays(hex) {
+		var raw = String(hex || '').replace('#', '');
+		if (raw.length === 3) {
+			raw = raw[0] + raw[0] + raw[1] + raw[1] + raw[2] + raw[2];
+		}
+		if (!/^[0-9a-fA-F]{6}$/.test(raw)) {
+			return {
+				idle: 'rgba(255,255,255,0.08)',
+				hover: 'rgba(255,255,255,0.16)'
+			};
+		}
+		var r = parseInt(raw.slice(0, 2), 16) / 255;
+		var g = parseInt(raw.slice(2, 4), 16) / 255;
+		var b = parseInt(raw.slice(4, 6), 16) / 255;
+		var lin = function (c) {
+			return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+		};
+		var luma = 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+		if (luma > 0.45) {
+			return {
+				idle: 'rgba(15,23,42,0.08)',
+				hover: 'rgba(15,23,42,0.16)'
+			};
+		}
+		return {
+			idle: 'rgba(255,255,255,0.08)',
+			hover: 'rgba(255,255,255,0.16)'
+		};
+	}
+
 	function isElementorThemeActive() {
 		return !!(
 			useElementorTheme &&
@@ -1773,6 +1803,10 @@
 			designValue('style_border_opacity', designDefaults.style_border_opacity || 10),
 			10
 		);
+		var borderWidth = parseInt(
+			designValue('style_border_width', designDefaults.style_border_width || 1),
+			10
+		);
 		if (isNaN(radius)) {
 			radius = 14;
 		}
@@ -1788,6 +1822,9 @@
 		if (isNaN(borderOpacity)) {
 			borderOpacity = 10;
 		}
+		if (isNaN(borderWidth)) {
+			borderWidth = 1;
+		}
 		var offsetX = parseInt(designValue('offset_x', 20), 10);
 		var offsetY = parseInt(designValue('offset_y', 20), 10);
 		if (isNaN(offsetX)) {
@@ -1801,6 +1838,7 @@
 		maxWidth = Math.max(220, Math.min(560, maxWidth));
 		offsetX = Math.max(0, Math.min(80, offsetX));
 		offsetY = Math.max(0, Math.min(80, offsetY));
+		borderWidth = Math.max(0, Math.min(8, borderWidth));
 		var mediaRadius =
 			imageFit === 'padded' ? Math.max(0, Math.min(24, Math.round(radius * 0.7))) : 0;
 
@@ -1808,6 +1846,8 @@
 		if (theme && theme.font) {
 			fontCss = '--mw-st-font:"' + String(theme.font).replace(/"/g, '') + '",system-ui,sans-serif;';
 		}
+
+		var closeBg = closeBgOverlays(colorVal('style_bg', designDefaults.style_bg));
 
 		var css =
 			'.mw-sales-toast{' +
@@ -1827,12 +1867,19 @@
 			'--mw-st-meta:' +
 			colorVal('style_meta', designDefaults.style_meta) +
 			';' +
-			'--mw-st-close-hover:' +
-			colorVal('style_close_hover', designDefaults.style_close_hover || '#dc2626') +
+			'--mw-st-close-hover:#dc2626;' +
+			'--mw-st-close-bg:' +
+			closeBg.idle +
+			';' +
+			'--mw-st-close-bg-hover:' +
+			closeBg.hover +
 			';' +
 			'--mw-st-border:' +
 			hexToRgba(colorVal('style_border', designDefaults.style_border), borderOpacity) +
 			';' +
+			'--mw-st-border-width:' +
+			borderWidth +
+			'px;' +
 			'--mw-st-radius:' +
 			radius +
 			'px;' +
@@ -1911,7 +1958,11 @@
 		var wrap = input.closest('.mwst-opacity-field');
 		var label = wrap ? wrap.querySelector('[data-opacity-value]') : null;
 		if (label) {
-			label.textContent = String(parseInt(input.value, 10) || 0) + '%';
+			var suffix = input.getAttribute('data-value-suffix');
+			if (suffix === null) {
+				suffix = '%';
+			}
+			label.textContent = String(parseInt(input.value, 10) || 0) + suffix;
 		}
 	}
 
@@ -1968,7 +2019,6 @@
 			style_body: 'data-style-body',
 			style_accent: 'data-style-accent',
 			style_meta: 'data-style-meta',
-			style_close_hover: 'data-style-close-hover',
 			style_border: 'data-style-border',
 			style_border_opacity: 'data-style-border-opacity',
 			style_radius: 'data-style-radius'
@@ -2197,6 +2247,7 @@
 				input.getAttribute('data-design') === 'custom_css' ||
 				input.getAttribute('data-design') === 'style_max_width' ||
 				input.getAttribute('data-design') === 'style_padding' ||
+				input.getAttribute('data-design') === 'style_border_width' ||
 				input.getAttribute('data-design') === 'style_shadow' ||
 				input.getAttribute('data-design') === 'offset_x' ||
 				input.getAttribute('data-design') === 'offset_y'
@@ -2215,6 +2266,7 @@
 				input.getAttribute('data-design') === 'custom_css' ||
 				input.getAttribute('data-design') === 'style_max_width' ||
 				input.getAttribute('data-design') === 'style_padding' ||
+				input.getAttribute('data-design') === 'style_border_width' ||
 				input.getAttribute('data-design') === 'style_shadow' ||
 				input.getAttribute('data-design') === 'offset_x' ||
 				input.getAttribute('data-design') === 'offset_y'

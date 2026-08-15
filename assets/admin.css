@@ -1292,9 +1292,9 @@
 }
 
 .mwst-save.is-dirty:not(.is-saving) {
-	background: #fff4e5;
+	background: rgba(255, 244, 229, 0.9);
 	border-color: #f0b429;
-	box-shadow: 0 -4px 20px rgba(180, 83, 9, 0.08);
+	box-shadow: 0 8px 28px rgba(180, 83, 9, 0.12);
 }
 
 .mwst-save.is-dirty:not(.is-saving) .mwst-save__hint {
@@ -1915,19 +1915,29 @@
 }
 
 .mwst-color-grid {
-	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
-	align-items: start;
-	gap: 14px 18px;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	gap: 18px 28px;
+}
+
+.mwst-color-col {
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+	width: 20rem;
+	max-width: 100%;
 }
 
 .mwst-color-field {
 	display: grid;
-	grid-template-columns: max-content;
+	grid-template-columns: minmax(0, 1fr);
 	justify-items: stretch;
 	align-content: start;
+	align-self: start;
 	gap: 6px;
-	max-width: 100%;
+	width: 100%;
+	max-width: 20rem;
 	font-size: 12px;
 	font-weight: 500;
 	color: var(--mwst-muted);
@@ -2106,8 +2116,9 @@
 }
 
 @media (max-width: 782px) {
-	.mwst-color-grid {
-		grid-template-columns: 1fr;
+	.mwst-color-col {
+		width: 100%;
+		max-width: 20rem;
 	}
 }
 
@@ -3070,13 +3081,14 @@ body.mwst-settings-dark #wpbody-content {
 }
 
 .mwst-admin.is-dark .mwst-save.is-dirty:not(.is-saving) {
-	background: rgba(245, 158, 11, 0.16);
-	border-color: rgba(251, 191, 36, 0.45);
+	background: rgba(42, 31, 14, 0.86);
+	border-color: rgba(251, 191, 36, 0.5);
+	box-shadow: 0 10px 32px rgba(0, 0, 0, 0.45), 0 1px 0 rgba(251, 191, 36, 0.1) inset;
 }
 
 .mwst-admin.is-dark .mwst-save.is-dirty:not(.is-saving) .mwst-save__hint,
-.mwst-admin.is-dark .mwst-save__revert {
-	color: #fbbf24;
+.mwst-admin.is-dark .mwst-save.is-dirty:not(.is-saving) .mwst-save__revert {
+	color: #fde68a;
 }
 
 .mwst-admin.is-dark .mwst-save__revert:hover,

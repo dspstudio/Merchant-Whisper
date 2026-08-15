@@ -122,6 +122,7 @@ class MW_Sales_Toast_Settings {
 			'style_close_hover'      => '#dc2626',
 			'style_border'           => '#ffffff',
 			'style_border_opacity'   => 10,
+			'style_border_width'     => 1,
 			'style_radius'           => 14,
 			'style_padding'          => 12,
 			'style_max_width'        => 360,
@@ -452,6 +453,27 @@ class MW_Sales_Toast_Settings {
 	}
 
 	/**
+	 * Close-button chip colors that contrast with the toast background.
+	 *
+	 * @param string $bg_hex Background hex.
+	 * @return array{0:string,1:string} Idle and hover rgba().
+	 */
+	private static function close_bg_overlays( $bg_hex ) {
+		$hex = self::sanitize_hex( $bg_hex, '#0c1220' );
+		$r   = hexdec( substr( $hex, 1, 2 ) ) / 255;
+		$g   = hexdec( substr( $hex, 3, 2 ) ) / 255;
+		$b   = hexdec( substr( $hex, 5, 2 ) ) / 255;
+		$lin = static function ( $c ) {
+			return $c <= 0.04045 ? $c / 12.92 : pow( ( $c + 0.055 ) / 1.055, 2.4 );
+		};
+		$luma = 0.2126 * $lin( $r ) + 0.7152 * $lin( $g ) + 0.0722 * $lin( $b );
+		if ( $luma > 0.45 ) {
+			return array( 'rgba(15,23,42,0.08)', 'rgba(15,23,42,0.16)' );
+		}
+		return array( 'rgba(255,255,255,0.08)', 'rgba(255,255,255,0.16)' );
+	}
+
+	/**
 	 * Sanitize custom CSS (strip HTML, cap length).
 	 *
 	 * @param mixed $css Raw CSS.
@@ -521,10 +543,11 @@ class MW_Sales_Toast_Settings {
 		$body   = self::sanitize_hex( $s['style_body'] ?? '', $defaults['style_body'] );
 		$accent = self::sanitize_hex( $s['style_accent'] ?? '', $defaults['style_accent'] );
 		$meta   = self::sanitize_hex( $s['style_meta'] ?? '', $defaults['style_meta'] );
-		$close_hover = self::sanitize_hex( $s['style_close_hover'] ?? '', $defaults['style_close_hover'] );
+		$close_hover = '#dc2626';
 		// Legacy --mw-st-color aliases meta (idle close + time).
 		$text   = $meta;
 		$border = self::resolve_color( $s['style_border'] ?? '', $border_opacity, 'rgba(255,255,255,0.1)' );
+		$border_w = max( 0, min( 8, (int) ( $s['style_border_width'] ?? $defaults['style_border_width'] ) ) );
 		$radius  = max( 0, min( 40, (int) ( $s['style_radius'] ?? $defaults['style_radius'] ) ) );
 		$padding = max( 4, min( 32, (int) ( $s['style_padding'] ?? $defaults['style_padding'] ) ) );
 		$max_w   = max( 220, min( 560, (int) ( $s['style_max_width'] ?? $defaults['style_max_width'] ) ) );
@@ -538,6 +561,7 @@ class MW_Sales_Toast_Settings {
 		$font_css = '';
 
 		$use_elementor = ! empty( $s['use_elementor_theme'] ) && self::is_elementor_active();
+		$bg_hex        = self::sanitize_hex( $s['style_bg'] ?? '', $defaults['style_bg'] );
 		if ( $use_elementor ) {
 			$theme = self::get_elementor_theme();
 			if ( is_array( $theme ) ) {
@@ -547,6 +571,7 @@ class MW_Sales_Toast_Settings {
 				$meta   = self::sanitize_hex( $theme['style_meta'], $meta );
 				$text   = $meta;
 				$border = self::resolve_color( $theme['style_border'], $border_opacity, $border );
+				$bg_hex = self::sanitize_hex( $theme['style_bg'], $bg_hex );
 				if ( ! empty( $theme['font'] ) ) {
 					$font_css = sprintf(
 						'--mw-st-font:"%1$s",system-ui,sans-serif;',
@@ -556,8 +581,10 @@ class MW_Sales_Toast_Settings {
 			}
 		}
 
+		$close_overlays = self::close_bg_overlays( $bg_hex );
+
 		$css = sprintf(
-			'.mw-sales-toast{%15$s--mw-st-bg:%1$s;--mw-st-color:%2$s;--mw-st-body:%3$s;--mw-st-accent:%4$s;--mw-st-meta:%5$s;--mw-st-close-hover:%6$s;--mw-st-border:%7$s;--mw-st-radius:%8$dpx;--mw-st-media-radius:%9$dpx;--mw-st-padding:%10$dpx;--mw-st-max-width:%11$dpx;--mw-st-offset-x:%12$dpx;--mw-st-offset-y:%13$dpx;--mw-st-shadow:%14$s;}',
+			'.mw-sales-toast{%15$s--mw-st-bg:%1$s;--mw-st-color:%2$s;--mw-st-body:%3$s;--mw-st-accent:%4$s;--mw-st-meta:%5$s;--mw-st-close-hover:%6$s;--mw-st-close-bg:%17$s;--mw-st-close-bg-hover:%18$s;--mw-st-border:%7$s;--mw-st-border-width:%16$dpx;--mw-st-radius:%8$dpx;--mw-st-media-radius:%9$dpx;--mw-st-padding:%10$dpx;--mw-st-max-width:%11$dpx;--mw-st-offset-x:%12$dpx;--mw-st-offset-y:%13$dpx;--mw-st-shadow:%14$s;}',
 			$bg,
 			$text,
 			$body,
@@ -572,7 +599,10 @@ class MW_Sales_Toast_Settings {
 			$off_x,
 			$off_y,
 			$shadow,
-			$font_css
+			$font_css,
+			$border_w,
+			$close_overlays[0],
+			$close_overlays[1]
 		);
 
 		$custom = self::sanitize_css( $s['custom_css'] ?? '' );
@@ -930,7 +960,6 @@ class MW_Sales_Toast_Settings {
 			'style_body',
 			'style_accent',
 			'style_meta',
-			'style_close_hover',
 			'style_border',
 			'style_border_opacity',
 			'style_radius',
@@ -1387,9 +1416,10 @@ class MW_Sales_Toast_Settings {
 		$out['style_body']           = self::sanitize_hex( $input['style_body'] ?? '', $defaults['style_body'] );
 		$out['style_accent']         = self::sanitize_hex( $input['style_accent'] ?? '', $defaults['style_accent'] );
 		$out['style_meta']           = self::sanitize_hex( $input['style_meta'] ?? '', $defaults['style_meta'] );
-		$out['style_close_hover']    = self::sanitize_hex( $input['style_close_hover'] ?? '', $defaults['style_close_hover'] );
+		$out['style_close_hover']    = $defaults['style_close_hover'];
 		$out['style_border']         = self::sanitize_hex( $input['style_border'] ?? '', $defaults['style_border'] );
 		$out['style_border_opacity'] = max( 0, min( 100, (int) ( $input['style_border_opacity'] ?? $defaults['style_border_opacity'] ) ) );
+		$out['style_border_width']   = max( 0, min( 8, (int) ( $input['style_border_width'] ?? $defaults['style_border_width'] ) ) );
 		$out['style_radius']         = max( 0, min( 40, (int) ( $input['style_radius'] ?? $defaults['style_radius'] ) ) );
 		$out['style_padding']        = max( 4, min( 32, (int) ( $input['style_padding'] ?? $defaults['style_padding'] ) ) );
 		$out['style_max_width']      = max( 220, min( 560, (int) ( $input['style_max_width'] ?? $defaults['style_max_width'] ) ) );
@@ -1616,9 +1646,9 @@ class MW_Sales_Toast_Settings {
 					'style_body'           => $defaults['style_body'],
 					'style_accent'         => $defaults['style_accent'],
 					'style_meta'           => $defaults['style_meta'],
-					'style_close_hover'    => $defaults['style_close_hover'],
 					'style_border'         => $defaults['style_border'],
 					'style_border_opacity' => $defaults['style_border_opacity'],
+					'style_border_width'   => $defaults['style_border_width'],
 					'style_radius'         => $defaults['style_radius'],
 					'style_padding'        => $defaults['style_padding'],
 					'style_max_width'      => $defaults['style_max_width'],
@@ -3098,7 +3128,6 @@ class MW_Sales_Toast_Settings {
 																'style_body',
 																'style_accent',
 																'style_meta',
-																'style_close_hover',
 																'style_border',
 																'style_border_opacity',
 																'style_radius',
@@ -3152,41 +3181,46 @@ class MW_Sales_Toast_Settings {
 										<div class="mwst-field__label"><?php esc_html_e( 'Colors', 'mw-sales-toast' ); ?></div>
 										<div class="mwst-field__control">
 											<div class="mwst-color-grid">
-												<div class="mwst-color-field">
-													<span><?php esc_html_e( 'Message', 'mw-sales-toast' ); ?></span>
-													<input type="text" class="mwst-design-input mwst-color-picker" data-design="style_body" id="mwst-style-body" name="<?php echo esc_attr( $opt ); ?>[style_body]" value="<?php echo esc_attr( self::picker_value( $s['style_body'], '#d7deea' ) ); ?>" data-default-color="#d7deea" />
+												<div class="mwst-color-col">
+													<div class="mwst-color-field">
+														<span><?php esc_html_e( 'Message', 'mw-sales-toast' ); ?></span>
+														<input type="text" class="mwst-design-input mwst-color-picker" data-design="style_body" id="mwst-style-body" name="<?php echo esc_attr( $opt ); ?>[style_body]" value="<?php echo esc_attr( self::picker_value( $s['style_body'], '#d7deea' ) ); ?>" data-default-color="#d7deea" />
+													</div>
+													<div class="mwst-color-field">
+														<span><?php esc_html_e( 'Meta / time / close', 'mw-sales-toast' ); ?></span>
+														<input type="text" class="mwst-design-input mwst-color-picker" data-design="style_meta" id="mwst-style-meta" name="<?php echo esc_attr( $opt ); ?>[style_meta]" value="<?php echo esc_attr( self::picker_value( $s['style_meta'], '#a8b2c4' ) ); ?>" data-default-color="#a8b2c4" />
+													</div>
+													<div class="mwst-color-field">
+														<span><?php esc_html_e( 'Product accent', 'mw-sales-toast' ); ?></span>
+														<input type="text" class="mwst-design-input mwst-color-picker" data-design="style_accent" id="mwst-style-accent" name="<?php echo esc_attr( $opt ); ?>[style_accent]" value="<?php echo esc_attr( self::picker_value( $s['style_accent'], '#e8c872' ) ); ?>" data-default-color="#e8c872" />
+													</div>
 												</div>
-												<div class="mwst-color-field">
-													<span><?php esc_html_e( 'Product accent', 'mw-sales-toast' ); ?></span>
-													<input type="text" class="mwst-design-input mwst-color-picker" data-design="style_accent" id="mwst-style-accent" name="<?php echo esc_attr( $opt ); ?>[style_accent]" value="<?php echo esc_attr( self::picker_value( $s['style_accent'], '#e8c872' ) ); ?>" data-default-color="#e8c872" />
+												<div class="mwst-color-col">
+													<div class="mwst-color-field">
+														<span><?php esc_html_e( 'Background', 'mw-sales-toast' ); ?></span>
+														<input type="text" class="mwst-design-input mwst-color-picker" data-design="style_bg" id="mwst-style-bg" name="<?php echo esc_attr( $opt ); ?>[style_bg]" value="<?php echo esc_attr( self::picker_value( $s['style_bg'], '#0c1220' ) ); ?>" data-default-color="#0c1220" />
+														<label class="mwst-opacity-field" for="mwst-style-bg-opacity">
+															<span class="mwst-opacity-field__label"><?php esc_html_e( 'Opacity', 'mw-sales-toast' ); ?></span>
+															<input type="range" min="0" max="100" step="1" class="mwst-design-input mwst-opacity-slider" data-design="style_bg_opacity" id="mwst-style-bg-opacity" name="<?php echo esc_attr( $opt ); ?>[style_bg_opacity]" value="<?php echo esc_attr( (string) (int) $s['style_bg_opacity'] ); ?>" />
+															<span class="mwst-opacity-field__value" data-opacity-value><?php echo esc_html( (string) (int) $s['style_bg_opacity'] ); ?>%</span>
+														</label>
+													</div>
+													<div class="mwst-color-field">
+														<span><?php esc_html_e( 'Border', 'mw-sales-toast' ); ?></span>
+														<input type="text" class="mwst-design-input mwst-color-picker" data-design="style_border" id="mwst-style-border" name="<?php echo esc_attr( $opt ); ?>[style_border]" value="<?php echo esc_attr( self::picker_value( $s['style_border'], '#ffffff' ) ); ?>" data-default-color="#ffffff" />
+														<label class="mwst-opacity-field" for="mwst-style-border-opacity">
+															<span class="mwst-opacity-field__label"><?php esc_html_e( 'Opacity', 'mw-sales-toast' ); ?></span>
+															<input type="range" min="0" max="100" step="1" class="mwst-design-input mwst-opacity-slider" data-design="style_border_opacity" id="mwst-style-border-opacity" name="<?php echo esc_attr( $opt ); ?>[style_border_opacity]" value="<?php echo esc_attr( (string) (int) $s['style_border_opacity'] ); ?>" />
+															<span class="mwst-opacity-field__value" data-opacity-value><?php echo esc_html( (string) (int) $s['style_border_opacity'] ); ?>%</span>
+														</label>
+														<label class="mwst-opacity-field" for="mwst-style-border-width">
+															<span class="mwst-opacity-field__label"><?php esc_html_e( 'Width', 'mw-sales-toast' ); ?></span>
+															<input type="range" min="0" max="8" step="1" class="mwst-design-input mwst-opacity-slider" data-design="style_border_width" data-value-suffix="px" id="mwst-style-border-width" name="<?php echo esc_attr( $opt ); ?>[style_border_width]" value="<?php echo esc_attr( (string) (int) ( $s['style_border_width'] ?? 1 ) ); ?>" />
+															<span class="mwst-opacity-field__value" data-opacity-value><?php echo esc_html( (string) (int) ( $s['style_border_width'] ?? 1 ) ); ?>px</span>
+														</label>
+													</div>
 												</div>
-												<div class="mwst-color-field">
-													<span><?php esc_html_e( 'Meta / time / close', 'mw-sales-toast' ); ?></span>
-													<input type="text" class="mwst-design-input mwst-color-picker" data-design="style_meta" id="mwst-style-meta" name="<?php echo esc_attr( $opt ); ?>[style_meta]" value="<?php echo esc_attr( self::picker_value( $s['style_meta'], '#a8b2c4' ) ); ?>" data-default-color="#a8b2c4" />
-												</div>
-												<div class="mwst-color-field">
-													<span><?php esc_html_e( '× hover', 'mw-sales-toast' ); ?></span>
-													<input type="text" class="mwst-design-input mwst-color-picker" data-design="style_close_hover" id="mwst-style-close-hover" name="<?php echo esc_attr( $opt ); ?>[style_close_hover]" value="<?php echo esc_attr( self::picker_value( isset( $s['style_close_hover'] ) ? $s['style_close_hover'] : '#dc2626', '#dc2626' ) ); ?>" data-default-color="#dc2626" />
-												</div>
-												<div class="mwst-color-field">
-													<span><?php esc_html_e( 'Background', 'mw-sales-toast' ); ?></span>
-													<input type="text" class="mwst-design-input mwst-color-picker" data-design="style_bg" id="mwst-style-bg" name="<?php echo esc_attr( $opt ); ?>[style_bg]" value="<?php echo esc_attr( self::picker_value( $s['style_bg'], '#0c1220' ) ); ?>" data-default-color="#0c1220" />
-													<label class="mwst-opacity-field" for="mwst-style-bg-opacity">
-														<span class="mwst-opacity-field__label"><?php esc_html_e( 'Opacity', 'mw-sales-toast' ); ?></span>
-														<input type="range" min="0" max="100" step="1" class="mwst-design-input mwst-opacity-slider" data-design="style_bg_opacity" id="mwst-style-bg-opacity" name="<?php echo esc_attr( $opt ); ?>[style_bg_opacity]" value="<?php echo esc_attr( (string) (int) $s['style_bg_opacity'] ); ?>" />
-														<span class="mwst-opacity-field__value" data-opacity-value><?php echo esc_html( (string) (int) $s['style_bg_opacity'] ); ?>%</span>
-													</label>
-												</div>
-												<div class="mwst-color-field">
-													<span><?php esc_html_e( 'Border', 'mw-sales-toast' ); ?></span>
-													<input type="text" class="mwst-design-input mwst-color-picker" data-design="style_border" id="mwst-style-border" name="<?php echo esc_attr( $opt ); ?>[style_border]" value="<?php echo esc_attr( self::picker_value( $s['style_border'], '#ffffff' ) ); ?>" data-default-color="#ffffff" />
-													<label class="mwst-opacity-field" for="mwst-style-border-opacity">
-														<span class="mwst-opacity-field__label"><?php esc_html_e( 'Opacity', 'mw-sales-toast' ); ?></span>
-														<input type="range" min="0" max="100" step="1" class="mwst-design-input mwst-opacity-slider" data-design="style_border_opacity" id="mwst-style-border-opacity" name="<?php echo esc_attr( $opt ); ?>[style_border_opacity]" value="<?php echo esc_attr( (string) (int) $s['style_border_opacity'] ); ?>" />
-														<span class="mwst-opacity-field__value" data-opacity-value><?php echo esc_html( (string) (int) $s['style_border_opacity'] ); ?>%</span>
-													</label>
-												</div>
-																						</div>
+											</div>
 										</div>
 									</div>
 									<div class="mwst-field">
@@ -3284,6 +3318,7 @@ class MW_Sales_Toast_Settings {
 													<code>.mw-sales-toast__text strong</code>
 													<code>.mw-sales-toast__meta</code>
 													<code>.mw-sales-toast__close</code>
+													<code>.mw-sales-toast__close:hover</code>
 												</p>
 												<p class="description" style="margin-top:10px;margin-bottom:6px;"><strong><?php esc_html_e( 'Layout & state', 'mw-sales-toast' ); ?></strong></p>
 												<p class="description mwst-css-selectors">
@@ -3305,6 +3340,7 @@ class MW_Sales_Toast_Settings {
 													<code>--mw-st-meta</code>
 													<code>--mw-st-close-hover</code>
 													<code>--mw-st-border</code>
+													<code>--mw-st-border-width</code>
 													<code>--mw-st-close-bg</code>
 													<code>--mw-st-close-bg-hover</code>
 													<code>--mw-st-radius</code>
