@@ -1657,6 +1657,7 @@ class MW_Sales_Toast_Settings {
 						: '',
 				),
 				'optionName'     => MW_SALES_TOAST_OPTION,
+				'previewSamples' => self::preview_samples(),
 				'i18n'           => array(
 					/* translators: %s: relative time */
 					'ago'            => __( '%s ago', 'mw-sales-toast' ),
@@ -2009,6 +2010,128 @@ class MW_Sales_Toast_Settings {
 	}
 
 	/**
+	 * One cached/demo event per toast type for the admin sidebar preview.
+	 *
+	 * @return array<string, array<string, mixed>|null>
+	 */
+	public static function preview_samples() {
+		$settings = self::get();
+		$picked   = array(
+			'sale'    => null,
+			'viewing' => null,
+			'review'  => null,
+		);
+
+		if ( class_exists( 'MW_Sales_Toast_Cache' ) ) {
+			foreach ( MW_Sales_Toast_Cache::get_events() as $event ) {
+				if ( ! is_array( $event ) ) {
+					continue;
+				}
+				$type = isset( $event['type'] ) ? (string) $event['type'] : 'sale';
+				if ( isset( $picked[ $type ] ) && null === $picked[ $type ] ) {
+					$picked[ $type ] = $event;
+				}
+			}
+		}
+
+		if ( null === $picked['sale'] && class_exists( 'MW_Sales_Toast_Cache' ) ) {
+			$demo = MW_Sales_Toast_Cache::demo_events( $settings, 1 );
+			if ( ! empty( $demo[0] ) ) {
+				$picked['sale'] = $demo[0];
+			}
+		}
+
+		if ( null === $picked['viewing'] && class_exists( 'MW_Sales_Toast_Types' ) ) {
+			$viewing = MW_Sales_Toast_Types::viewing_events( $settings );
+			if ( ! empty( $viewing[0] ) ) {
+				$picked['viewing'] = $viewing[0];
+			} elseif ( class_exists( 'MW_Sales_Toast_Cache' ) ) {
+				$products = MW_Sales_Toast_Cache::products( 1 );
+				if ( ! empty( $products[0]['id'] ) ) {
+					$event = MW_Sales_Toast_Types::viewing_event_for_product(
+						(int) $products[0]['id'],
+						$settings,
+						$products[0]
+					);
+					if ( $event ) {
+						$picked['viewing'] = $event;
+					}
+				}
+			}
+		}
+
+		if ( null === $picked['review'] && class_exists( 'MW_Sales_Toast_Types' ) ) {
+			$reviews = MW_Sales_Toast_Types::review_events( $settings );
+			if ( ! empty( $reviews[0] ) ) {
+				$picked['review'] = $reviews[0];
+			}
+		}
+
+		foreach ( $picked as $type => $event ) {
+			$picked[ $type ] = self::preview_event_payload( $event, $settings );
+		}
+
+		return $picked;
+	}
+
+	/**
+	 * Slim event row for admin preview JS.
+	 *
+	 * @param array|null               $event    Raw event.
+	 * @param array<string, mixed>|null $settings Settings.
+	 * @return array<string, mixed>|null
+	 */
+	private static function preview_event_payload( $event, $settings = null ) {
+		if ( ! is_array( $event ) || '' === trim( (string) ( $event['title'] ?? '' ) ) ) {
+			return null;
+		}
+
+		$settings = is_array( $settings ) ? $settings : self::get();
+		$pid      = isset( $event['productId'] ) ? absint( $event['productId'] ) : 0;
+		$image    = isset( $event['image'] ) ? esc_url_raw( (string) $event['image'] ) : '';
+		if ( '' === $image && $pid > 0 && function_exists( 'wc_get_product' ) ) {
+			$product = wc_get_product( $pid );
+			if ( $product ) {
+				$image_id = $product->get_image_id();
+				$image    = $image_id ? wp_get_attachment_image_url( $image_id, 'thumbnail' ) : '';
+				$image    = $image ? esc_url_raw( $image ) : '';
+			}
+		}
+
+		$when = '';
+		if ( ! empty( $event['whenLiteral'] ) ) {
+			$when = sanitize_text_field( (string) ( $event['when'] ?? '' ) );
+		} elseif ( ! empty( $event['whenTs'] ) && class_exists( 'MW_Sales_Toast_Cache' ) ) {
+			$when = MW_Sales_Toast_Cache::format_when(
+				(int) $event['whenTs'],
+				(string) ( $settings['when_style'] ?? 'natural' )
+			);
+		}
+
+		$count = isset( $event['count'] ) ? absint( $event['count'] ) : 0;
+		if ( 'viewing' === ( $event['type'] ?? '' ) && $count < 1 ) {
+			$min   = max( 1, min( 99, (int) ( $settings['viewing_min'] ?? 2 ) ) );
+			$max   = max( $min, min( 99, (int) ( $settings['viewing_max'] ?? 12 ) ) );
+			$count = (int) round( ( $min + $max ) / 2 );
+		}
+
+		return array(
+			'name'        => sanitize_text_field( (string) ( $event['name'] ?? '' ) ),
+			'city'        => sanitize_text_field( (string) ( $event['city'] ?? '' ) ),
+			'title'       => sanitize_text_field( (string) ( $event['title'] ?? '' ) ),
+			'image'       => $image ? $image : '',
+			'rating'      => isset( $event['rating'] ) ? max( 0, min( 5, (int) $event['rating'] ) ) : 0,
+			'excerpt'     => sanitize_text_field( (string) ( $event['excerpt'] ?? '' ) ),
+			'count'       => $count,
+			'people'      => sanitize_text_field( (string) ( $event['people'] ?? '' ) ),
+			'when'        => $when,
+			'whenLiteral' => ! empty( $event['whenLiteral'] ),
+			'stock'       => sanitize_text_field( (string) ( $event['stock'] ?? '' ) ),
+			'stockLabel'  => sanitize_text_field( (string) ( $event['stockLabel'] ?? '' ) ),
+		);
+	}
+
+	/**
 	 * In-admin link that switches to another settings tab.
 	 *
 	 * @param string $tab   Tab id (general, message, design, timing, statistics, support, account).
@@ -2201,13 +2324,18 @@ class MW_Sales_Toast_Settings {
 							<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M16.5 13.5A7 7 0 0 1 10.5 5a7 7 0 1 0 6 8.5z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
 						</button>
 					</div>
-					<span
-						id="mwst-status-badge"
-						class="mwst-badge <?php echo $enabled ? 'mwst-badge--on' : 'mwst-badge--off'; ?>"
-					>
-						<?php echo $enabled ? esc_html__( 'Enabled', 'mw-sales-toast' ) : esc_html__( 'Disabled', 'mw-sales-toast' ); ?>
-					</span>
 					<dl class="mwst-header__metrics" aria-label="<?php esc_attr_e( 'System status', 'mw-sales-toast' ); ?>">
+						<div class="mwst-header__metric">
+							<dt><?php esc_html_e( 'Toasts', 'mw-sales-toast' ); ?></dt>
+							<dd>
+								<span
+									id="mwst-status-badge"
+									class="mwst-badge <?php echo $enabled ? 'mwst-badge--on' : 'mwst-badge--off'; ?>"
+								>
+									<?php echo $enabled ? esc_html__( 'Enabled', 'mw-sales-toast' ) : esc_html__( 'Disabled', 'mw-sales-toast' ); ?>
+								</span>
+							</dd>
+						</div>
 						<div class="mwst-header__metric">
 							<dt><?php esc_html_e( 'WooCommerce', 'mw-sales-toast' ); ?></dt>
 							<dd>

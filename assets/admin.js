@@ -80,8 +80,6 @@
 	var elementorThemeCfg = cfg.elementorTheme || {};
 	var tabs = root.querySelectorAll('.mwst-tabs__btn');
 	var panels = root.querySelectorAll('.mwst-panel');
-	var enabled = root.querySelector('#mwst-enabled');
-	var badge = root.querySelector('#mwst-status-badge');
 	var template = root.querySelector('#mwst-template');
 	var fallback = root.querySelector('#mwst-fallback');
 	var hideNames = root.querySelector('#mwst-hide-names');
@@ -351,7 +349,6 @@
 		restoringForm = true;
 		try {
 			applySettingsMap(saveState || {});
-			syncBadge();
 			syncTimingPreset();
 			updateCycleEstimate();
 			syncTriggerOptions();
@@ -724,21 +721,75 @@
 		});
 	});
 
-	function syncBadge() {
-		if (!badge || !enabled) {
-			return;
+	function parseDemoPeople() {
+		var raw = fieldValue('#mwst-people', '');
+		if (!raw) {
+			return [];
 		}
-		var on = enabled.checked;
-		badge.textContent = on ? 'Enabled' : 'Disabled';
-		badge.classList.toggle('mwst-badge--on', on);
-		badge.classList.toggle('mwst-badge--off', !on);
+		var out = [];
+		raw.split(/\n/).forEach(function (line) {
+			line = String(line || '').trim();
+			if (!line) {
+				return;
+			}
+			var parts = line.split(',');
+			var name = String(parts[0] || '').trim();
+			var city = parts.length > 1 ? String(parts.slice(1).join(',')).trim() : '';
+			if (name) {
+				out.push({ name: name, city: city });
+			}
+		});
+		return out;
 	}
 
-	function sampleName() {
-		if (hideNames && hideNames.checked) {
-			return (fallback && fallback.value.trim()) || 'Someone';
+	function previewEvent(type) {
+		var samples = cfg.previewSamples || {};
+		var ev = samples[type];
+		return ev && typeof ev === 'object' ? ev : null;
+	}
+
+	function samplePerson(type) {
+		var people = parseDemoPeople();
+		var ev = previewEvent(type) || previewEvent('sale') || previewEvent('review');
+		var name = 'Ana';
+		var city = 'Bucharest';
+		if (ev && ev.name) {
+			name = ev.name;
+		} else if (people.length) {
+			name = people[0].name;
 		}
-		return 'Ana';
+		if (ev && ev.city) {
+			city = ev.city;
+		} else if (people.length && people[0].city) {
+			city = people[0].city;
+		}
+		if (hideNames && hideNames.checked) {
+			name = (fallback && fallback.value.trim()) || 'Someone';
+		}
+		return { name: name, city: city };
+	}
+
+	function sampleProduct(type) {
+		var ev =
+			previewEvent(type) ||
+			previewEvent('sale') ||
+			previewEvent('viewing') ||
+			previewEvent('review');
+		var title = ev && ev.title ? String(ev.title) : 'Classic Tee';
+		var image = ev && ev.image ? String(ev.image) : '';
+		return {
+			title: title,
+			image: image,
+			html: '<strong>' + escapeHtml(title) + '</strong>'
+		};
+	}
+
+	function sampleWhen(type) {
+		var ev = previewEvent(type);
+		if (ev && ev.when) {
+			return ev.when;
+		}
+		return agoLabel();
 	}
 
 	function currentPosition() {
@@ -1142,25 +1193,56 @@
 
 	function sampleMaps() {
 		var stock = sampleStockFields();
-		var name = sampleName();
-		var product = '<strong>Classic Tee</strong>';
+		var saleEv = previewEvent('sale');
+		var viewEv = previewEvent('viewing');
+		var reviewEv = previewEvent('review');
+		var salePerson = samplePerson('sale');
+		var reviewPerson = samplePerson('review');
+		var saleProduct = sampleProduct('sale');
+		var viewProduct = sampleProduct('viewing');
+		var reviewProduct = sampleProduct('review');
 		var coupon = fieldValue('#mwst-cta-coupon', '');
-		var rating = 5;
+		var rating =
+			reviewEv && reviewEv.rating
+				? Math.max(1, Math.min(5, Number(reviewEv.rating) || 5))
+				: 5;
+		var excerpt =
+			(reviewEv && reviewEv.excerpt) || i18n.sampleExcerpt || 'Exactly what I needed.';
+		var viewCount =
+			viewEv && viewEv.count
+				? Number(viewEv.count)
+				: sampleViewingCount();
+		if (!viewCount || viewCount < 1) {
+			viewCount = sampleViewingCount();
+		}
+		var viewPeople =
+			viewCount === 1
+				? i18n.person || 'person'
+				: (viewEv && viewEv.people) || i18n.people || 'people';
+		if (saleEv && saleEv.stockLabel && stock.stockLabel) {
+			stock = {
+				stock: saleEv.stock || stock.stock,
+				stockLabel: saleEv.stockLabel || stock.stockLabel
+			};
+		}
+		var city = salePerson.city;
+
 		return {
 			sale: {
 				tpl:
 					(template && template.value) ||
 					'{name} from {city} just bought {product}',
 				map: {
-					'{name}': name,
-					'{city}': 'Bucharest',
-					'{product}': product,
+					'{name}': salePerson.name,
+					'{city}': city,
+					'{product}': saleProduct.html,
 					'{stock}': stock.stock,
 					'{stock_label}': stock.stockLabel
 				},
-				meta: sampleSaleMeta(stock),
+				meta: sampleSaleMeta(stock, 'sale'),
 				cta: '',
-				showMedia: true
+				showMedia: true,
+				image: saleProduct.image
 			},
 			viewing: {
 				tpl:
@@ -1169,16 +1251,14 @@
 						'{count} {people} are viewing {product}'
 					),
 				map: {
-					'{count}': String(sampleViewingCount()),
-					'{people}':
-						sampleViewingCount() === 1
-							? i18n.person || 'person'
-							: i18n.people || 'people',
-					'{product}': product
+					'{count}': String(viewCount),
+					'{people}': viewPeople,
+					'{product}': viewProduct.html
 				},
 				meta: i18n.now || 'now',
 				cta: '',
-				showMedia: true
+				showMedia: true,
+				image: viewProduct.image
 			},
 			review: {
 				tpl:
@@ -1187,31 +1267,33 @@
 						'{name} left a {rating}-star review of {product}'
 					),
 				map: {
-					'{name}': name,
+					'{name}': reviewPerson.name,
 					'{rating}': String(rating),
 					'{stars}': starsHtml(rating),
-					'{product}': product,
-					'{excerpt}': i18n.sampleExcerpt || 'Exactly what I needed.'
+					'{product}': reviewProduct.html,
+					'{excerpt}': excerpt
 				},
-				meta: sampleReviewMeta(rating),
+				meta: sampleReviewMeta(rating, excerpt),
 				cta: '',
-				showMedia: true
+				showMedia: true,
+				image: reviewProduct.image
 			},
 			cta: {
 				tpl: fieldValue('#mwst-cta-message', 'Get 10% off your next order'),
 				map: {
 					'{coupon}': coupon,
-					'{product}': product
+					'{product}': saleProduct.html
 				},
 				meta: '',
 				cta: sampleCtaMarkup(coupon),
-				showMedia: false
+				showMedia: false,
+				image: ''
 			}
 		};
 	}
 
-	function sampleSaleMeta(stock) {
-		var when = agoLabel();
+	function sampleSaleMeta(stock, type) {
+		var when = sampleWhen(type || 'sale');
 		var tpl = (template && template.value) || '';
 		var usesStock = /\{stock(_label)?\}/.test(tpl);
 		if (stock.stockLabel && !usesStock) {
@@ -1220,7 +1302,7 @@
 		return when;
 	}
 
-	function sampleReviewMeta(rating) {
+	function sampleReviewMeta(rating, excerpt) {
 		var tpl = fieldValue('#mwst-review-template', '');
 		var bits = [];
 		if (!/\{stars\}/.test(tpl)) {
@@ -1231,9 +1313,9 @@
 			root.querySelector('#mwst-review-excerpt').checked &&
 			!/\{excerpt\}/.test(tpl)
 		) {
-			bits.push(i18n.sampleExcerpt || 'Exactly what I needed.');
+			bits.push(excerpt || i18n.sampleExcerpt || 'Exactly what I needed.');
 		}
-		bits.push(agoLabel());
+		bits.push(sampleWhen('review'));
 		return bits.join(' · ');
 	}
 
@@ -1281,7 +1363,7 @@
 			mediaEl.hidden = false;
 			mediaEl.innerHTML =
 				'<img src="' +
-				PLACEHOLDER_IMG +
+				escapeHtml(sample.image || PLACEHOLDER_IMG) +
 				'" alt="" width="48" height="48">';
 		} else {
 			mediaEl.hidden = true;
@@ -1945,9 +2027,6 @@
 		});
 	});
 
-	if (enabled) {
-		enabled.addEventListener('change', syncBadge);
-	}
 	if (template) {
 		template.addEventListener('input', syncSample);
 	}
@@ -2398,7 +2477,6 @@
 		input.addEventListener('change', syncTypeOptions);
 	});
 
-	syncBadge();
 	syncStockThresholdState();
 	syncExcludeHomeState();
 	syncMobileBreakpointState();

@@ -402,6 +402,22 @@
 	border-color: rgba(148, 163, 184, 0.28);
 }
 
+.mwst-header__metric .mwst-badge {
+	padding: 2px 8px;
+	font-size: 11px;
+	letter-spacing: 0;
+}
+
+.mwst-header__metric .mwst-badge::before {
+	width: 6px;
+	height: 6px;
+	box-shadow: 0 0 0 2px currentColor;
+}
+
+.mwst-header__metric .mwst-badge--on::before {
+	box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.25);
+}
+
 /* Layout */
 
 .mwst-layout {
@@ -706,8 +722,16 @@
 
 .mwst-fold {
 	margin: 16px 0 0;
-	padding: 12px 0 0;
+	padding: 12px 12px 8px;
 	border-top: 1px solid var(--mwst-border);
+}
+
+.mwst-field:has(+ .mwst-fold) {
+	border-bottom: 0;
+}
+
+.mwst-field + .mwst-fold {
+	margin-top: 8px;
 }
 
 .mwst-fold > summary {
