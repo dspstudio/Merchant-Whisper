@@ -97,6 +97,8 @@
 
   var MUTE_KEY = 'mw_st_mute_until';
   var COUNT_KEY = 'mw_st_toast_count';
+  var SHOWN_KEY = 'mw_st_shown_ids';
+  var LOOP_KEY = 'mw_st_loop';
   var delay = Number(cfg.delay) || 6000;
   var duration = Number(cfg.duration) || 7000;
   var gap = Number(cfg.gap) || 12000;
@@ -133,6 +135,18 @@
   var shownAt = 0;
   var dismissPending = false;
   var shownThisSession = readSessionCount();
+  var shownIds = readShownIds();
+  (function syncSessionCount() {
+    var n = 0;
+    for (var key in shownIds) {
+      if (shownIds[key]) {
+        n += 1;
+      }
+    }
+    if (n > shownThisSession) {
+      shownThisSession = n;
+    }
+  })();
 
   function readSessionCount() {
     try {
@@ -142,6 +156,64 @@
     }
   }
 
+  function readShownIds() {
+    var map = Object.create(null);
+    try {
+      var raw = sessionStorage.getItem(SHOWN_KEY);
+      var list = raw ? JSON.parse(raw) : [];
+      if (!Array.isArray(list)) {
+        return map;
+      }
+      for (var i = 0; i < list.length; i++) {
+        var sid = String(list[i] || '');
+        if (sid) {
+          map[sid] = true;
+        }
+      }
+    } catch (e) {
+      /* ignore */
+    }
+    return map;
+  }
+
+  function persistShownIds() {
+    var list = [];
+    for (var key in shownIds) {
+      if (shownIds[key]) {
+        list.push(key);
+      }
+    }
+    if (list.length > 40) {
+      list = list.slice(-40);
+    }
+    try {
+      sessionStorage.setItem(SHOWN_KEY, JSON.stringify(list));
+    } catch (e) {
+      /* ignore */
+    }
+  }
+
+  function eventId(event) {
+    if (!event || event.id == null || event.id === '') {
+      return '';
+    }
+    return String(event.id);
+  }
+
+  function wasShown(event) {
+    var id = eventId(event);
+    return !!(id && shownIds[id]);
+  }
+
+  function markShown(event) {
+    var id = eventId(event);
+    if (!id || shownIds[id]) {
+      return;
+    }
+    shownIds[id] = true;
+    persistShownIds();
+  }
+
   function bumpSessionCount() {
     shownThisSession += 1;
     try {
@@ -149,6 +221,34 @@
     } catch (e) {
       /* ignore */
     }
+  }
+
+  function readLoopTrigger() {
+    try {
+      return sessionStorage.getItem(LOOP_KEY) || '';
+    } catch (e) {
+      return '';
+    }
+  }
+
+  function persistLoop(reason) {
+    try {
+      sessionStorage.setItem(LOOP_KEY, reason || 'page_load');
+    } catch (e) {
+      /* ignore */
+    }
+  }
+
+  function sessionHasProgress() {
+    if (shownThisSession > 0 || readLoopTrigger()) {
+      return true;
+    }
+    for (var key in shownIds) {
+      if (shownIds[key]) {
+        return true;
+      }
+    }
+    return false;
   }
 
   function isMuted() {
@@ -727,6 +827,7 @@
     root.classList.remove('is-leaving');
     void root.offsetWidth;
     root.classList.add('is-visible');
+    markShown(event);
     bumpSessionCount();
     track('impression', eventPayload(event));
     if (type === 'cta') {
@@ -778,6 +879,9 @@
       var event = events[index % events.length];
       index += 1;
       attempts += 1;
+      if (wasShown(event)) {
+        continue;
+      }
       if (eventType(event) === 'cta' && ctaAlreadyShown()) {
         continue;
       }
@@ -838,6 +942,10 @@
       track('skipped', { reason: 'session_cap' });
       return;
     }
+    if (sessionHasProgress()) {
+      resumeLoop();
+      return;
+    }
     attachTriggers();
   }
 
@@ -845,6 +953,17 @@
   var loopTrigger = '';
   var pageLoadTimer = null;
   var triggerCleanups = [];
+
+  function resumeLoop() {
+    loopStarted = true;
+    loopTrigger = readLoopTrigger() || 'page_load';
+    persistLoop(loopTrigger);
+    if (shownThisSession > 0) {
+      scheduleGap(withJitter(gap));
+      return;
+    }
+    window.setTimeout(next, 350);
+  }
 
   function addCleanup(fn) {
     triggerCleanups.push(fn);
@@ -878,6 +997,7 @@
     }
     loopStarted = true;
     loopTrigger = reason || 'page_load';
+    persistLoop(loopTrigger);
     detachTriggers();
     if (reason === 'page_load') {
       next();
