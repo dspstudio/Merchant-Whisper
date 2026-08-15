@@ -496,6 +496,7 @@ class MW_Sales_Toast_Frontend {
 			'disableMobile'        => ! empty( $settings['disable_mobile'] ),
 			'mobileBreakpoint'     => $breakpoint,
 			'soundEnabled'         => ! empty( $settings['sound_enabled'] ),
+			'pauseOnHover'         => ! empty( $settings['pause_on_hover'] ),
 			'imageFit'             => ( 'padded' === ( $settings['style_image_fit'] ?? '' ) ) ? 'padded' : 'full',
 			'maxPerSession'        => max( 1, (int) $settings['max_per_session'] ),
 			'muteHours'            => max( 0, (int) $settings['mute_hours'] ),

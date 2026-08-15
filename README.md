@@ -63,7 +63,7 @@ Requires WordPress 5.8+, PHP 7.2+. WooCommerce is required for real orders; demo
 - Product thumbnail; image and title link to the product
 - Hide on cart & checkout; entire site or shop/products only
 - Respect `prefers-reduced-motion`
-- Hover pauses hide/loop timers
+- Hover pauses hide/loop timers (admin toggle; on by default)
 - Dismiss control; `role="status"` / polite live region
 - Safe escaping; product link is the only intentional HTML in the line
 - Empty REST response → no toast loop
@@ -126,7 +126,7 @@ Visitor JS ──► GET mw-st/v1/notifications ──────┘──► t
 | Hide names | Always use fallback name |
 | Require checkout consent | Privacy gate for real orders |
 | Mute after dismiss (hours) | localStorage mute TTL |
-| Timing | Delay / interval / visible for (seconds) |
+| Timing | Delay / interval / visible for (seconds); pause on hover |
 | Triggers | Page load, scroll, exit intent, add to cart, inactivity, click |
 | Toasts per visit | Unique toasts in one session (no repeats) |
 | Max cached orders | Rebuild query size (keep ≥ toasts per visit) |

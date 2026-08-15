@@ -101,6 +101,7 @@
   var duration = Number(cfg.duration) || 7000;
   var gap = Number(cfg.gap) || 12000;
   var jitter = Math.max(0, Math.min(50, Number(cfg.jitter) || 0));
+  var pauseOnHover = cfg.pauseOnHover !== false;
   var position = cfg.position || 'bottom-left';
   var imageFit = cfg.imageFit === 'padded' ? 'padded' : 'full';
   var maxPerSession = Number(cfg.maxPerSession) || 12;
@@ -514,13 +515,13 @@
     document.body.appendChild(el);
 
     el.addEventListener('mouseenter', function () {
-      if (stopped || !el.classList.contains('is-visible')) return;
+      if (!pauseOnHover || stopped || !el.classList.contains('is-visible')) return;
       hovering = true;
       pauseHideTimer();
     });
 
     el.addEventListener('mouseleave', function () {
-      if (stopped) return;
+      if (!pauseOnHover || stopped) return;
       hovering = false;
       resumeHideTimer();
     });

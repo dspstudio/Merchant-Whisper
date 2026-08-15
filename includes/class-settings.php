@@ -42,6 +42,7 @@ class MW_Sales_Toast_Settings {
 			'duration'               => 7,
 			'gap'                    => 12,
 			'jitter'                 => 20,
+			'pause_on_hover'         => 1,
 			'trigger_page_load'      => 1,
 			'trigger_scroll'         => 0,
 			'trigger_exit_intent'    => 0,
@@ -591,7 +592,7 @@ class MW_Sales_Toast_Settings {
 	/**
 	 * Timing presets (seconds).
 	 *
-	 * @return array<string, array{delay:int,duration:int,gap:int,label:string,desc:string}>
+	 * @return array<string, array{delay:int,duration:int,gap:int,icon:string,label:string,desc:string}>
 	 */
 	public static function timing_presets() {
 		return array(
@@ -599,6 +600,7 @@ class MW_Sales_Toast_Settings {
 				'delay'    => 12,
 				'duration' => 8,
 				'gap'      => 22,
+				'icon'     => 'dashicons-controls-pause',
 				'label'    => __( 'Relaxed', 'mw-sales-toast' ),
 				'desc'     => __( 'Slower first toast, longer quiet time', 'mw-sales-toast' ),
 			),
@@ -606,6 +608,7 @@ class MW_Sales_Toast_Settings {
 				'delay'    => 6,
 				'duration' => 7,
 				'gap'      => 12,
+				'icon'     => 'dashicons-yes-alt',
 				'label'    => __( 'Balanced', 'mw-sales-toast' ),
 				'desc'     => __( 'Good default for most stores', 'mw-sales-toast' ),
 			),
@@ -613,6 +616,7 @@ class MW_Sales_Toast_Settings {
 				'delay'    => 3,
 				'duration' => 5,
 				'gap'      => 6,
+				'icon'     => 'dashicons-performance',
 				'label'    => __( 'Frequent', 'mw-sales-toast' ),
 				'desc'     => __( 'Faster cadence — use sparingly', 'mw-sales-toast' ),
 			),
@@ -620,6 +624,7 @@ class MW_Sales_Toast_Settings {
 				'delay'    => 6,
 				'duration' => 7,
 				'gap'      => 12,
+				'icon'     => 'dashicons-admin-generic',
 				'label'    => __( 'Custom', 'mw-sales-toast' ),
 				'desc'     => __( 'Set delay, visible time, and gap yourself', 'mw-sales-toast' ),
 			),
@@ -629,37 +634,43 @@ class MW_Sales_Toast_Settings {
 	/**
 	 * When the first toast may start (any selected trigger; first match wins).
 	 *
-	 * @return array<string, array{key:string,label:string,desc:string}>
+	 * @return array<string, array{key:string,icon:string,label:string,desc:string}>
 	 */
 	public static function trigger_defs() {
 		return array(
 			'page_load'   => array(
 				'key'   => 'trigger_page_load',
+				'icon'  => 'dashicons-update',
 				'label' => __( 'Page load', 'mw-sales-toast' ),
 				'desc'  => __( 'After First delay below', 'mw-sales-toast' ),
 			),
 			'scroll'      => array(
 				'key'   => 'trigger_scroll',
+				'icon'  => 'dashicons-arrow-down-alt',
 				'label' => __( 'Scroll', 'mw-sales-toast' ),
 				'desc'  => __( 'After the visitor scrolls down the page', 'mw-sales-toast' ),
 			),
 			'exit_intent' => array(
 				'key'   => 'trigger_exit_intent',
+				'icon'  => 'dashicons-migrate',
 				'label' => __( 'Exit intent', 'mw-sales-toast' ),
 				'desc'  => __( 'When the cursor leaves toward the top (desktop)', 'mw-sales-toast' ),
 			),
 			'add_to_cart' => array(
 				'key'   => 'trigger_add_to_cart',
+				'icon'  => 'dashicons-cart',
 				'label' => __( 'Add to cart', 'mw-sales-toast' ),
 				'desc'  => __( 'After a WooCommerce add-to-cart', 'mw-sales-toast' ),
 			),
 			'inactivity'  => array(
 				'key'   => 'trigger_inactivity',
+				'icon'  => 'dashicons-clock',
 				'label' => __( 'Inactivity', 'mw-sales-toast' ),
 				'desc'  => __( 'After no mouse, keyboard, or scroll', 'mw-sales-toast' ),
 			),
 			'click'       => array(
 				'key'   => 'trigger_click',
+				'icon'  => 'dashicons-marker',
 				'label' => __( 'Click', 'mw-sales-toast' ),
 				'desc'  => __( 'When a matching element is clicked', 'mw-sales-toast' ),
 			),
@@ -760,6 +771,30 @@ class MW_Sales_Toast_Settings {
 	private static function type_icon_html( $type_id ) {
 		$defs = self::type_defs();
 		$icon = isset( $defs[ $type_id ]['icon'] ) ? (string) $defs[ $type_id ]['icon'] : '';
+		return self::dashicon_html( $icon );
+	}
+
+	/**
+	 * Dashicon markup for a start trigger.
+	 *
+	 * @param string $trigger_id page_load|scroll|exit_intent|add_to_cart|inactivity|click.
+	 * @return string
+	 */
+	private static function trigger_icon_html( $trigger_id ) {
+		$defs = self::trigger_defs();
+		$icon = isset( $defs[ $trigger_id ]['icon'] ) ? (string) $defs[ $trigger_id ]['icon'] : '';
+		return self::dashicon_html( $icon );
+	}
+
+	/**
+	 * Dashicon markup for a timing preset.
+	 *
+	 * @param string $preset_id relaxed|balanced|frequent|custom.
+	 * @return string
+	 */
+	private static function timing_icon_html( $preset_id ) {
+		$defs = self::timing_presets();
+		$icon = isset( $defs[ $preset_id ]['icon'] ) ? (string) $defs[ $preset_id ]['icon'] : '';
 		return self::dashicon_html( $icon );
 	}
 
@@ -1108,6 +1143,7 @@ class MW_Sales_Toast_Settings {
 			'hide_names',
 			'disable_mobile',
 			'sound_enabled',
+			'pause_on_hover',
 			'newsletter',
 			'use_elementor_theme',
 			'trigger_page_load',
@@ -3197,7 +3233,7 @@ class MW_Sales_Toast_Settings {
 															data-trigger="<?php echo esc_attr( $trig_id ); ?>"
 															<?php checked( ! empty( $s[ $trig['key'] ] ) ); ?>
 														/>
-														<span class="mwst-preset__label"><?php echo esc_html( $trig['label'] ); ?></span>
+														<span class="mwst-preset__label"><?php echo self::trigger_icon_html( $trig_id ); ?><?php echo esc_html( $trig['label'] ); ?></span>
 														<span class="mwst-preset__desc"><?php echo esc_html( $trig['desc'] ); ?></span>
 													</label>
 												<?php endforeach; ?>
@@ -3260,7 +3296,7 @@ class MW_Sales_Toast_Settings {
 															data-duration="<?php echo esc_attr( (string) $preset['duration'] ); ?>"
 															data-gap="<?php echo esc_attr( (string) $preset['gap'] ); ?>"
 														/>
-														<span class="mwst-preset__label"><?php echo esc_html( $preset['label'] ); ?></span>
+														<span class="mwst-preset__label"><?php echo self::timing_icon_html( $key ); ?><?php echo esc_html( $preset['label'] ); ?></span>
 														<span class="mwst-preset__desc"><?php echo esc_html( $preset['desc'] ); ?></span>
 														<?php if ( 'custom' !== $key ) : ?>
 															<span class="mwst-preset__meta">
@@ -3308,6 +3344,13 @@ class MW_Sales_Toast_Settings {
 											<input id="mwst-jitter" type="number" min="0" max="50" class="small-text" name="<?php echo esc_attr( $opt ); ?>[jitter]" value="<?php echo esc_attr( (string) (int) $s['jitter'] ); ?>" />
 											<span class="mwst-hint">%</span>
 											<p class="description"><?php esc_html_e( 'Randomizes page-load delay and gap by up to this percent so the rhythm feels less robotic. 0 = exact timing. Visible duration is never jittered.', 'mw-sales-toast' ); ?></p>
+										</div>
+									</div>
+									<div class="mwst-field">
+										<div class="mwst-field__label"><?php esc_html_e( 'Pause on hover', 'mw-sales-toast' ); ?></div>
+										<div class="mwst-field__control">
+											<?php self::toggle( $opt, 'pause_on_hover', $s, 'mwst-pause-hover', __( 'Pause the visible timer while the visitor hovers the toast', 'mw-sales-toast' ) ); ?>
+											<p class="description"><?php esc_html_e( 'When off, the toast still hides after the visible duration even if the pointer is over it.', 'mw-sales-toast' ); ?></p>
 										</div>
 									</div>
 									<div class="mwst-field">
@@ -4332,6 +4375,7 @@ class MW_Sales_Toast_Settings {
 												<li><strong><?php esc_html_e( 'Visible for', 'mw-sales-toast' ); ?></strong> — <?php esc_html_e( 'How long each toast stays on screen.', 'mw-sales-toast' ); ?></li>
 												<li><strong><?php esc_html_e( 'Gap after hide', 'mw-sales-toast' ); ?></strong> — <?php esc_html_e( 'Quiet time after a toast hides before the next one.', 'mw-sales-toast' ); ?></li>
 												<li><strong><?php esc_html_e( 'Jitter', 'mw-sales-toast' ); ?></strong> — <?php esc_html_e( 'Randomizes delay and gap (±%) so the rhythm feels less robotic. Visible time is never jittered. Does not shuffle which events appear.', 'mw-sales-toast' ); ?></li>
+												<li><strong><?php esc_html_e( 'Pause on hover', 'mw-sales-toast' ); ?></strong> — <?php esc_html_e( 'When on, hovering a toast pauses the visible timer until the pointer leaves. When off, the toast still auto-hides on schedule.', 'mw-sales-toast' ); ?></li>
 												<li><strong><?php esc_html_e( 'Time label', 'mw-sales-toast' ); ?></strong> — <?php esc_html_e( 'Natural (just now…) or Exact (2 minutes ago) for real orders; demo lines are shown as written.', 'mw-sales-toast' ); ?></li>
 												<li><strong><?php esc_html_e( 'Toasts per visit', 'mw-sales-toast' ); ?></strong> — <?php esc_html_e( 'How many unique toasts a visitor sees in one session (newest first). The list does not repeat. The estimate under this field is delay + visible + gaps for that count.', 'mw-sales-toast' ); ?></li>
 												<li><strong><?php esc_html_e( 'Cache lifetime', 'mw-sales-toast' ); ?></strong> — <?php esc_html_e( 'How long the rebuilt list is kept (default 15 minutes). Remaining time is shown next to the field.', 'mw-sales-toast' ); ?></li>
