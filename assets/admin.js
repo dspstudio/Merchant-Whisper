@@ -3810,6 +3810,69 @@
 		}
 	});
 
+	(function initI18nTabs() {
+		var bar = document.getElementById('mwst-i18n-bar');
+		var panel = document.getElementById('mwst-panel-message');
+		if (!bar || !panel) {
+			return;
+		}
+		var langsCfg = cfg.languages || {};
+		var active = langsCfg.default || '';
+		var tabs = bar.querySelectorAll('.mwst-i18n-tab');
+
+		function setLang(lang) {
+			if (!lang) {
+				return;
+			}
+			active = lang;
+			panel.setAttribute('data-mwst-lang', lang);
+			tabs.forEach(function (tab) {
+				var on = tab.getAttribute('data-lang') === lang;
+				tab.classList.toggle('is-active', on);
+				tab.setAttribute('aria-selected', on ? 'true' : 'false');
+			});
+			panel.querySelectorAll('.mwst-i18n-pane').forEach(function (pane) {
+				var on = pane.getAttribute('data-lang') === lang;
+				pane.hidden = !on;
+				pane.classList.toggle('is-active', on);
+			});
+		}
+
+		bar.addEventListener('click', function (e) {
+			var tab = e.target.closest('.mwst-i18n-tab');
+			if (!tab || !bar.contains(tab)) {
+				return;
+			}
+			e.preventDefault();
+			setLang(tab.getAttribute('data-lang') || '');
+		});
+
+		var i18nToggle = root.querySelector('#mwst-i18n-enabled');
+		var i18nTools = document.getElementById('mwst-i18n-tools');
+		function syncI18nTools(on) {
+			if (i18nTools) {
+				i18nTools.hidden = !on;
+			}
+			if (on) {
+				setLang(active || langsCfg.default || '');
+				return;
+			}
+			setLang(langsCfg.default || '');
+		}
+		if (i18nToggle) {
+			i18nToggle.addEventListener('change', function () {
+				syncI18nTools(!!i18nToggle.checked);
+			});
+		}
+
+		if (active) {
+			setLang(active);
+		}
+		if (i18nToggle) {
+			syncI18nTools(!!i18nToggle.checked);
+		}
+	})();
+
 	captureSaveSnapshot(true);
 	window.setTimeout(function () {
 		if (!userTouchedForm) {

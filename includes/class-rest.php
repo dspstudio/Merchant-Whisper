@@ -170,21 +170,24 @@ class MW_Sales_Toast_REST {
 	 * @return WP_REST_Response
 	 */
 	public static function get_notifications( $request ) {
-		$settings = MW_Sales_Toast_Settings::get();
+		$base_settings = MW_Sales_Toast_Settings::get();
 
-		if ( empty( $settings['enabled'] ) ) {
+		if ( empty( $base_settings['enabled'] ) ) {
 			return rest_ensure_response( array() );
 		}
 
-		$limit  = max( 1, min( 40, (int) $settings['max_events'] ) );
-		if ( class_exists( 'MW_Sales_Toast_Types' ) && MW_Sales_Toast_Types::any_enabled( $settings ) ) {
+		$settings = MW_Sales_Toast_Settings::get_for_lang();
+
+		$limit  = max( 1, min( 40, (int) $base_settings['max_events'] ) );
+		if ( class_exists( 'MW_Sales_Toast_Types' ) && MW_Sales_Toast_Types::any_enabled( $base_settings ) ) {
 			$limit = min( 40, $limit + 8 );
 		}
 		$events = MW_Sales_Toast_Cache::get_events();
 		// Pull a wider pool before catalog/PDP filters so includes still fill the limit.
 		$events = array_slice( $events, 0, max( $limit * 5, 50 ) );
 		if ( class_exists( 'MW_Sales_Toast_Frontend' ) ) {
-			$events = MW_Sales_Toast_Frontend::filter_events_for_display( $events, $settings );
+			$events = MW_Sales_Toast_Frontend::filter_events_for_display( $events, $base_settings );
+			$events = MW_Sales_Toast_Frontend::apply_lang_to_events( $events, $settings );
 		}
 
 		$product_id = absint( $request->get_param( 'product' ) );

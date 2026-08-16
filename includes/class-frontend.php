@@ -281,8 +281,18 @@ class MW_Sales_Toast_Frontend {
 	public static function filter_events_by_catalog( $events, $settings ) {
 		$inc_products = MW_Sales_Toast_Settings::normalize_id_list( $settings['include_products'] ?? array() );
 		$exc_products = MW_Sales_Toast_Settings::normalize_id_list( $settings['exclude_products'] ?? array() );
-		$inc_cats     = self::expand_category_ids( $settings['include_categories'] ?? array() );
-		$exc_cats     = self::expand_category_ids( $settings['exclude_categories'] ?? array() );
+		$inc_cats     = MW_Sales_Toast_Settings::normalize_id_list( $settings['include_categories'] ?? array() );
+		$exc_cats     = MW_Sales_Toast_Settings::normalize_id_list( $settings['exclude_categories'] ?? array() );
+
+		if ( class_exists( 'MW_Sales_Toast_Language' ) ) {
+			$inc_products = MW_Sales_Toast_Language::expand_post_ids( $inc_products );
+			$exc_products = MW_Sales_Toast_Language::expand_post_ids( $exc_products );
+			$inc_cats     = MW_Sales_Toast_Language::expand_term_ids( $inc_cats );
+			$exc_cats     = MW_Sales_Toast_Language::expand_term_ids( $exc_cats );
+		}
+
+		$inc_cats = self::expand_category_ids( $inc_cats );
+		$exc_cats = self::expand_category_ids( $exc_cats );
 
 		$has_include = ! empty( $inc_products ) || ! empty( $inc_cats );
 		if ( ! $has_include && empty( $exc_products ) && empty( $exc_cats ) ) {
@@ -416,6 +426,10 @@ class MW_Sales_Toast_Frontend {
 			return $events;
 		}
 
+		$match_ids = class_exists( 'MW_Sales_Toast_Language' )
+			? MW_Sales_Toast_Language::product_match_ids( $product_id )
+			: array( $product_id );
+
 		$filtered = array();
 		foreach ( (array) $events as $event ) {
 			$type = isset( $event['type'] ) ? (string) $event['type'] : 'sale';
@@ -424,7 +438,7 @@ class MW_Sales_Toast_Frontend {
 				continue;
 			}
 			$eid = isset( $event['productId'] ) ? (int) $event['productId'] : 0;
-			if ( $eid === $product_id ) {
+			if ( $eid > 0 && in_array( $eid, $match_ids, true ) ) {
 				$filtered[] = $event;
 			}
 		}
@@ -433,14 +447,88 @@ class MW_Sales_Toast_Frontend {
 	}
 
 	/**
+	 * Apply per-language merchant strings to cached events at delivery time.
+	 *
+	 * @param array                $events   Cached events.
+	 * @param array<string, mixed> $settings Language-aware settings (from get_for_lang).
+	 * @return array<int, array<string, mixed>>
+	 */
+	public static function apply_lang_to_events( $events, $settings ) {
+		$fallback = isset( $settings['fallback_name'] ) ? (string) $settings['fallback_name'] : 'Someone';
+		$hide     = ! empty( $settings['hide_names'] );
+		$style    = isset( $settings['when_style'] ) ? (string) $settings['when_style'] : 'natural';
+		$people   = class_exists( 'MW_Sales_Toast_Cache' )
+			? MW_Sales_Toast_Cache::parse_people( $settings['demo_people'] ?? '' )
+			: array();
+		$whens    = class_exists( 'MW_Sales_Toast_Cache' )
+			? MW_Sales_Toast_Cache::parse_whens( $settings['demo_whens'] ?? '', $style )
+			: array();
+
+		$cta = null;
+		if ( ! empty( $settings['type_cta'] ) && class_exists( 'MW_Sales_Toast_Types' ) ) {
+			$cta = MW_Sales_Toast_Types::cta_event( $settings );
+		}
+
+		$out = array();
+		foreach ( (array) $events as $event ) {
+			if ( ! is_array( $event ) ) {
+				continue;
+			}
+			$type = isset( $event['type'] ) ? (string) $event['type'] : 'sale';
+
+			if ( 'cta' === $type ) {
+				if ( $cta ) {
+					$out[] = $cta;
+				}
+				continue;
+			}
+
+			if ( $hide ) {
+				$event['name'] = $fallback;
+			} elseif ( ! empty( $event['demo'] ) && ! empty( $people ) && in_array( $type, array( 'sale', 'review' ), true ) ) {
+				$idx               = self::stable_index( (string) ( $event['id'] ?? '' ), count( $people ) );
+				$event['name']     = $people[ $idx ]['name'];
+				if ( 'sale' === $type ) {
+					$event['city'] = $people[ $idx ]['city'];
+				}
+			}
+
+			if ( ! empty( $event['demo'] ) && ! empty( $event['whenLiteral'] ) && ! empty( $whens ) && 'sale' === $type ) {
+				$widx          = self::stable_index( (string) ( $event['id'] ?? '' ) . ':when', count( $whens ) );
+				$event['when'] = $whens[ $widx ];
+			}
+
+			$out[] = $event;
+		}
+
+		return $out;
+	}
+
+	/**
+	 * Stable list index from a string seed.
+	 *
+	 * @param string $seed Seed.
+	 * @param int    $count List length.
+	 * @return int
+	 */
+	private static function stable_index( $seed, $count ) {
+		$count = max( 1, (int) $count );
+		return (int) ( sprintf( '%u', crc32( (string) $seed ) ) % $count );
+	}
+
+	/**
 	 * Enqueue script/style — settings + either REST fetch or inline events.
 	 */
 	public static function enqueue() {
-		$settings = MW_Sales_Toast_Settings::get();
+		$base_settings = MW_Sales_Toast_Settings::get();
 
-		if ( ! self::should_load( $settings ) ) {
+		if ( ! self::should_load( $base_settings ) ) {
 			return;
 		}
+
+		$settings = class_exists( 'MW_Sales_Toast_Settings' )
+			? MW_Sales_Toast_Settings::get_for_lang()
+			: $base_settings;
 
 		wp_enqueue_style(
 			'mw-sales-toast',
@@ -449,7 +537,7 @@ class MW_Sales_Toast_Frontend {
 			MW_SALES_TOAST_VERSION
 		);
 
-		$design_css = MW_Sales_Toast_Settings::design_css( $settings );
+		$design_css = MW_Sales_Toast_Settings::design_css( $base_settings );
 		if ( '' !== $design_css ) {
 			wp_add_inline_style( 'mw-sales-toast', $design_css );
 		}
@@ -470,12 +558,12 @@ class MW_Sales_Toast_Frontend {
 			true
 		);
 
-		$delivery   = ( 'inline' === ( $settings['event_delivery'] ?? '' ) ) ? 'inline' : 'rest';
-		$limit      = max( 1, min( 30, (int) $settings['max_events'] ) );
-		if ( class_exists( 'MW_Sales_Toast_Types' ) && MW_Sales_Toast_Types::any_enabled( $settings ) ) {
+		$delivery   = ( 'inline' === ( $base_settings['event_delivery'] ?? '' ) ) ? 'inline' : 'rest';
+		$limit      = max( 1, min( 30, (int) $base_settings['max_events'] ) );
+		if ( class_exists( 'MW_Sales_Toast_Types' ) && MW_Sales_Toast_Types::any_enabled( $base_settings ) ) {
 			$limit = min( 40, $limit + 8 );
 		}
-		$breakpoint = max( 320, min( 1200, (int) ( $settings['mobile_breakpoint'] ?? 768 ) ) );
+		$breakpoint = max( 320, min( 1200, (int) ( $base_settings['mobile_breakpoint'] ?? 768 ) ) );
 
 		$current_product_id = 0;
 		if ( function_exists( 'is_product' ) && is_product() ) {
@@ -487,29 +575,29 @@ class MW_Sales_Toast_Frontend {
 			'endpoint'             => '',
 			'nonce'                => '',
 			'events'               => array(),
-			'position'             => $settings['position'],
-			'delay'                => max( 1, (int) $settings['delay'] ) * 1000,
-			'duration'             => max( 2, (int) $settings['duration'] ) * 1000,
-			'gap'                  => max( 1, (int) $settings['gap'] ) * 1000,
-			'jitter'               => max( 0, min( 50, (int) ( $settings['jitter'] ?? 0 ) ) ),
-			'respectReducedMotion' => ! empty( $settings['respect_reduced_motion'] ),
-			'disableMobile'        => ! empty( $settings['disable_mobile'] ),
+			'position'             => $base_settings['position'],
+			'delay'                => max( 1, (int) $base_settings['delay'] ) * 1000,
+			'duration'             => max( 2, (int) $base_settings['duration'] ) * 1000,
+			'gap'                  => max( 1, (int) $base_settings['gap'] ) * 1000,
+			'jitter'               => max( 0, min( 50, (int) ( $base_settings['jitter'] ?? 0 ) ) ),
+			'respectReducedMotion' => ! empty( $base_settings['respect_reduced_motion'] ),
+			'disableMobile'        => ! empty( $base_settings['disable_mobile'] ),
 			'mobileBreakpoint'     => $breakpoint,
-			'soundEnabled'         => ! empty( $settings['sound_enabled'] ),
-			'pauseOnHover'         => ! empty( $settings['pause_on_hover'] ),
-			'imageFit'             => ( 'padded' === ( $settings['style_image_fit'] ?? '' ) ) ? 'padded' : 'full',
-			'maxPerSession'        => max( 1, (int) $settings['max_per_session'] ),
-			'muteHours'            => max( 0, (int) $settings['mute_hours'] ),
+			'soundEnabled'         => ! empty( $base_settings['sound_enabled'] ),
+			'pauseOnHover'         => ! empty( $base_settings['pause_on_hover'] ),
+			'imageFit'             => ( 'padded' === ( $base_settings['style_image_fit'] ?? '' ) ) ? 'padded' : 'full',
+			'maxPerSession'        => max( 1, (int) $base_settings['max_per_session'] ),
+			'muteHours'            => max( 0, (int) $base_settings['mute_hours'] ),
 			'messageTemplate'      => $settings['message_template'],
 			'viewingTemplate'      => (string) ( $settings['viewing_template'] ?? '' ),
 			'reviewTemplate'       => (string) ( $settings['review_template'] ?? '' ),
-			'ctaOnce'              => ! empty( $settings['cta_once'] ),
-			'viewingMode'          => ( 'live' === ( $settings['viewing_mode'] ?? '' ) ) ? 'live' : 'simulated',
+			'ctaOnce'              => ! empty( $base_settings['cta_once'] ),
+			'viewingMode'          => ( 'live' === ( $base_settings['viewing_mode'] ?? '' ) ) ? 'live' : 'simulated',
 			'presenceEndpoint'     => '',
-			'whenStyle'            => ( 'exact' === ( $settings['when_style'] ?? '' ) ) ? 'exact' : 'natural',
-			'matchProductPage'     => ! empty( $settings['match_product_page'] ),
+			'whenStyle'            => ( 'exact' === ( $base_settings['when_style'] ?? '' ) ) ? 'exact' : 'natural',
+			'matchProductPage'     => ! empty( $base_settings['match_product_page'] ),
 			'currentProductId'     => $current_product_id,
-			'triggers'             => MW_Sales_Toast_Settings::triggers_config( $settings ),
+			'triggers'             => MW_Sales_Toast_Settings::triggers_config( $base_settings ),
 			'analytics'            => false,
 			'refetchMs'            => 0,
 			'i18n'                 => array(
@@ -541,8 +629,9 @@ class MW_Sales_Toast_Frontend {
 		);
 
 		if ( 'inline' === $delivery ) {
-			$events           = array_slice( MW_Sales_Toast_Cache::get_events(), 0, max( $limit * 3, 30 ) );
-			$events           = self::filter_events_for_display( $events, $settings );
+			$events = array_slice( MW_Sales_Toast_Cache::get_events(), 0, max( $limit * 3, 30 ) );
+			$events = self::filter_events_for_display( $events, $base_settings );
+			$events = self::apply_lang_to_events( $events, $settings );
 			if ( $current_product_id && class_exists( 'MW_Sales_Toast_Types' ) ) {
 				$events = MW_Sales_Toast_Types::inject_current_viewing( $events, $settings, $current_product_id );
 			}
@@ -553,10 +642,10 @@ class MW_Sales_Toast_Frontend {
 		} else {
 			$config['endpoint']  = esc_url_raw( rest_url( 'mw-st/v1/notifications' ) );
 			$config['nonce']     = MW_Sales_Toast_REST::create_nonce();
-			$config['refetchMs'] = MW_Sales_Toast_Cache::cache_ttl_seconds( $settings ) * 1000;
+			$config['refetchMs'] = MW_Sales_Toast_Cache::cache_ttl_seconds( $base_settings ) * 1000;
 		}
 
-		if ( ! empty( $settings['type_viewing'] ) && 'live' === ( $settings['viewing_mode'] ?? '' ) && $current_product_id > 0 ) {
+		if ( ! empty( $base_settings['type_viewing'] ) && 'live' === ( $base_settings['viewing_mode'] ?? '' ) && $current_product_id > 0 ) {
 			$config['presenceEndpoint'] = esc_url_raw( rest_url( 'mw-st/v1/presence' ) );
 			if ( empty( $config['nonce'] ) ) {
 				$config['nonce'] = MW_Sales_Toast_REST::create_nonce();

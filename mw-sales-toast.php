@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Merchant Whisper
  * Description: Social proof for WooCommerce — recent purchases, viewing counts, reviews, and promo notices. Cached real orders, privacy controls, optional demo fill.
- * Version: 2.2.0
+ * Version: 2.2.1
  * Author: MWV3
  * Requires at least: 5.8
  * Requires PHP: 7.2
@@ -11,7 +11,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'MW_SALES_TOAST_VERSION', '2.2.0' );
+define( 'MW_SALES_TOAST_VERSION', '2.2.1' );
 define( 'MW_SALES_TOAST_NAME', 'Merchant Whisper' );
 define( 'MW_SALES_TOAST_FILE', __FILE__ );
 define( 'MW_SALES_TOAST_URL', plugin_dir_url( __FILE__ ) );
@@ -24,6 +24,7 @@ define( 'MW_SALES_TOAST_CONSENT_META', '_mw_st_allow_public' );
 define( 'MW_SALES_TOAST_CACHE_SCHEMA', 11 );
 
 require_once MW_SALES_TOAST_PATH . 'includes/class-settings.php';
+require_once MW_SALES_TOAST_PATH . 'includes/class-language.php';
 require_once MW_SALES_TOAST_PATH . 'includes/class-transfer.php';
 require_once MW_SALES_TOAST_PATH . 'includes/class-cache.php';
 require_once MW_SALES_TOAST_PATH . 'includes/class-types.php';
@@ -103,6 +104,9 @@ function mw_sales_toast_maybe_flush_cache_schema() {
 function mw_sales_toast_init() {
 	mw_sales_toast_maybe_flush_cache_schema();
 	MW_Sales_Toast_Settings::init();
+	if ( class_exists( 'MW_Sales_Toast_Language' ) ) {
+		MW_Sales_Toast_Language::init();
+	}
 	MW_Sales_Toast_Transfer::init();
 	MW_Sales_Toast_Cache::init();
 	MW_Sales_Toast_Types::init();

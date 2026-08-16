@@ -785,7 +785,7 @@
 
 .mwst-fold--card > summary.mwst-card__head::after {
 	position: absolute;
-	top: 26px;
+	top: 35px;
 	right: 22px;
 	margin: 0;
 }
@@ -838,6 +838,61 @@
 	gap: 6px;
 	margin-top: 8px;
 }
+
+.mwst-i18n-bar {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin: 10px 0 0;
+}
+
+.mwst-i18n-tab {
+	appearance: none;
+	border: 1px solid var(--mwst-border-strong);
+	background: var(--mwst-surface, #fff);
+	color: var(--mwst-text);
+	border-radius: 999px;
+	padding: 4px 12px;
+	font-size: 12px;
+	line-height: 1.4;
+	cursor: pointer;
+}
+
+.mwst-i18n-tab.is-active {
+	border-color: var(--mwst-accent);
+	background: var(--mwst-accent-soft);
+	color: var(--mwst-accent);
+	font-weight: 600;
+}
+
+.mwst-i18n-tab:disabled {
+	cursor: not-allowed;
+}
+
+.mwst-i18n-note {
+	margin: 0 0 14px !important;
+}
+
+.mwst-i18n-stack {
+	display: block;
+}
+
+.mwst-i18n-pane[hidden] {
+	display: none !important;
+}
+
+.mwst-admin.is-dark .mwst-i18n-tab {
+	background: var(--mwst-hover);
+	border-color: var(--mwst-border-strong);
+	color: var(--mwst-text);
+}
+
+.mwst-admin.is-dark .mwst-i18n-tab.is-active {
+	background: var(--mwst-accent-soft);
+	border-color: var(--mwst-accent);
+	color: var(--mwst-accent);
+}
+
 
 .mwst-token {
 	appearance: none;

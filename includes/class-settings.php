@@ -115,6 +115,8 @@ class MW_Sales_Toast_Settings {
 			'hide_roles'             => array(),
 			'demo_people'            => "Ana, Bucharest\nMarco, Milan\nSofia, Lisbon\nJonas, Berlin\nLéa, Paris\nNoah, Amsterdam\nElena, Madrid\nOmar, Cairo",
 			'demo_whens'             => "just now\na few minutes ago\na couple of hours ago\nearlier today\nyesterday\nrecently",
+			'i18n'                   => array(),
+			'i18n_enabled'           => 1,
 			'style_bg'               => '#0c1220',
 			'style_bg_opacity'       => 92,
 			'style_text'             => '#e8eef8',
@@ -147,6 +149,115 @@ class MW_Sales_Toast_Settings {
 		$s['max_events']      = $n;
 		$s['max_per_session'] = $n;
 		return $s;
+	}
+
+	/**
+	 * Merchant string keys that support per-language overrides.
+	 *
+	 * @return array<int, string>
+	 */
+	public static function string_i18n_keys() {
+		return array(
+			'message_template',
+			'viewing_template',
+			'review_template',
+			'fallback_name',
+			'cta_message',
+			'cta_button',
+			'demo_people',
+			'demo_whens',
+		);
+	}
+
+	/**
+	 * Normalize stored i18n map (known keys only, non-empty values).
+	 *
+	 * @param mixed $raw Raw i18n option.
+	 * @return array<string, array<string, string>>
+	 */
+	public static function normalize_i18n( $raw ) {
+		$out  = array();
+		$keys = self::string_i18n_keys();
+		if ( ! is_array( $raw ) ) {
+			return $out;
+		}
+
+		$textarea = array( 'demo_people', 'demo_whens' );
+
+		foreach ( $raw as $lang => $fields ) {
+			$slug = sanitize_key( (string) $lang );
+			if ( '' === $slug || ! is_array( $fields ) ) {
+				continue;
+			}
+			$row = array();
+			foreach ( $keys as $key ) {
+				if ( ! array_key_exists( $key, $fields ) ) {
+					continue;
+				}
+				$val = $fields[ $key ];
+				if ( ! is_string( $val ) && ! is_numeric( $val ) ) {
+					continue;
+				}
+				$val = in_array( $key, $textarea, true )
+					? sanitize_textarea_field( (string) $val )
+					: sanitize_text_field( (string) $val );
+				if ( 'demo_whens' === $key && class_exists( 'MW_Sales_Toast_Cache' ) ) {
+					$val = MW_Sales_Toast_Cache::migrate_demo_whens( $val );
+				}
+				if ( '' === trim( $val ) ) {
+					continue;
+				}
+				$row[ $key ] = $val;
+			}
+			if ( ! empty( $row ) ) {
+				$out[ $slug ] = $row;
+			}
+		}
+
+		return $out;
+	}
+
+	/**
+	 * Settings with per-language string overrides applied.
+	 *
+	 * @param string|null $lang Language slug; null = current; empty = base only.
+	 * @return array<string, mixed>
+	 */
+	public static function get_for_lang( $lang = null ) {
+		$settings = self::get();
+		if ( null === $lang && class_exists( 'MW_Sales_Toast_Language' ) ) {
+			$lang = MW_Sales_Toast_Language::current_lang();
+		}
+		$lang = is_string( $lang ) ? sanitize_key( $lang ) : '';
+		if ( '' === $lang || empty( $settings['i18n_enabled'] ) ) {
+			return $settings;
+		}
+
+		$default = class_exists( 'MW_Sales_Toast_Language' )
+			? MW_Sales_Toast_Language::default_lang()
+			: '';
+		if ( $default && $lang === $default ) {
+			return $settings;
+		}
+
+		$i18n = isset( $settings['i18n'] ) && is_array( $settings['i18n'] ) ? $settings['i18n'] : array();
+		$row  = ( isset( $i18n[ $lang ] ) && is_array( $i18n[ $lang ] ) ) ? $i18n[ $lang ] : array();
+
+		foreach ( self::string_i18n_keys() as $key ) {
+			if ( ! empty( $row[ $key ] ) ) {
+				$settings[ $key ] = $row[ $key ];
+				continue;
+			}
+			if ( class_exists( 'MW_Sales_Toast_Language' ) ) {
+				$settings[ $key ] = MW_Sales_Toast_Language::translate_string(
+					(string) ( $settings[ $key ] ?? '' ),
+					$lang,
+					$key
+				);
+			}
+		}
+
+		return $settings;
 	}
 
 	/**
@@ -1132,6 +1243,9 @@ class MW_Sales_Toast_Settings {
 			$merged['source'] = 'demo';
 		}
 
+		$merged['i18n']         = self::normalize_i18n( $merged['i18n'] ?? array() );
+		$merged['i18n_enabled'] = empty( $merged['i18n_enabled'] ) ? 0 : 1;
+
 		return self::sync_visit_caps( $merged );
 	}
 
@@ -1223,6 +1337,15 @@ class MW_Sales_Toast_Settings {
 
 		// Disabled inputs are omitted from POST — keep previously saved values.
 		$saved_opts = get_option( MW_SALES_TOAST_OPTION, array() );
+
+		$multilingual = class_exists( 'MW_Sales_Toast_Language' ) && MW_Sales_Toast_Language::is_multilingual();
+		if ( $multilingual ) {
+			$out['i18n_enabled'] = empty( $input['i18n_enabled'] ) ? 0 : 1;
+		} elseif ( is_array( $saved_opts ) && array_key_exists( 'i18n_enabled', $saved_opts ) ) {
+			$out['i18n_enabled'] = empty( $saved_opts['i18n_enabled'] ) ? 0 : 1;
+		} else {
+			$out['i18n_enabled'] = 1;
+		}
 
 		$attr_allowed = array( 15, 30, 60, 120 );
 		if ( array_key_exists( 'analytics_attr_minutes', $input ) ) {
@@ -1412,6 +1535,8 @@ class MW_Sales_Toast_Settings {
 		if ( class_exists( 'MW_Sales_Toast_Cache' ) ) {
 			$out['demo_whens'] = MW_Sales_Toast_Cache::migrate_demo_whens( $out['demo_whens'] );
 		}
+
+		$out['i18n'] = self::normalize_i18n( $input['i18n'] ?? array() );
 
 		$out['style_bg']             = self::sanitize_hex( $input['style_bg'] ?? '', $defaults['style_bg'] );
 		$out['style_bg_opacity']     = max( 0, min( 100, (int) ( $input['style_bg_opacity'] ?? $defaults['style_bg_opacity'] ) ) );
@@ -1707,6 +1832,13 @@ class MW_Sales_Toast_Settings {
 						: '',
 				),
 				'optionName'     => MW_SALES_TOAST_OPTION,
+				'languages'      => class_exists( 'MW_Sales_Toast_Language' ) && MW_Sales_Toast_Language::is_multilingual()
+					? array(
+						'provider' => MW_Sales_Toast_Language::provider(),
+						'default'  => MW_Sales_Toast_Language::default_lang(),
+						'list'     => MW_Sales_Toast_Language::languages(),
+					)
+					: null,
 				'previewSamples' => self::preview_samples(),
 				'i18n'           => array(
 					/* translators: %s: relative time */
@@ -1782,6 +1914,211 @@ class MW_Sales_Toast_Settings {
 	 */
 	private static function picker_value( $value, $default ) {
 		return self::sanitize_hex( $value, $default );
+	}
+
+	/**
+	 * Whether a multilingual plugin with 2+ languages is available.
+	 *
+	 * @return bool
+	 */
+	private static function i18n_ui_enabled() {
+		return class_exists( 'MW_Sales_Toast_Language' ) && MW_Sales_Toast_Language::is_multilingual();
+	}
+
+	/**
+	 * Whether per-language toast copy is on (plugin + setting).
+	 *
+	 * @param array<string, mixed>|null $s Settings snapshot.
+	 * @return bool
+	 */
+	private static function i18n_copy_enabled( $s = null ) {
+		if ( ! self::i18n_ui_enabled() ) {
+			return false;
+		}
+		if ( ! is_array( $s ) ) {
+			$s = self::get();
+		}
+		return ! empty( $s['i18n_enabled'] );
+	}
+
+	/**
+	 * Override value for a language/key (empty = inherit).
+	 *
+	 * @param array  $s    Settings.
+	 * @param string $lang Lang slug.
+	 * @param string $key  Setting key.
+	 * @return string
+	 */
+	private static function i18n_override_value( $s, $lang, $key ) {
+		$i18n = isset( $s['i18n'] ) && is_array( $s['i18n'] ) ? $s['i18n'] : array();
+		if ( empty( $i18n[ $lang ][ $key ] ) ) {
+			return '';
+		}
+		return (string) $i18n[ $lang ][ $key ];
+	}
+
+	/**
+	 * Languages card: real toggle when a multilingual plugin is active.
+	 *
+	 * @param string               $opt Option name.
+	 * @param array<string, mixed> $s   Settings.
+	 */
+	private static function render_i18n_bar( $opt, $s ) {
+		$available = self::i18n_ui_enabled();
+		$copy_on   = self::i18n_copy_enabled( $s );
+		$plugin    = $available ? MW_Sales_Toast_Language::provider_label() : '';
+		$langs     = $available ? MW_Sales_Toast_Language::languages() : array();
+		$default   = $available ? MW_Sales_Toast_Language::default_lang() : '';
+		$toggle    = __( 'Write a different message for each language', 'mw-sales-toast' );
+		?>
+		<details class="mwst-card mwst-fold mwst-fold--card" id="mwst-card-languages">
+			<summary class="mwst-card__head">
+				<h2><?php echo self::dashicon_html( 'dashicons-translation' ); ?><?php esc_html_e( 'Languages', 'mw-sales-toast' ); ?></h2>
+				<p><?php esc_html_e( 'Show a different toast on each language of your shop.', 'mw-sales-toast' ); ?></p>
+			</summary>
+			<div class="mwst-card__body">
+				<div class="mwst-field" id="mwst-i18n-field"<?php echo $available ? '' : ' data-disabled="1"'; ?>>
+					<div class="mwst-field__label"><?php esc_html_e( 'Translations', 'mw-sales-toast' ); ?></div>
+					<div class="mwst-field__control">
+						<?php if ( $available ) : ?>
+							<?php self::toggle( $opt, 'i18n_enabled', $s, 'mwst-i18n-enabled', $toggle ); ?>
+							<p class="description">
+								<?php
+								printf(
+									/* translators: %s: plugin name, e.g. Polylang */
+									esc_html__( 'Using %s.', 'mw-sales-toast' ),
+									esc_html( $plugin )
+								);
+								echo ' ';
+								esc_html_e( 'Turn this on, pick a language, then edit the text in the cards above. Turn it off to use the same text everywhere.', 'mw-sales-toast' );
+								if ( 'polylang' === MW_Sales_Toast_Language::provider() ) {
+									echo ' ';
+									printf(
+										/* translators: %s: Polylang string group name */
+										esc_html__( 'You can also find them in Languages → Translations, group “%s”.', 'mw-sales-toast' ),
+										esc_html( MW_Sales_Toast_Language::string_group() )
+									);
+								} elseif ( 'wpml' === MW_Sales_Toast_Language::provider() ) {
+									echo ' ';
+									printf(
+										/* translators: %s: WPML string context name */
+										esc_html__( 'You can also find them in WPML → String Translation, context “%s”.', 'mw-sales-toast' ),
+										esc_html( MW_Sales_Toast_Language::string_group() )
+									);
+								}
+								?>
+							</p>
+							<div id="mwst-i18n-tools"<?php echo $copy_on ? '' : ' hidden'; ?>>
+								<div
+									class="mwst-i18n-bar"
+									id="mwst-i18n-bar"
+									role="tablist"
+									aria-label="<?php esc_attr_e( 'Language', 'mw-sales-toast' ); ?>"
+								>
+									<?php foreach ( $langs as $lang ) : ?>
+										<?php
+										$slug   = $lang['slug'];
+										$active = ( $slug === $default );
+										?>
+										<button
+											type="button"
+											class="mwst-i18n-tab<?php echo $active ? ' is-active' : ''; ?>"
+											role="tab"
+											aria-selected="<?php echo $active ? 'true' : 'false'; ?>"
+											data-lang="<?php echo esc_attr( $slug ); ?>"
+										><?php echo esc_html( $lang['name'] ); ?></button>
+									<?php endforeach; ?>
+								</div>
+								<p class="description mwst-i18n-note"><?php esc_html_e( 'If you leave a language blank, it uses your default text.', 'mw-sales-toast' ); ?></p>
+							</div>
+						<?php else : ?>
+							<label class="mwst-toggle is-disabled">
+								<input type="checkbox" disabled />
+								<span class="mwst-toggle__track" aria-hidden="true"></span>
+								<span class="mwst-toggle__text"><?php echo esc_html( $toggle ); ?></span>
+							</label>
+							<p class="description"><?php esc_html_e( 'Add a language plugin first (Polylang, WPML, or TranslatePress).', 'mw-sales-toast' ); ?></p>
+						<?php endif; ?>
+					</div>
+				</div>
+			</div>
+		</details>
+		<?php
+	}
+
+	/**
+	 * Open an i18n field stack (default-language pane).
+	 */
+	private static function i18n_stack_open() {
+		if ( ! self::i18n_ui_enabled() ) {
+			return;
+		}
+		$default = MW_Sales_Toast_Language::default_lang();
+		echo '<div class="mwst-i18n-stack">';
+		echo '<div class="mwst-i18n-pane is-active" data-lang="' . esc_attr( $default ) . '">';
+	}
+
+	/**
+	 * Close default pane and print override panes for other languages.
+	 *
+	 * @param string               $opt  Option name.
+	 * @param array<string, mixed> $s    Settings.
+	 * @param string               $key  Setting key.
+	 * @param array<string, mixed> $args type (text|textarea), class, rows.
+	 */
+	private static function i18n_stack_overrides( $opt, $s, $key, $args = array() ) {
+		if ( ! self::i18n_ui_enabled() ) {
+			return;
+		}
+		echo '</div>';
+
+		$type    = isset( $args['type'] ) && 'textarea' === $args['type'] ? 'textarea' : 'text';
+		$class   = isset( $args['class'] ) ? (string) $args['class'] : 'large-text';
+		$rows    = isset( $args['rows'] ) ? max( 2, (int) $args['rows'] ) : 4;
+		$default = MW_Sales_Toast_Language::default_lang();
+		$langs   = MW_Sales_Toast_Language::languages();
+
+		foreach ( $langs as $lang ) {
+			$slug = $lang['slug'];
+			if ( $slug === $default ) {
+				continue;
+			}
+			$val  = self::i18n_override_value( $s, $slug, $key );
+			$name = $opt . '[i18n][' . $slug . '][' . $key . ']';
+			$id   = 'mwst-i18n-' . $slug . '-' . $key;
+			echo '<div class="mwst-i18n-pane" data-lang="' . esc_attr( $slug ) . '" hidden>';
+			if ( 'textarea' === $type ) {
+				printf(
+					'<textarea id="%1$s" name="%2$s" rows="%3$d" class="%4$s" placeholder="%5$s">%6$s</textarea>',
+					esc_attr( $id ),
+					esc_attr( $name ),
+					(int) $rows,
+					esc_attr( $class ),
+					esc_attr__( 'Same as default', 'mw-sales-toast' ),
+					esc_textarea( $val )
+				);
+			} else {
+				printf(
+					'<input id="%1$s" type="text" class="%2$s" name="%3$s" value="%4$s" placeholder="%5$s" />',
+					esc_attr( $id ),
+					esc_attr( $class ),
+					esc_attr( $name ),
+					esc_attr( $val ),
+					esc_attr__( 'Same as default', 'mw-sales-toast' )
+				);
+			}
+			echo '</div>';
+		}
+	}
+
+	/**
+	 * Close i18n field stack.
+	 */
+	private static function i18n_stack_close() {
+		if ( ! self::i18n_ui_enabled() ) {
+			return;
+		}
+		echo '</div>';
 	}
 
 	/**
@@ -2051,12 +2388,18 @@ class MW_Sales_Toast_Settings {
 			: __( 'Not scheduled', 'mw-sales-toast' );
 
 		$wc_active = class_exists( 'WooCommerce' );
+		$lang_plugin = '';
+		if ( class_exists( 'MW_Sales_Toast_Language' ) ) {
+			$lang_plugin = MW_Sales_Toast_Language::provider_label();
+		}
 
 		return array(
 			'events'    => $count,
 			'ttl'       => $ttl,
 			'wc'        => $wc_active ? __( 'Active', 'mw-sales-toast' ) : __( 'Not detected', 'mw-sales-toast' ),
 			'wc_active' => $wc_active,
+			'lang'      => $lang_plugin ? $lang_plugin : __( 'Not detected', 'mw-sales-toast' ),
+			'lang_ok'   => '' !== $lang_plugin,
 			'cron'      => $cron_label,
 			'source'    => $s['source'],
 		);
@@ -2394,6 +2737,14 @@ class MW_Sales_Toast_Settings {
 							<dd>
 								<span class="mwst-header__status <?php echo ! empty( $status['wc_active'] ) ? 'is-ok' : 'is-bad'; ?>">
 									<?php echo esc_html( $status['wc'] ); ?>
+								</span>
+							</dd>
+						</div>
+						<div class="mwst-header__metric">
+							<dt><?php esc_html_e( 'Languages', 'mw-sales-toast' ); ?></dt>
+							<dd>
+								<span class="mwst-header__status <?php echo ! empty( $status['lang_ok'] ) ? 'is-ok' : 'is-bad'; ?>">
+									<?php echo esc_html( $status['lang'] ); ?>
 								</span>
 							</dd>
 						</div>
@@ -2846,7 +3197,12 @@ class MW_Sales_Toast_Settings {
 									<div class="mwst-field">
 										<div class="mwst-field__label"><label for="mwst-template"><?php esc_html_e( 'Template', 'mw-sales-toast' ); ?></label></div>
 										<div class="mwst-field__control">
+											<?php self::i18n_stack_open(); ?>
 											<input id="mwst-template" type="text" class="large-text" name="<?php echo esc_attr( $opt ); ?>[message_template]" value="<?php echo esc_attr( $s['message_template'] ); ?>" />
+											<?php
+											self::i18n_stack_overrides( $opt, $s, 'message_template', array( 'type' => 'text', 'class' => 'large-text' ) );
+											self::i18n_stack_close();
+											?>
 											<div class="mwst-tokens" aria-label="<?php esc_attr_e( 'Insert placeholder', 'mw-sales-toast' ); ?>">
 												<button type="button" class="mwst-token" data-token="{name}" data-target="mwst-template">{name}</button>
 												<button type="button" class="mwst-token" data-token="{city}" data-target="mwst-template">{city}</button>
@@ -2860,7 +3216,12 @@ class MW_Sales_Toast_Settings {
 									<div class="mwst-field">
 										<div class="mwst-field__label"><label for="mwst-fallback"><?php esc_html_e( 'Fallback name', 'mw-sales-toast' ); ?></label></div>
 										<div class="mwst-field__control">
+											<?php self::i18n_stack_open(); ?>
 											<input id="mwst-fallback" type="text" class="regular-text" name="<?php echo esc_attr( $opt ); ?>[fallback_name]" value="<?php echo esc_attr( $s['fallback_name'] ); ?>" />
+											<?php
+											self::i18n_stack_overrides( $opt, $s, 'fallback_name', array( 'type' => 'text', 'class' => 'regular-text' ) );
+											self::i18n_stack_close();
+											?>
 											<p class="description"><?php esc_html_e( 'Used when a name is missing, or when “Hide names” is on.', 'mw-sales-toast' ); ?></p>
 										</div>
 									</div>
@@ -2899,14 +3260,24 @@ class MW_Sales_Toast_Settings {
 											<div class="mwst-field">
 												<div class="mwst-field__label"><label for="mwst-people"><?php esc_html_e( 'Demo people', 'mw-sales-toast' ); ?></label></div>
 												<div class="mwst-field__control">
+													<?php self::i18n_stack_open(); ?>
 													<textarea id="mwst-people" name="<?php echo esc_attr( $opt ); ?>[demo_people]" rows="6" class="large-text code"><?php echo esc_textarea( $s['demo_people'] ); ?></textarea>
+													<?php
+													self::i18n_stack_overrides( $opt, $s, 'demo_people', array( 'type' => 'textarea', 'class' => 'large-text code', 'rows' => 6 ) );
+													self::i18n_stack_close();
+													?>
 													<p class="description"><?php esc_html_e( 'One per line: Name, City', 'mw-sales-toast' ); ?></p>
 												</div>
 											</div>
 											<div class="mwst-field">
 												<div class="mwst-field__label"><label for="mwst-whens"><?php esc_html_e( 'Demo times', 'mw-sales-toast' ); ?></label></div>
 												<div class="mwst-field__control">
+													<?php self::i18n_stack_open(); ?>
 													<textarea id="mwst-whens" name="<?php echo esc_attr( $opt ); ?>[demo_whens]" rows="4" class="large-text code"><?php echo esc_textarea( $s['demo_whens'] ); ?></textarea>
+													<?php
+													self::i18n_stack_overrides( $opt, $s, 'demo_whens', array( 'type' => 'textarea', 'class' => 'large-text code', 'rows' => 4 ) );
+													self::i18n_stack_close();
+													?>
 													<p class="description"><?php esc_html_e( 'One per line, shown as-is (e.g. “just now”). No automatic “ago” is added.', 'mw-sales-toast' ); ?></p>
 												</div>
 											</div>
@@ -2924,7 +3295,12 @@ class MW_Sales_Toast_Settings {
 									<div class="mwst-field">
 										<div class="mwst-field__label"><label for="mwst-viewing-template"><?php esc_html_e( 'Template', 'mw-sales-toast' ); ?></label></div>
 										<div class="mwst-field__control">
+											<?php self::i18n_stack_open(); ?>
 											<input id="mwst-viewing-template" type="text" class="large-text" name="<?php echo esc_attr( $opt ); ?>[viewing_template]" value="<?php echo esc_attr( (string) $s['viewing_template'] ); ?>" />
+											<?php
+											self::i18n_stack_overrides( $opt, $s, 'viewing_template', array( 'type' => 'text', 'class' => 'large-text' ) );
+											self::i18n_stack_close();
+											?>
 											<div class="mwst-tokens">
 												<button type="button" class="mwst-token" data-token="{count}" data-target="mwst-viewing-template">{count}</button>
 												<button type="button" class="mwst-token" data-token="{people}" data-target="mwst-viewing-template">{people}</button>
@@ -2989,7 +3365,12 @@ class MW_Sales_Toast_Settings {
 									<div class="mwst-field">
 										<div class="mwst-field__label"><label for="mwst-review-template"><?php esc_html_e( 'Template', 'mw-sales-toast' ); ?></label></div>
 										<div class="mwst-field__control">
+											<?php self::i18n_stack_open(); ?>
 											<input id="mwst-review-template" type="text" class="large-text" name="<?php echo esc_attr( $opt ); ?>[review_template]" value="<?php echo esc_attr( (string) $s['review_template'] ); ?>" />
+											<?php
+											self::i18n_stack_overrides( $opt, $s, 'review_template', array( 'type' => 'text', 'class' => 'large-text' ) );
+											self::i18n_stack_close();
+											?>
 											<div class="mwst-tokens">
 												<button type="button" class="mwst-token" data-token="{name}" data-target="mwst-review-template">{name}</button>
 												<button type="button" class="mwst-token" data-token="{rating}" data-target="mwst-review-template">{rating}</button>
@@ -3037,7 +3418,12 @@ class MW_Sales_Toast_Settings {
 									<div class="mwst-field">
 										<div class="mwst-field__label"><label for="mwst-cta-message"><?php esc_html_e( 'Message', 'mw-sales-toast' ); ?></label></div>
 										<div class="mwst-field__control">
+											<?php self::i18n_stack_open(); ?>
 											<input id="mwst-cta-message" type="text" class="large-text" name="<?php echo esc_attr( $opt ); ?>[cta_message]" value="<?php echo esc_attr( (string) $s['cta_message'] ); ?>" />
+											<?php
+											self::i18n_stack_overrides( $opt, $s, 'cta_message', array( 'type' => 'text', 'class' => 'large-text' ) );
+											self::i18n_stack_close();
+											?>
 											<p class="description"><?php esc_html_e( 'Shown as the toast line. Use {coupon} to insert the code in the text.', 'mw-sales-toast' ); ?></p>
 										</div>
 									</div>
@@ -3050,7 +3436,12 @@ class MW_Sales_Toast_Settings {
 									<div class="mwst-field">
 										<div class="mwst-field__label"><label for="mwst-cta-button"><?php esc_html_e( 'Button label', 'mw-sales-toast' ); ?></label></div>
 										<div class="mwst-field__control">
+											<?php self::i18n_stack_open(); ?>
 											<input id="mwst-cta-button" type="text" class="regular-text" name="<?php echo esc_attr( $opt ); ?>[cta_button]" value="<?php echo esc_attr( (string) $s['cta_button'] ); ?>" />
+											<?php
+											self::i18n_stack_overrides( $opt, $s, 'cta_button', array( 'type' => 'text', 'class' => 'regular-text' ) );
+											self::i18n_stack_close();
+											?>
 										</div>
 									</div>
 									<div class="mwst-field">
@@ -3068,6 +3459,8 @@ class MW_Sales_Toast_Settings {
 									</div>
 								</div>
 							</details>
+
+							<?php self::render_i18n_bar( $opt, $s ); ?>
 
 							<details class="mwst-card mwst-fold mwst-fold--card" id="mwst-card-privacy">
 								<summary class="mwst-card__head">

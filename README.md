@@ -1,6 +1,6 @@
 # Merchant Whisper
 
-**Version 2.2.0** — Social proof for WooCommerce: cached real orders, privacy controls, and optional demo fill.
+**Version 2.2.1** — Social proof for WooCommerce: cached real orders, privacy controls, and optional demo fill.
 
 Requires WordPress 5.8+, PHP 7.2+. WooCommerce is required for real orders; demo mode can run without it.
 
@@ -37,6 +37,7 @@ Requires WordPress 5.8+, PHP 7.2+. WooCommerce is required for real orders; demo
 ### Message & session controls
 - Message template with `{name}`, `{city}`, `{product}`
 - Fallback name
+- **Multilingual** — optional per-language toast copy (templates, CTA, demo lists) when Polylang, WPML, or TranslatePress is active; product/category ID mapping for Polylang & WPML. Admin UI still uses WordPress `.po` / gettext
 - Toasts per visit (`sessionStorage`, no repeats)
 - Mute after dismiss via `localStorage` (hours; `0` = dismiss current only)
 - Optional disable below 768px viewport width
@@ -229,6 +230,9 @@ Terms people may use in **WordPress Admin → Plugins → Add New** or Google:
 5. fomo
 
 ## Changelog
+
+### 2.2.1
+- Multilingual toast copy for Polylang, WPML, and TranslatePress; product/category ID mapping for Polylang & WPML
 
 ### 2.2.0
 - Extra toast types: viewing now, product reviews, and CTA/coupon
