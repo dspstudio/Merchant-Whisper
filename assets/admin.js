@@ -166,6 +166,7 @@
 	var supportSubmit = root.querySelector('#mwst-support-submit');
 	var supportCfg = cfg.support || {};
 	var cacheCfg = cfg.cache || {};
+	var slackCfg = cfg.slack || {};
 	var saveHintDefault = saveHint ? saveHint.textContent : '';
 	var optionPrefix = cfg.optionName || 'mw_sales_toast_settings';
 	var saveDirty = false;
@@ -2420,6 +2421,71 @@
 				.finally(function () {
 					cacheRebuildBtn.disabled = false;
 					cacheRebuildBtn.textContent = i18n.cacheRebuild || 'Rebuild cache';
+				});
+		});
+	}
+
+	var slackTestBtn = root.querySelector('#mwst-slack-test');
+	var slackTestStatus = root.querySelector('#mwst-slack-test-status');
+	var slackWebhookInput = root.querySelector('#mwst-slack-webhook');
+	if (slackTestBtn) {
+		slackTestBtn.addEventListener('click', function () {
+			if (!slackCfg.ajaxUrl) {
+				return;
+			}
+			slackTestBtn.disabled = true;
+			slackTestBtn.textContent = i18n.slackTesting || 'Sending…';
+			if (slackTestStatus) {
+				slackTestStatus.classList.remove('is-ok', 'is-error');
+				slackTestStatus.textContent = i18n.slackTesting || 'Sending…';
+			}
+
+			var body = new window.FormData();
+			body.append('action', slackCfg.action || 'mw_st_slack_test');
+			body.append('nonce', slackCfg.nonce || '');
+			body.append('webhook', slackWebhookInput ? slackWebhookInput.value : '');
+
+			window
+				.fetch(slackCfg.ajaxUrl, {
+					method: 'POST',
+					credentials: 'same-origin',
+					body: body
+				})
+				.then(function (res) {
+					return res.json().then(function (data) {
+						return { ok: res.ok, data: data };
+					});
+				})
+				.then(function (result) {
+					var payload = result.data || {};
+					var inner = payload.data || {};
+					var msg =
+						inner.message ||
+						payload.message ||
+						i18n.slackTestError ||
+						'Could not send the Slack test. Please try again.';
+					if (slackTestStatus) {
+						if (payload.success) {
+							slackTestStatus.classList.add('is-ok');
+							slackTestStatus.classList.remove('is-error');
+						} else {
+							slackTestStatus.classList.add('is-error');
+							slackTestStatus.classList.remove('is-ok');
+						}
+						slackTestStatus.textContent = msg;
+					}
+				})
+				.catch(function () {
+					if (slackTestStatus) {
+						slackTestStatus.classList.add('is-error');
+						slackTestStatus.classList.remove('is-ok');
+						slackTestStatus.textContent =
+							i18n.slackTestError || 'Could not send the Slack test. Please try again.';
+					}
+				})
+				.finally(function () {
+					slackTestBtn.disabled = false;
+					slackTestBtn.textContent = i18n.slackTest || 'Send test';
 				});
 		});
 	}

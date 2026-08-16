@@ -60,7 +60,7 @@ class MW_Sales_Toast_Transfer {
 	 * @return array<int, string>
 	 */
 	public static function skip_keys() {
-		return array( 'newsletter' );
+		return array( 'newsletter', 'slack_webhook' );
 	}
 
 	/**

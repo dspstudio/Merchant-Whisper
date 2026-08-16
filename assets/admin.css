@@ -609,6 +609,7 @@
 
 .mwst-field input[type="text"]:not(.select2-search__field),
 .mwst-field input[type="number"],
+.mwst-field input[type="password"],
 .mwst-field select:not(.select2-hidden-accessible),
 .mwst-field textarea {
 	border-radius: 6px;
@@ -618,6 +619,7 @@
 
 .mwst-field input[type="text"]:not(.select2-search__field):focus,
 .mwst-field input[type="number"]:focus,
+.mwst-field input[type="password"]:focus,
 .mwst-field select:not(.select2-hidden-accessible):focus,
 .mwst-field textarea:focus {
 	border-color: var(--mwst-accent);
@@ -3047,6 +3049,7 @@ body.mwst-settings-dark #wpbody-content {
 .mwst-admin.is-dark input[type="search"],
 .mwst-admin.is-dark input[type="url"],
 .mwst-admin.is-dark input[type="email"],
+.mwst-admin.is-dark input[type="password"],
 .mwst-admin.is-dark select,
 .mwst-admin.is-dark textarea {
 	background: var(--mwst-input-bg);

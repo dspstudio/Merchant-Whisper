@@ -96,6 +96,8 @@ class MW_Sales_Toast_Settings {
 			'mobile_breakpoint'      => 768,
 			'sound_enabled'          => 0,
 			'newsletter'             => 0,
+			'slack_webhook'          => '',
+			'slack_digest'           => 'off',
 			'analytics_enabled'      => 1,
 			'analytics_attr_minutes' => 30,
 			'when_style'             => 'natural',
@@ -1465,11 +1467,24 @@ class MW_Sales_Toast_Settings {
 		$out['match_product_page'] = empty( $input['match_product_page'] ) ? 0 : 1;
 		$out['hide_roles']         = self::sanitize_role_list( $input['hide_roles'] ?? array() );
 
+		$digest_modes = array( 'off', 'weekly' );
+		$out['slack_digest'] = in_array( $input['slack_digest'] ?? '', $digest_modes, true )
+			? $input['slack_digest']
+			: $defaults['slack_digest'];
+		if ( class_exists( 'MW_Sales_Toast_Slack' ) ) {
+			$out['slack_webhook'] = MW_Sales_Toast_Slack::sanitize_webhook( $input['slack_webhook'] ?? '' );
+		} else {
+			$out['slack_webhook'] = '';
+		}
+
 		// Rebuild cache + reschedule cron so admin status and front end reflect the new settings immediately.
 		delete_transient( MW_SALES_TOAST_TRANSIENT );
 		if ( class_exists( 'MW_Sales_Toast_Cache' ) ) {
 			MW_Sales_Toast_Cache::rebuild( $out );
 			MW_Sales_Toast_Cache::reschedule_cron( $out );
+		}
+		if ( class_exists( 'MW_Sales_Toast_Slack' ) ) {
+			MW_Sales_Toast_Slack::ensure_cron( $out );
 		}
 
 		return $out;
@@ -1670,6 +1685,11 @@ class MW_Sales_Toast_Settings {
 					'nonce'   => wp_create_nonce( 'mw_st_rebuild_cache' ),
 					'action'  => 'mw_st_rebuild_cache',
 				),
+				'slack'          => array(
+					'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+					'nonce'   => wp_create_nonce( 'mw_st_slack_test' ),
+					'action'  => 'mw_st_slack_test',
+				),
 				'analytics'      => class_exists( 'MW_Sales_Toast_Analytics' )
 					? MW_Sales_Toast_Analytics::dashboard_payload()
 					: null,
@@ -1745,6 +1765,9 @@ class MW_Sales_Toast_Settings {
 					'cacheRebuild'     => __( 'Rebuild cache', 'mw-sales-toast' ),
 					'cacheRebuilding'  => __( 'Rebuilding cache…', 'mw-sales-toast' ),
 					'cacheRebuildError' => __( 'Could not rebuild the cache. Please try again.', 'mw-sales-toast' ),
+					'slackTest'        => __( 'Send test', 'mw-sales-toast' ),
+					'slackTesting'     => __( 'Sending…', 'mw-sales-toast' ),
+					'slackTestError'   => __( 'Could not send the Slack test. Please try again.', 'mw-sales-toast' ),
 				),
 			)
 		);
@@ -4125,6 +4148,7 @@ class MW_Sales_Toast_Settings {
 										<li><?php esc_html_e( 'Counts only: impressions, auto-hides, dismissals, mutes, skips, clicks, toast type, source, page kind, trigger, click target, dwell averages, soft-attributed carts/orders, and order totals as revenue.', 'mw-sales-toast' ); ?></li>
 										<li><?php esc_html_e( 'Product IDs only — never customer names, emails, IPs, or page URLs.', 'mw-sales-toast' ); ?></li>
 										<li><?php esc_html_e( 'No cross-site tracking pixels; daily totals stay in a table on your WordPress site (90 days).', 'mw-sales-toast' ); ?></li>
+										<li><?php esc_html_e( 'Optional Slack Incoming Webhook (Account tab) may send aggregate digests over HTTPS to Slack when you save a webhook — never customer names, cities, or the webhook URL in support system info.', 'mw-sales-toast' ); ?></li>
 										<li><?php esc_html_e( 'You can turn collection off or reset totals from this tab. Export is a CSV of aggregates only.', 'mw-sales-toast' ); ?></li>
 									</ul>
 								</div>
@@ -4375,6 +4399,20 @@ class MW_Sales_Toast_Settings {
 											</div>
 										</details>
 										<details class="mwst-faq__item">
+											<summary><?php esc_html_e( 'How does the Slack digest work?', 'mw-sales-toast' ); ?></summary>
+											<div class="mwst-faq__answer">
+												<p>
+													<?php
+													printf(
+														/* translators: %s: Account tab link */
+														esc_html__( 'On %s you can paste a Slack Incoming Webhook URL and turn on a weekly digest (Mondays, UTC). It posts last-7-day impressions, clicks, CTR, attributed carts/orders, and revenue — aggregates only. Toast delivery stays on your site; Slack is contacted only when a webhook is saved and a digest or test runs. Statistics collection must be on.', 'mw-sales-toast' ),
+														self::tab_link( 'account', __( 'Account', 'mw-sales-toast' ) )
+													);
+													?>
+												</p>
+											</div>
+										</details>
+										<details class="mwst-faq__item">
 											<summary><?php esc_html_e( 'Still stuck — how do I get help?', 'mw-sales-toast' ); ?></summary>
 											<div class="mwst-faq__answer">
 												<p>
@@ -4459,7 +4497,7 @@ class MW_Sales_Toast_Settings {
 													<?php
 													printf(
 														/* translators: %s: Account tab link */
-														esc_html__( '%s — profile, newsletter, and settings import/export.', 'mw-sales-toast' ),
+														esc_html__( '%s — profile, newsletter, optional Slack digest webhook, and settings import/export.', 'mw-sales-toast' ),
 														self::tab_link( 'account', __( 'Account', 'mw-sales-toast' ) )
 													);
 													?>
@@ -4754,10 +4792,64 @@ class MW_Sales_Toast_Settings {
 								</div>
 							</div>
 
+							<div class="mwst-card" id="mwst-account-slack">
+								<div class="mwst-card__head">
+									<h2><?php esc_html_e( 'Slack', 'mw-sales-toast' ); ?></h2>
+									<p><?php esc_html_e( 'Optional weekly stats digest via an Incoming Webhook. Off by default.', 'mw-sales-toast' ); ?></p>
+								</div>
+								<div class="mwst-card__body">
+									<div class="mwst-field">
+										<div class="mwst-field__label"><label for="mwst-slack-webhook"><?php esc_html_e( 'Webhook URL', 'mw-sales-toast' ); ?></label></div>
+										<div class="mwst-field__control">
+											<input
+												type="password"
+												id="mwst-slack-webhook"
+												name="<?php echo esc_attr( $opt ); ?>[slack_webhook]"
+												class="large-text code"
+												value="<?php echo esc_attr( (string) ( $s['slack_webhook'] ?? '' ) ); ?>"
+												autocomplete="off"
+												spellcheck="false"
+												placeholder="https://hooks.slack.com/services/…"
+											/>
+											<p class="description">
+												<?php
+												printf(
+													/* translators: %s: Slack Incoming Webhooks docs URL */
+													esc_html__( 'Create a Slack app, enable Incoming Webhooks, add the webhook to a channel, then paste the URL here. %s', 'mw-sales-toast' ),
+													'<a href="https://api.slack.com/messaging/webhooks" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Slack docs', 'mw-sales-toast' ) . '</a>'
+												);
+												?>
+											</p>
+										</div>
+									</div>
+									<div class="mwst-field">
+										<div class="mwst-field__label"><label for="mwst-slack-digest"><?php esc_html_e( 'Digest', 'mw-sales-toast' ); ?></label></div>
+										<div class="mwst-field__control">
+											<?php $slack_digest = isset( $s['slack_digest'] ) ? (string) $s['slack_digest'] : 'off'; ?>
+											<select id="mwst-slack-digest" name="<?php echo esc_attr( $opt ); ?>[slack_digest]">
+												<option value="off" <?php selected( $slack_digest, 'off' ); ?>><?php esc_html_e( 'Off', 'mw-sales-toast' ); ?></option>
+												<option value="weekly" <?php selected( $slack_digest, 'weekly' ); ?>><?php esc_html_e( 'Weekly (Mondays, UTC)', 'mw-sales-toast' ); ?></option>
+											</select>
+											<p class="description"><?php esc_html_e( 'Sends last-7-day impressions, clicks, CTR, attributed carts/orders, and revenue. Needs Statistics collection on. Aggregates only — no customer data.', 'mw-sales-toast' ); ?></p>
+										</div>
+									</div>
+									<div class="mwst-field">
+										<div class="mwst-field__label"><?php esc_html_e( 'Test', 'mw-sales-toast' ); ?></div>
+										<div class="mwst-field__control">
+											<div class="mwst-cache-actions">
+												<button type="button" class="button" id="mwst-slack-test"><?php esc_html_e( 'Send test', 'mw-sales-toast' ); ?></button>
+												<p class="description mwst-cache-rebuild-status" id="mwst-slack-test-status" role="status" aria-live="polite"></p>
+											</div>
+											<p class="description"><?php esc_html_e( 'Uses the URL in the field above (save to keep it). Rate-limited to once per minute.', 'mw-sales-toast' ); ?></p>
+										</div>
+									</div>
+								</div>
+							</div>
+
 							<div class="mwst-card" id="mwst-account-transfer">
 								<div class="mwst-card__head">
 									<h2><?php esc_html_e( 'Import / export', 'mw-sales-toast' ); ?></h2>
-									<p><?php esc_html_e( 'Move all settings between sites. Newsletter preference stays on this WordPress user.', 'mw-sales-toast' ); ?></p>
+									<p><?php esc_html_e( 'Move all settings between sites. Newsletter preference and Slack webhook stay on this site.', 'mw-sales-toast' ); ?></p>
 								</div>
 								<div class="mwst-card__body">
 									<?php

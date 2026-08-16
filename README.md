@@ -92,9 +92,10 @@ Requires WordPress 5.8+, PHP 7.2+. WooCommerce is required for real orders; demo
 - Completion funnel, skip reasons, dwell averages, per-product table, CSV export
 - Collection toggle and 15/30/60/120-minute attribution window (coupon clicks do not attribute)
 - Counts and product IDs only — no names, emails, IPs, or URLs
+- **Slack digest (optional)** — Incoming Webhook on Account; weekly Monday UTC aggregates (impressions, clicks, CTR, attributed carts/orders/revenue). Off by default; webhook is site-local and skipped on settings import
 
 ### Import / export
-- Full settings JSON on Account (newsletter stays local)
+- Full settings JSON on Account (newsletter and Slack webhook stay local)
 - Product/category IDs are per-site — review targeting after import
 
 ## Architecture
@@ -138,6 +139,7 @@ Visitor JS ──► GET mw-st/v1/notifications ──────┘──► t
 | Custom CSS | Extra toast chrome overrides |
 | Theme JSON | Export/import design tokens + custom CSS |
 | Statistics | Toast engagement aggregates |
+| Slack webhook / digest | Optional weekly stats to Slack (Account; off by default) |
 | Import / export | Full settings JSON (Account tab) |
 
 ## How checkout consent works
@@ -173,6 +175,7 @@ mw-sales-toast/
     ├── class-analytics.php     Toast engagement aggregates
     ├── class-privacy.php       Checkout consent meta
     ├── class-support.php       Admin contact form
+    ├── class-slack.php         Optional Slack Incoming Webhook digest
     └── class-frontend.php      Enqueue + page gates
 ```
 

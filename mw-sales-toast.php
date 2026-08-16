@@ -32,6 +32,7 @@ require_once MW_SALES_TOAST_PATH . 'includes/class-analytics.php';
 require_once MW_SALES_TOAST_PATH . 'includes/class-privacy.php';
 require_once MW_SALES_TOAST_PATH . 'includes/class-frontend.php';
 require_once MW_SALES_TOAST_PATH . 'includes/class-support.php';
+require_once MW_SALES_TOAST_PATH . 'includes/class-slack.php';
 
 /**
  * Add custom cron interval from settings.
@@ -67,6 +68,9 @@ function mw_sales_toast_activate() {
 	if ( class_exists( 'MW_Sales_Toast_Analytics' ) ) {
 		MW_Sales_Toast_Analytics::maybe_install();
 	}
+	if ( class_exists( 'MW_Sales_Toast_Slack' ) ) {
+		MW_Sales_Toast_Slack::ensure_cron();
+	}
 }
 register_activation_hook( __FILE__, 'mw_sales_toast_activate' );
 
@@ -75,6 +79,9 @@ register_activation_hook( __FILE__, 'mw_sales_toast_activate' );
  */
 function mw_sales_toast_deactivate() {
 	MW_Sales_Toast_Cache::clear_cron();
+	if ( class_exists( 'MW_Sales_Toast_Slack' ) ) {
+		MW_Sales_Toast_Slack::clear_cron();
+	}
 }
 register_deactivation_hook( __FILE__, 'mw_sales_toast_deactivate' );
 
@@ -104,5 +111,6 @@ function mw_sales_toast_init() {
 	MW_Sales_Toast_Privacy::init();
 	MW_Sales_Toast_Frontend::init();
 	MW_Sales_Toast_Support::init();
+	MW_Sales_Toast_Slack::init();
 }
 add_action( 'plugins_loaded', 'mw_sales_toast_init' );
