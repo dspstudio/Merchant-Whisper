@@ -378,7 +378,7 @@
 	}
 
 	function setSavingState(on) {
-		if (!saveBar || saveBar.classList.contains('is-nonsave-tab')) {
+		if (!saveBar) {
 			return;
 		}
 		saveBar.classList.toggle('is-saving', !!on);
@@ -415,7 +415,7 @@
 		}
 	}
 
-	/** Enter in inputs/selects submits Save settings (not in textareas or Support/Account). */
+	/** Enter in inputs/selects submits Save settings (not in textareas). */
 	if (settingsForm) {
 		settingsForm.addEventListener('submit', function () {
 			saveLeaving = true;
@@ -461,9 +461,6 @@
 			if (event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) {
 				return;
 			}
-			if (saveBar && saveBar.classList.contains('is-nonsave-tab')) {
-				return;
-			}
 			if (saveBar && saveBar.classList.contains('is-saving')) {
 				event.preventDefault();
 				return;
@@ -471,6 +468,11 @@
 
 			var target = event.target;
 			if (!target || !settingsForm.contains(target)) {
+				return;
+			}
+
+			if (target.closest && target.closest('#mwst-support')) {
+				event.preventDefault();
 				return;
 			}
 
@@ -660,12 +662,6 @@
 		panels.forEach(function (panel) {
 			panel.classList.toggle('is-active', panel.id === 'mwst-panel-' + id);
 		});
-		if (saveBar) {
-			saveBar.classList.toggle(
-				'is-nonsave-tab',
-				id === 'statistics' || id === 'support'
-			);
-		}
 		syncTabUrl(id);
 		if (id === 'design' && cssCodeMirror) {
 			window.setTimeout(function () {
@@ -2428,9 +2424,43 @@
 	var slackTestBtn = root.querySelector('#mwst-slack-test');
 	var slackTestStatus = root.querySelector('#mwst-slack-test-status');
 	var slackWebhookInput = root.querySelector('#mwst-slack-webhook');
+
+	function setSlackTestStatus(msg, ok) {
+		if (!slackTestStatus) {
+			return;
+		}
+		slackTestStatus.classList.toggle('is-ok', !!ok);
+		slackTestStatus.classList.toggle('is-error', !ok);
+		slackTestStatus.textContent = '';
+		var text = String(msg || '');
+		var re = /HTTP \d{3}|No HTTP response/g;
+		var last = 0;
+		var match;
+		while ((match = re.exec(text))) {
+			if (match.index > last) {
+				slackTestStatus.appendChild(document.createTextNode(text.slice(last, match.index)));
+			}
+			var badge = document.createElement('span');
+			var digits = match[0].match(/\d{3}/);
+			var cls = 'mwst-http-code';
+			if (digits) {
+				cls += ' is-' + String(digits[0]).charAt(0) + 'xx';
+			} else {
+				cls += ' is-0xx';
+			}
+			badge.className = cls;
+			badge.textContent = match[0];
+			slackTestStatus.appendChild(badge);
+			last = match.index + match[0].length;
+		}
+		if (last < text.length) {
+			slackTestStatus.appendChild(document.createTextNode(text.slice(last)));
+		}
+	}
+
 	if (slackTestBtn) {
 		slackTestBtn.addEventListener('click', function () {
-			if (!slackCfg.ajaxUrl) {
+			if (!slackCfg.ajaxUrl || analyticsUi.enabled === false) {
 				return;
 			}
 			slackTestBtn.disabled = true;
@@ -2452,7 +2482,20 @@
 					body: body
 				})
 				.then(function (res) {
-					return res.json().then(function (data) {
+					return res.text().then(function (text) {
+						var data = {};
+						try {
+							data = text ? JSON.parse(text) : {};
+						} catch (err) {
+							data = {
+								success: false,
+								data: {
+									message:
+										i18n.slackTestError ||
+										'Could not send the webhook test. Please try again.'
+								}
+							};
+						}
 						return { ok: res.ok, data: data };
 					});
 				})
@@ -2463,28 +2506,19 @@
 						inner.message ||
 						payload.message ||
 						i18n.slackTestError ||
-						'Could not send the Slack test. Please try again.';
+						'Could not send the webhook test. Please try again.';
 					if (slackTestStatus) {
-						if (payload.success) {
-							slackTestStatus.classList.add('is-ok');
-							slackTestStatus.classList.remove('is-error');
-						} else {
-							slackTestStatus.classList.add('is-error');
-							slackTestStatus.classList.remove('is-ok');
-						}
-						slackTestStatus.textContent = msg;
+						setSlackTestStatus(msg, !!payload.success);
 					}
 				})
 				.catch(function () {
-					if (slackTestStatus) {
-						slackTestStatus.classList.add('is-error');
-						slackTestStatus.classList.remove('is-ok');
-						slackTestStatus.textContent =
-							i18n.slackTestError || 'Could not send the Slack test. Please try again.';
-					}
+					setSlackTestStatus(
+						i18n.slackTestError || 'Could not send the webhook test. Please try again.',
+						false
+					);
 				})
 				.finally(function () {
-					slackTestBtn.disabled = false;
+					slackTestBtn.disabled = analyticsUi.enabled === false;
 					slackTestBtn.textContent = i18n.slackTest || 'Send test';
 				});
 		});
@@ -3477,6 +3511,58 @@
 		el.classList.toggle('is-error', !ok && !!msg);
 	}
 
+	function setGatedField(el, on) {
+		if (!el) {
+			return;
+		}
+		el.classList.toggle('is-disabled', !on);
+		if (on) {
+			el.removeAttribute('data-disabled');
+		} else {
+			el.setAttribute('data-disabled', '1');
+		}
+	}
+
+	function syncKeep(live, keep, on) {
+		if (!live || !keep) {
+			return;
+		}
+		keep.value = live.value;
+		live.disabled = !on;
+		keep.disabled = !!on;
+	}
+
+	function syncWebhookForAnalytics(on) {
+		var card = root.querySelector('#mwst-account-slack');
+		var notice = root.querySelector('#mwst-webhook-stats-off');
+		if (card) {
+			if (on) {
+				card.removeAttribute('data-disabled');
+			} else {
+				card.setAttribute('data-disabled', '1');
+			}
+		}
+		if (notice) {
+			notice.hidden = !!on;
+		}
+		root.querySelectorAll('.mwst-webhook-gated').forEach(function (field) {
+			setGatedField(field, on);
+		});
+		syncKeep(
+			root.querySelector('#mwst-slack-webhook'),
+			root.querySelector('#mwst-slack-webhook-keep'),
+			on
+		);
+		syncKeep(
+			root.querySelector('#mwst-slack-digest'),
+			root.querySelector('#mwst-slack-digest-keep'),
+			on
+		);
+		if (slackTestBtn) {
+			slackTestBtn.disabled = !on;
+		}
+	}
+
 	function setAnalyticsEnabledUi(on) {
 		var disabled = root.querySelector('#mwst-stats-disabled');
 		if (disabled) {
@@ -3487,6 +3573,7 @@
 			box.checked = !!on;
 		}
 		analyticsUi.enabled = !!on;
+		syncWebhookForAnalytics(!!on);
 	}
 
 	root.querySelectorAll('.mwst-stats-range').forEach(function (group) {
@@ -3763,6 +3850,20 @@
 	}
 	setAnalyticsEnabledUi(analyticsUi.enabled !== false);
 
+	root.querySelectorAll('.mwst-transfer__export-link').forEach(function (link) {
+		var base = link.getAttribute('data-mwst-export-base');
+		var withCatalog = link.getAttribute('data-mwst-export-catalog');
+		var box = root.querySelector('.mwst-transfer__catalog-export');
+		if (!base || !withCatalog || !box) {
+			return;
+		}
+		function syncExportHref() {
+			link.href = box.checked ? withCatalog : base;
+		}
+		box.addEventListener('change', syncExportHref);
+		syncExportHref();
+	});
+
 	root.querySelectorAll('.mwst-transfer__submit').forEach(function (btn) {
 		var fileId = btn.getAttribute('data-mwst-file') || '';
 		var formId = btn.getAttribute('data-mwst-form') || '';
@@ -3796,7 +3897,11 @@
 				if (!file.value) {
 					return;
 				}
+				var catalogBox = root.querySelector('.mwst-transfer__catalog-import');
 				var msg = btn.getAttribute('data-mwst-confirm') || '';
+				if (catalogBox && catalogBox.checked) {
+					msg = btn.getAttribute('data-mwst-confirm-catalog') || msg;
+				}
 				if (msg && !window.confirm(msg)) {
 					file.value = '';
 					return;

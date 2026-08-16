@@ -55,6 +55,23 @@ class MW_Sales_Toast_Transfer {
 	}
 
 	/**
+	 * Keys that are catalog / URL targeting (wrong on another store).
+	 *
+	 * @return array<int, string>
+	 */
+	public static function catalog_keys() {
+		return array(
+			'include_products',
+			'exclude_products',
+			'include_categories',
+			'exclude_categories',
+			'viewing_products',
+			'url_include',
+			'url_exclude',
+		);
+	}
+
+	/**
 	 * Keys never written from an import (site / account specific).
 	 *
 	 * @return array<int, string>
@@ -66,19 +83,21 @@ class MW_Sales_Toast_Transfer {
 	/**
 	 * Download URL for a pack.
 	 *
-	 * @param string $kind settings|theme.
+	 * @param string $kind            settings|theme.
+	 * @param bool   $include_catalog Include product/category/URL targeting.
 	 * @return string
 	 */
-	public static function export_url( $kind ) {
+	public static function export_url( $kind, $include_catalog = false ) {
 		$kind = ( 'theme' === $kind ) ? 'theme' : 'settings';
+		$args = array(
+			'action' => 'mw_st_export',
+			'kind'   => $kind,
+		);
+		if ( 'settings' === $kind && $include_catalog ) {
+			$args['catalog'] = '1';
+		}
 		return wp_nonce_url(
-			add_query_arg(
-				array(
-					'action' => 'mw_st_export',
-					'kind'   => $kind,
-				),
-				admin_url( 'admin-post.php' )
-			),
+			add_query_arg( $args, admin_url( 'admin-post.php' ) ),
 			self::NONCE,
 			'mw_st_transfer_nonce'
 		);
@@ -115,9 +134,10 @@ class MW_Sales_Toast_Transfer {
 		}
 		check_admin_referer( self::NONCE, 'mw_st_transfer_nonce' );
 
-		$kind    = isset( $_GET['kind'] ) ? sanitize_key( wp_unslash( $_GET['kind'] ) ) : 'settings';
-		$kind    = ( 'theme' === $kind ) ? 'theme' : 'settings';
-		$payload = self::build_payload( $kind );
+		$kind            = isset( $_GET['kind'] ) ? sanitize_key( wp_unslash( $_GET['kind'] ) ) : 'settings';
+		$kind            = ( 'theme' === $kind ) ? 'theme' : 'settings';
+		$include_catalog = ( 'settings' === $kind ) && ! empty( $_GET['catalog'] );
+		$payload         = self::build_payload( $kind, $include_catalog );
 		$json    = wp_json_encode( $payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
 		if ( ! is_string( $json ) || '' === $json ) {
 			wp_die( esc_html__( 'Could not build the export file.', 'mw-sales-toast' ) );
@@ -195,7 +215,7 @@ class MW_Sales_Toast_Transfer {
 			exit;
 		}
 
-		$ok = self::apply_payload( $decoded, $type );
+		$ok = self::apply_payload( $decoded, $type, ! empty( $_POST['mwst_import_catalog'] ) );
 		if ( ! $ok ) {
 			wp_safe_redirect( self::settings_url( $tab, 'error' ) );
 			exit;
@@ -208,12 +228,14 @@ class MW_Sales_Toast_Transfer {
 	/**
 	 * Build a portable JSON document.
 	 *
-	 * @param string $kind settings|theme.
+	 * @param string $kind            settings|theme.
+	 * @param bool   $include_catalog Include catalog/URL targeting in settings packs.
 	 * @return array<string, mixed>
 	 */
-	public static function build_payload( $kind ) {
-		$settings = class_exists( 'MW_Sales_Toast_Settings' ) ? MW_Sales_Toast_Settings::get() : array();
-		$data     = array();
+	public static function build_payload( $kind, $include_catalog = false ) {
+		$settings        = class_exists( 'MW_Sales_Toast_Settings' ) ? MW_Sales_Toast_Settings::get() : array();
+		$data            = array();
+		$include_catalog = (bool) $include_catalog;
 
 		if ( 'theme' === $kind ) {
 			foreach ( self::theme_keys() as $key ) {
@@ -221,10 +243,15 @@ class MW_Sales_Toast_Transfer {
 					$data[ $key ] = $settings[ $key ];
 				}
 			}
+			$include_catalog = false;
 		} else {
-			$skip = array_fill_keys( self::skip_keys(), true );
+			$skip    = array_fill_keys( self::skip_keys(), true );
+			$catalog = array_fill_keys( self::catalog_keys(), true );
 			foreach ( $settings as $key => $value ) {
 				if ( isset( $skip[ $key ] ) ) {
+					continue;
+				}
+				if ( ! $include_catalog && isset( $catalog[ $key ] ) ) {
 					continue;
 				}
 				$data[ $key ] = $value;
@@ -239,13 +266,18 @@ class MW_Sales_Toast_Transfer {
 		 */
 		$data = apply_filters( 'mw_sales_toast_export_data', $data, $kind );
 
-		return array(
+		$doc = array(
 			'plugin'     => 'mw-sales-toast',
 			'type'       => $kind,
 			'version'    => defined( 'MW_SALES_TOAST_VERSION' ) ? MW_SALES_TOAST_VERSION : '',
 			'exportedAt' => gmdate( 'c' ),
 			'data'       => $data,
 		);
+		if ( 'settings' === $kind ) {
+			$doc['includesCatalog'] = $include_catalog;
+		}
+
+		return $doc;
 	}
 
 	/**
@@ -271,11 +303,12 @@ class MW_Sales_Toast_Transfer {
 	/**
 	 * Merge payload into saved options (via Settings::sanitize).
 	 *
-	 * @param array  $decoded Full document.
-	 * @param string $type    settings|theme.
+	 * @param array  $decoded       Full document.
+	 * @param string $type          settings|theme.
+	 * @param bool   $apply_catalog Apply product/category/URL targeting from the file.
 	 * @return bool
 	 */
-	public static function apply_payload( $decoded, $type ) {
+	public static function apply_payload( $decoded, $type, $apply_catalog = false ) {
 		$data = isset( $decoded['data'] ) && is_array( $decoded['data'] ) ? $decoded['data'] : array();
 		if ( ! $data ) {
 			return false;
@@ -283,6 +316,7 @@ class MW_Sales_Toast_Transfer {
 
 		$current = MW_Sales_Toast_Settings::get();
 		$skip    = array_fill_keys( self::skip_keys(), true );
+		$catalog = array_fill_keys( self::catalog_keys(), true );
 
 		if ( 'theme' === $type ) {
 			$merged = $current;
@@ -296,6 +330,9 @@ class MW_Sales_Toast_Transfer {
 			$merged = $current;
 			foreach ( $data as $key => $value ) {
 				if ( isset( $skip[ $key ] ) ) {
+					continue;
+				}
+				if ( isset( $catalog[ $key ] ) && ! $apply_catalog ) {
 					continue;
 				}
 				$merged[ $key ] = $value;
@@ -357,37 +394,62 @@ class MW_Sales_Toast_Transfer {
 			: __( 'Import settings', 'mw-sales-toast' );
 		$confirm  = ( 'theme' === $kind )
 			? __( 'Replace the current toast design with this theme file?', 'mw-sales-toast' )
-			: __( 'Replace the current Merchant Whisper settings with this file? Product and category IDs are site-specific.', 'mw-sales-toast' );
+			: __( 'Replace messages, timing, and other settings? This store’s product, category, and URL targeting will be kept.', 'mw-sales-toast' );
+		$confirm_catalog = __( 'Replace settings including product, category, and URL targeting from the file? Those IDs only match the store they were exported from.', 'mw-sales-toast' );
 		?>
 		<div class="mwst-transfer">
-			<p class="mwst-transfer__export">
-				<a class="button" href="<?php echo esc_url( self::export_url( $kind ) ); ?>">
-					<?php echo esc_html( $label ); ?>
-				</a>
-			</p>
-			<div class="mwst-transfer__import">
-				<label class="screen-reader-text" for="<?php echo esc_attr( $file_id ); ?>">
-					<?php echo esc_html( $import ); ?>
+			<?php if ( 'settings' === $kind ) : ?>
+				<label class="mwst-transfer__opt">
+					<input type="checkbox" id="mwst-export-catalog" class="mwst-transfer__catalog-export" />
+					<span><?php esc_html_e( 'Include product, category, and URL targeting in the export', 'mw-sales-toast' ); ?></span>
 				</label>
-				<input
-					type="file"
-					id="<?php echo esc_attr( $file_id ); ?>"
-					name="mwst_file"
-					form="<?php echo esc_attr( $form_id ); ?>"
-					accept=".json,application/json"
-					class="mwst-transfer__file"
-					tabindex="-1"
-				/>
-				<button
-					type="button"
-					class="button button-secondary mwst-transfer__submit"
-					data-mwst-form="<?php echo esc_attr( $form_id ); ?>"
-					data-mwst-file="<?php echo esc_attr( $file_id ); ?>"
-					data-mwst-confirm="<?php echo esc_attr( $confirm ); ?>"
-				>
-					<?php echo esc_html( $import ); ?>
-				</button>
-				<span class="mwst-transfer__spinner" hidden aria-hidden="true"></span>
+				<label class="mwst-transfer__opt">
+					<input
+						type="checkbox"
+						id="mwst-import-catalog"
+						name="mwst_import_catalog"
+						value="1"
+						form="<?php echo esc_attr( $form_id ); ?>"
+						class="mwst-transfer__catalog-import"
+					/>
+					<span><?php esc_html_e( 'On import, apply that targeting from the file', 'mw-sales-toast' ); ?></span>
+				</label>
+			<?php endif; ?>
+			<div class="mwst-transfer__actions">
+				<p class="mwst-transfer__export">
+					<a
+						class="button mwst-transfer__export-link"
+						href="<?php echo esc_url( self::export_url( $kind, false ) ); ?>"
+						<?php echo ( 'settings' === $kind ) ? ' data-mwst-export-base="' . esc_url( self::export_url( $kind, false ) ) . '" data-mwst-export-catalog="' . esc_url( self::export_url( $kind, true ) ) . '"' : ''; ?>
+					>
+						<?php echo esc_html( $label ); ?>
+					</a>
+				</p>
+				<div class="mwst-transfer__import">
+					<label class="screen-reader-text" for="<?php echo esc_attr( $file_id ); ?>">
+						<?php echo esc_html( $import ); ?>
+					</label>
+					<input
+						type="file"
+						id="<?php echo esc_attr( $file_id ); ?>"
+						name="mwst_file"
+						form="<?php echo esc_attr( $form_id ); ?>"
+						accept=".json,application/json"
+						class="mwst-transfer__file"
+						tabindex="-1"
+					/>
+					<button
+						type="button"
+						class="button button-secondary mwst-transfer__submit"
+						data-mwst-form="<?php echo esc_attr( $form_id ); ?>"
+						data-mwst-file="<?php echo esc_attr( $file_id ); ?>"
+						data-mwst-confirm="<?php echo esc_attr( $confirm ); ?>"
+						<?php echo ( 'settings' === $kind ) ? ' data-mwst-confirm-catalog="' . esc_attr( $confirm_catalog ) . '"' : ''; ?>
+					>
+						<?php echo esc_html( $import ); ?>
+					</button>
+					<span class="mwst-transfer__spinner" hidden aria-hidden="true"></span>
+				</div>
 			</div>
 		</div>
 		<?php

@@ -1245,6 +1245,11 @@ class MW_Sales_Toast_Settings {
 
 		$merged['i18n']         = self::normalize_i18n( $merged['i18n'] ?? array() );
 		$merged['i18n_enabled'] = empty( $merged['i18n_enabled'] ) ? 0 : 1;
+		if ( class_exists( 'MW_Sales_Toast_Slack' ) ) {
+			$merged['slack_digest'] = MW_Sales_Toast_Slack::normalize_digest_mode( $merged['slack_digest'] ?? 'off' );
+		} elseif ( 'weekly' === ( $merged['slack_digest'] ?? '' ) ) {
+			$merged['slack_digest'] = '7days';
+		}
 
 		return self::sync_visit_caps( $merged );
 	}
@@ -1592,9 +1597,13 @@ class MW_Sales_Toast_Settings {
 		$out['match_product_page'] = empty( $input['match_product_page'] ) ? 0 : 1;
 		$out['hide_roles']         = self::sanitize_role_list( $input['hide_roles'] ?? array() );
 
-		$digest_modes = array( 'off', 'weekly' );
-		$out['slack_digest'] = in_array( $input['slack_digest'] ?? '', $digest_modes, true )
-			? $input['slack_digest']
+		$digest_modes = array( 'off', 'daily', '3days', '7days', '2weeks', 'monthly' );
+		$digest_in    = isset( $input['slack_digest'] ) ? (string) $input['slack_digest'] : 'off';
+		if ( 'weekly' === $digest_in ) {
+			$digest_in = '7days';
+		}
+		$out['slack_digest'] = in_array( $digest_in, $digest_modes, true )
+			? $digest_in
 			: $defaults['slack_digest'];
 		if ( class_exists( 'MW_Sales_Toast_Slack' ) ) {
 			$out['slack_webhook'] = MW_Sales_Toast_Slack::sanitize_webhook( $input['slack_webhook'] ?? '' );
@@ -1899,7 +1908,7 @@ class MW_Sales_Toast_Settings {
 					'cacheRebuildError' => __( 'Could not rebuild the cache. Please try again.', 'mw-sales-toast' ),
 					'slackTest'        => __( 'Send test', 'mw-sales-toast' ),
 					'slackTesting'     => __( 'Sending…', 'mw-sales-toast' ),
-					'slackTestError'   => __( 'Could not send the Slack test. Please try again.', 'mw-sales-toast' ),
+					'slackTestError'   => __( 'Could not send the webhook test. Please try again.', 'mw-sales-toast' ),
 				),
 			)
 		);
@@ -2532,13 +2541,21 @@ class MW_Sales_Toast_Settings {
 	 *
 	 * @param string $tab   Tab id (general, message, design, timing, statistics, support, account).
 	 * @param string $label Link text.
+	 * @param string $hash  Optional in-page target, e.g. #mwst-stats-collection.
 	 * @return string Safe HTML anchor.
 	 */
-	private static function tab_link( $tab, $label ) {
-		$tab = sanitize_key( $tab );
+	private static function tab_link( $tab, $label, $hash = '' ) {
+		$tab  = sanitize_key( $tab );
+		$hash = is_string( $hash ) ? $hash : '';
+		if ( '' !== $hash && '#' !== substr( $hash, 0, 1 ) ) {
+			$hash = '#' . $hash;
+		}
+		if ( '' !== $hash && ! preg_match( '/^#mwst-[a-z0-9-]+$/', $hash ) ) {
+			$hash = '';
+		}
 		return sprintf(
 			'<a href="%1$s" class="mwst-tab-link" data-tab="%2$s">%3$s</a>',
-			esc_url( add_query_arg( 'tab', $tab ) ),
+			'' !== $hash ? esc_url( $hash ) : esc_url( add_query_arg( 'tab', $tab ) ),
 			esc_attr( $tab ),
 			esc_html( $label )
 		);
@@ -2641,7 +2658,6 @@ class MW_Sales_Toast_Settings {
 		if ( ! in_array( $current_tab, $allowed_tabs, true ) ) {
 			$current_tab = 'general';
 		}
-		$nonsave_tabs = array( 'statistics', 'support' );
 
 		$source_labels = array(
 			'real_orders'    => __( 'Real orders only', 'mw-sales-toast' ),
@@ -4087,7 +4103,15 @@ class MW_Sales_Toast_Settings {
 								<span class="mwst-notice__icon" aria-hidden="true">!</span>
 								<div class="mwst-notice__body">
 									<strong><?php esc_html_e( 'Collection is off', 'mw-sales-toast' ); ?></strong>
-									<p><?php esc_html_e( 'Existing totals stay on this tab. New storefront events are not recorded until you turn collection back on below.', 'mw-sales-toast' ); ?></p>
+									<p>
+										<?php
+										printf(
+											/* translators: %s: Collection section link */
+											esc_html__( 'Existing totals stay on this tab. New storefront events are not recorded until you turn collection back on in %s.', 'mw-sales-toast' ),
+											self::tab_link( 'statistics', __( 'Collection', 'mw-sales-toast' ), '#mwst-stats-collection' )
+										);
+										?>
+									</p>
 								</div>
 							</div>
 
@@ -4487,10 +4511,10 @@ class MW_Sales_Toast_Settings {
 							<details class="mwst-card mwst-fold mwst-fold--card" id="mwst-stats-collection" open>
 								<summary class="mwst-card__head">
 									<h2><?php echo self::dashicon_html( 'dashicons-cloud' ); ?><?php esc_html_e( 'Collection', 'mw-sales-toast' ); ?></h2>
-									<p><?php esc_html_e( 'Control recording and clear stored totals. This tab is not saved with the main settings bar.', 'mw-sales-toast' ); ?></p>
+									<p><?php esc_html_e( 'Record events and attribution save immediately. Reset clears stored totals. Other plugin settings still use Save settings below.', 'mw-sales-toast' ); ?></p>
 								</summary>
 								<div class="mwst-card__body">
-									<div class="mwst-field">
+									<div class="mwst-field" id="mwst-stats-record">
 										<div class="mwst-field__label"><?php esc_html_e( 'Record events', 'mw-sales-toast' ); ?></div>
 										<div class="mwst-field__control">
 											<?php self::toggle( $opt, 'analytics_enabled', $s, 'mwst-analytics-enabled', __( 'Collect toast impressions, clicks, and skip reasons', 'mw-sales-toast' ) ); ?>
@@ -4541,7 +4565,7 @@ class MW_Sales_Toast_Settings {
 										<li><?php esc_html_e( 'Counts only: impressions, auto-hides, dismissals, mutes, skips, clicks, toast type, source, page kind, trigger, click target, dwell averages, soft-attributed carts/orders, and order totals as revenue.', 'mw-sales-toast' ); ?></li>
 										<li><?php esc_html_e( 'Product IDs only — never customer names, emails, IPs, or page URLs.', 'mw-sales-toast' ); ?></li>
 										<li><?php esc_html_e( 'No cross-site tracking pixels; daily totals stay in a table on your WordPress site (90 days).', 'mw-sales-toast' ); ?></li>
-										<li><?php esc_html_e( 'Optional Slack Incoming Webhook (Account tab) may send aggregate digests over HTTPS to Slack when you save a webhook — never customer names, cities, or the webhook URL in support system info.', 'mw-sales-toast' ); ?></li>
+										<li><?php esc_html_e( 'Optional HTTPS webhook (Account tab) may send aggregate digests when you save a URL — never customer names, cities, or the webhook URL in support system info. Slack Incoming Webhooks are the usual example.', 'mw-sales-toast' ); ?></li>
 										<li><?php esc_html_e( 'You can turn collection off or reset totals from this tab. Export is a CSV of aggregates only.', 'mw-sales-toast' ); ?></li>
 									</ul>
 								</div>
@@ -4792,13 +4816,13 @@ class MW_Sales_Toast_Settings {
 											</div>
 										</details>
 										<details class="mwst-faq__item">
-											<summary><?php esc_html_e( 'How does the Slack digest work?', 'mw-sales-toast' ); ?></summary>
+											<summary><?php esc_html_e( 'How does the webhook digest work?', 'mw-sales-toast' ); ?></summary>
 											<div class="mwst-faq__answer">
 												<p>
 													<?php
 													printf(
 														/* translators: %s: Account tab link */
-														esc_html__( 'On %s you can paste a Slack Incoming Webhook URL and turn on a weekly digest (Mondays, UTC). It posts last-7-day impressions, clicks, CTR, attributed carts/orders, and revenue — aggregates only. Toast delivery stays on your site; Slack is contacted only when a webhook is saved and a digest or test runs. Statistics collection must be on.', 'mw-sales-toast' ),
+														esc_html__( 'On %s you can paste any HTTPS webhook URL (Slack Incoming Webhooks are the example) and pick a cadence: daily, every 3 days, 7 days, 2 weeks, or monthly (30 days). Each POST covers that same window of impressions, clicks, CTR, attributed carts/orders, and revenue — aggregates only. The first digest can go out on the next cron after you save; then it waits the chosen interval (UTC). Statistics collection must be on. Local and private addresses are blocked.', 'mw-sales-toast' ),
 														self::tab_link( 'account', __( 'Account', 'mw-sales-toast' ) )
 													);
 													?>
@@ -4890,7 +4914,7 @@ class MW_Sales_Toast_Settings {
 													<?php
 													printf(
 														/* translators: %s: Account tab link */
-														esc_html__( '%s — profile, newsletter preference, optional Slack digest webhook, and settings import/export.', 'mw-sales-toast' ),
+														esc_html__( '%s — profile, newsletter preference, optional digest webhook, and settings import/export.', 'mw-sales-toast' ),
 														self::tab_link( 'account', __( 'Account', 'mw-sales-toast' ) )
 													);
 													?>
@@ -5185,55 +5209,102 @@ class MW_Sales_Toast_Settings {
 								</div>
 							</div>
 
-							<div class="mwst-card" id="mwst-account-slack">
+							<?php
+							$slack_digest = isset( $s['slack_digest'] ) ? (string) $s['slack_digest'] : 'off';
+							if ( 'weekly' === $slack_digest ) {
+								$slack_digest = '7days';
+							}
+							$digest_labels = array(
+								'off'     => __( 'Off', 'mw-sales-toast' ),
+								'daily'   => __( 'Daily', 'mw-sales-toast' ),
+								'3days'   => __( 'Every 3 days', 'mw-sales-toast' ),
+								'7days'   => __( 'Every 7 days', 'mw-sales-toast' ),
+								'2weeks'  => __( 'Every 2 weeks', 'mw-sales-toast' ),
+								'monthly' => __( 'Monthly (30 days)', 'mw-sales-toast' ),
+							);
+							$digest_stats_on   = ! empty( $s['analytics_enabled'] );
+							$slack_webhook_val = (string) ( $s['slack_webhook'] ?? '' );
+							?>
+							<div class="mwst-card" id="mwst-account-slack"<?php echo $digest_stats_on ? '' : ' data-disabled="1"'; ?>>
 								<div class="mwst-card__head">
-									<h2><?php esc_html_e( 'Slack', 'mw-sales-toast' ); ?></h2>
-									<p><?php esc_html_e( 'Optional weekly stats digest via an Incoming Webhook. Off by default.', 'mw-sales-toast' ); ?></p>
+									<h2><?php esc_html_e( 'Webhook', 'mw-sales-toast' ); ?></h2>
+									<p><?php esc_html_e( 'Optional stats digest to any HTTPS JSON webhook. Off by default. Slack Incoming Webhooks are the usual example.', 'mw-sales-toast' ); ?></p>
 								</div>
 								<div class="mwst-card__body">
-									<div class="mwst-field">
-										<div class="mwst-field__label"><label for="mwst-slack-webhook"><?php esc_html_e( 'Webhook URL', 'mw-sales-toast' ); ?></label></div>
-										<div class="mwst-field__control">
-											<input
-												type="password"
-												id="mwst-slack-webhook"
-												name="<?php echo esc_attr( $opt ); ?>[slack_webhook]"
-												class="large-text code"
-												value="<?php echo esc_attr( (string) ( $s['slack_webhook'] ?? '' ) ); ?>"
-												autocomplete="off"
-												spellcheck="false"
-												placeholder="https://hooks.slack.com/services/…"
-											/>
-											<p class="description">
+									<div class="mwst-notice mwst-notice--warn" id="mwst-webhook-stats-off" role="status"<?php echo $digest_stats_on ? ' hidden' : ''; ?>>
+										<span class="mwst-notice__icon" aria-hidden="true">!</span>
+										<div class="mwst-notice__body">
+											<strong><?php esc_html_e( 'Collection is off', 'mw-sales-toast' ); ?></strong>
+											<p>
 												<?php
 												printf(
-													/* translators: %s: Slack Incoming Webhooks docs URL */
-													esc_html__( 'Create a Slack app, enable Incoming Webhooks, add the webhook to a channel, then paste the URL here. %s', 'mw-sales-toast' ),
-													'<a href="https://api.slack.com/messaging/webhooks" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Slack docs', 'mw-sales-toast' ) . '</a>'
+													/* translators: 1: Statistics tab link, 2: Collection section link */
+													esc_html__( 'Turn on Record events in %1$s → %2$s to send webhook digests.', 'mw-sales-toast' ),
+													self::tab_link( 'statistics', __( 'Statistics', 'mw-sales-toast' ) ),
+													self::tab_link( 'statistics', __( 'Collection', 'mw-sales-toast' ), '#mwst-stats-collection' )
 												);
 												?>
 											</p>
 										</div>
 									</div>
-									<div class="mwst-field">
-										<div class="mwst-field__label"><label for="mwst-slack-digest"><?php esc_html_e( 'Digest', 'mw-sales-toast' ); ?></label></div>
+									<div class="mwst-field mwst-webhook-gated<?php echo $digest_stats_on ? '' : ' is-disabled'; ?>" id="mwst-webhook-url-field"<?php echo $digest_stats_on ? '' : ' data-disabled="1"'; ?>>
+										<div class="mwst-field__label"><label for="mwst-slack-webhook"><?php esc_html_e( 'Webhook URL', 'mw-sales-toast' ); ?></label></div>
 										<div class="mwst-field__control">
-											<?php $slack_digest = isset( $s['slack_digest'] ) ? (string) $s['slack_digest'] : 'off'; ?>
-											<select id="mwst-slack-digest" name="<?php echo esc_attr( $opt ); ?>[slack_digest]">
-												<option value="off" <?php selected( $slack_digest, 'off' ); ?>><?php esc_html_e( 'Off', 'mw-sales-toast' ); ?></option>
-												<option value="weekly" <?php selected( $slack_digest, 'weekly' ); ?>><?php esc_html_e( 'Weekly (Mondays, UTC)', 'mw-sales-toast' ); ?></option>
-											</select>
-											<p class="description"><?php esc_html_e( 'Sends last-7-day impressions, clicks, CTR, attributed carts/orders, and revenue. Needs Statistics collection on. Aggregates only — no customer data.', 'mw-sales-toast' ); ?></p>
+											<input
+												type="url"
+												id="mwst-slack-webhook"
+												name="<?php echo esc_attr( $opt ); ?>[slack_webhook]"
+												class="large-text code"
+												value="<?php echo esc_attr( $slack_webhook_val ); ?>"
+												autocomplete="off"
+												spellcheck="false"
+												placeholder="https://hooks.slack.com/services/…"
+												<?php disabled( ! $digest_stats_on ); ?>
+											/>
+											<input
+												type="hidden"
+												id="mwst-slack-webhook-keep"
+												name="<?php echo esc_attr( $opt ); ?>[slack_webhook]"
+												value="<?php echo esc_attr( $slack_webhook_val ); ?>"
+												<?php disabled( $digest_stats_on ); ?>
+											/>
+											<p class="description">
+												<?php
+												printf(
+													/* translators: %s: Slack Incoming Webhooks docs URL */
+													esc_html__( 'HTTPS only. Example: create a Slack app, enable Incoming Webhooks, add it to a channel, then paste that URL. Make, n8n, and similar tools that accept JSON work the same way. Local and private addresses are blocked. %s', 'mw-sales-toast' ),
+													'<a href="https://api.slack.com/messaging/webhooks" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Slack Incoming Webhooks', 'mw-sales-toast' ) . '</a>'
+												);
+												?>
+											</p>
 										</div>
 									</div>
-									<div class="mwst-field">
+									<div class="mwst-field mwst-webhook-gated<?php echo $digest_stats_on ? '' : ' is-disabled'; ?>" id="mwst-digest-field"<?php echo $digest_stats_on ? '' : ' data-disabled="1"'; ?>>
+										<div class="mwst-field__label"><label for="mwst-slack-digest"><?php esc_html_e( 'Digest', 'mw-sales-toast' ); ?></label></div>
+										<div class="mwst-field__control">
+											<select id="mwst-slack-digest" name="<?php echo esc_attr( $opt ); ?>[slack_digest]" <?php disabled( ! $digest_stats_on ); ?>>
+												<?php foreach ( $digest_labels as $digest_val => $digest_label ) : ?>
+													<option value="<?php echo esc_attr( $digest_val ); ?>" <?php selected( $slack_digest, $digest_val ); ?>><?php echo esc_html( $digest_label ); ?></option>
+												<?php endforeach; ?>
+											</select>
+											<input
+												type="hidden"
+												id="mwst-slack-digest-keep"
+												name="<?php echo esc_attr( $opt ); ?>[slack_digest]"
+												value="<?php echo esc_attr( $slack_digest ); ?>"
+												<?php disabled( $digest_stats_on ); ?>
+											/>
+											<p class="description"><?php esc_html_e( 'How often to send the digest.', 'mw-sales-toast' ); ?></p>
+										</div>
+									</div>
+									<div class="mwst-field mwst-webhook-gated<?php echo $digest_stats_on ? '' : ' is-disabled'; ?>" id="mwst-webhook-test-field"<?php echo $digest_stats_on ? '' : ' data-disabled="1"'; ?>>
 										<div class="mwst-field__label"><?php esc_html_e( 'Test', 'mw-sales-toast' ); ?></div>
 										<div class="mwst-field__control">
 											<div class="mwst-cache-actions">
-												<button type="button" class="button" id="mwst-slack-test"><?php esc_html_e( 'Send test', 'mw-sales-toast' ); ?></button>
+												<button type="button" class="button" id="mwst-slack-test" <?php disabled( ! $digest_stats_on ); ?>><?php esc_html_e( 'Send test', 'mw-sales-toast' ); ?></button>
 												<p class="description mwst-cache-rebuild-status" id="mwst-slack-test-status" role="status" aria-live="polite"></p>
 											</div>
-											<p class="description"><?php esc_html_e( 'Uses the URL in the field above (save to keep it). Rate-limited to once per minute.', 'mw-sales-toast' ); ?></p>
+											<p class="description"><?php esc_html_e( 'Uses the URL in the field above (save to keep it). Limited to one successful test every 15 seconds.', 'mw-sales-toast' ); ?></p>
 										</div>
 									</div>
 								</div>
@@ -5242,7 +5313,7 @@ class MW_Sales_Toast_Settings {
 							<div class="mwst-card" id="mwst-account-transfer">
 								<div class="mwst-card__head">
 									<h2><?php esc_html_e( 'Import / export', 'mw-sales-toast' ); ?></h2>
-									<p><?php esc_html_e( 'Move all settings between sites. Newsletter preference and Slack webhook stay on this site.', 'mw-sales-toast' ); ?></p>
+									<p><?php esc_html_e( 'Copy messages, timing, and design to another site. Newsletter and webhook URL stay here.', 'mw-sales-toast' ); ?></p>
 								</div>
 								<div class="mwst-card__body">
 									<?php
@@ -5250,7 +5321,7 @@ class MW_Sales_Toast_Settings {
 										MW_Sales_Toast_Transfer::render_controls( 'settings' );
 									}
 									?>
-									<p class="description"><?php esc_html_e( 'Product and category IDs belong to the source store — review targeting after import. For design-only, use Theme JSON on the Design tab.', 'mw-sales-toast' ); ?></p>
+									<p class="description"><?php esc_html_e( 'Leave the targeting boxes unchecked unless this is the same store (or a clone). Product and category IDs from another catalog will not match. Colors-only: Design → Theme JSON.', 'mw-sales-toast' ); ?></p>
 								</div>
 							</div>
 						</div>
@@ -5280,7 +5351,7 @@ class MW_Sales_Toast_Settings {
 					</aside>
 				</div>
 
-				<div class="mwst-save<?php echo in_array( $current_tab, $nonsave_tabs, true ) ? ' is-nonsave-tab' : ''; ?>" id="mwst-save-bar">
+				<div class="mwst-save" id="mwst-save-bar">
 					<p class="mwst-save__hint" id="mwst-save-hint"><?php esc_html_e( 'Changes apply after save. The front-end cache rebuilds automatically.', 'mw-sales-toast' ); ?></p>
 					<div class="mwst-save__actions">
 						<button type="button" class="button-link mwst-save__revert" id="mwst-save-revert" hidden>

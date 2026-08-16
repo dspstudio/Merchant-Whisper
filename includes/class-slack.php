@@ -1,6 +1,6 @@
 <?php
 /**
- * Optional Slack Incoming Webhook (test ping + weekly digest).
+ * Optional HTTPS webhook (test ping + scheduled digest). Slack Incoming Webhooks are the documented example.
  *
  * @package MW_Sales_Toast
  */
@@ -8,7 +8,7 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Slack webhook helper.
+ * HTTPS webhook helper (Slack-compatible JSON).
  */
 class MW_Sales_Toast_Slack {
 
@@ -32,72 +32,87 @@ class MW_Sales_Toast_Slack {
 	}
 
 	/**
-	 * Validate a Slack Incoming Webhook URL.
+	 * Validate an HTTPS webhook URL (public hosts only).
 	 *
 	 * @param mixed $raw Raw URL.
 	 * @return string Empty or sanitized URL.
 	 */
 	public static function sanitize_webhook( $raw ) {
-		$url = esc_url_raw( trim( (string) $raw ) );
-		if ( '' === $url ) {
+		$url = esc_url_raw( trim( (string) $raw ), array( 'https' ) );
+		if ( '' === $url || strlen( $url ) > 2048 ) {
 			return '';
 		}
 		$parts = wp_parse_url( $url );
-		if ( ! is_array( $parts ) ) {
+		if ( ! is_array( $parts ) || empty( $parts['host'] ) ) {
 			return '';
 		}
-		$host = isset( $parts['host'] ) ? strtolower( (string) $parts['host'] ) : '';
-		$path = isset( $parts['path'] ) ? (string) $parts['path'] : '';
-		if ( 'hooks.slack.com' !== $host ) {
+		if ( 'https' !== strtolower( (string) ( $parts['scheme'] ?? '' ) ) ) {
 			return '';
 		}
-		if ( 0 !== strpos( $path, '/services/' ) ) {
-			return '';
-		}
-		if ( ! empty( $parts['scheme'] ) && 'https' !== strtolower( (string) $parts['scheme'] ) ) {
+		if ( function_exists( 'wp_http_validate_url' ) && ! wp_http_validate_url( $url ) ) {
 			return '';
 		}
 		return $url;
 	}
 
 	/**
-	 * POST JSON to a Slack webhook.
+	 * POST JSON to a webhook (Slack Incoming Webhooks and other HTTPS receivers).
 	 *
 	 * @param string               $url     Webhook URL.
-	 * @param array<string, mixed> $payload Slack payload.
-	 * @return true|WP_Error
+	 * @param array<string, mixed> $payload JSON body.
+	 * @return int|WP_Error HTTP status on success.
 	 */
 	public static function post( $url, $payload ) {
 		$url = self::sanitize_webhook( $url );
 		if ( '' === $url ) {
-			return new WP_Error( 'mw_st_slack_url', __( 'Enter a valid Slack Incoming Webhook URL.', 'mw-sales-toast' ) );
+			return new WP_Error( 'mw_st_slack_url', __( 'Enter a valid HTTPS webhook URL.', 'mw-sales-toast' ) );
 		}
 
-		$response = wp_remote_post(
+		$response = wp_safe_remote_post(
 			$url,
 			array(
-				'timeout' => 8,
-				'headers' => array(
+				'timeout'     => 8,
+				'redirection' => 0,
+				'headers'     => array(
 					'Content-Type' => 'application/json',
 				),
-				'body'    => wp_json_encode( $payload ),
+				'body'        => wp_json_encode( $payload ),
+				'user-agent'  => 'Merchant Whisper/' . MW_SALES_TOAST_VERSION,
 			)
 		);
 
 		if ( is_wp_error( $response ) ) {
-			return $response;
-		}
-
-		$code = (int) wp_remote_retrieve_response_code( $response );
-		$body = trim( (string) wp_remote_retrieve_body( $response ) );
-		if ( $code < 200 || $code >= 300 || ( '' !== $body && 'ok' !== $body ) ) {
+			$transport = $response->get_error_message();
 			return new WP_Error(
-				'mw_st_slack_http',
-				__( 'Slack rejected the message. Check the webhook URL and try again.', 'mw-sales-toast' )
+				'mw_st_slack_transport',
+				sprintf(
+					/* translators: %s: transport error from WordPress HTTP API */
+					__( 'No HTTP response (%s).', 'mw-sales-toast' ),
+					$transport
+				),
+				array( 'status' => 0 )
 			);
 		}
 
-		return true;
+		$code   = (int) wp_remote_retrieve_response_code( $response );
+		$reason = trim( (string) wp_remote_retrieve_response_message( $response ) );
+		$label  = $code > 0
+			? ( '' !== $reason ? sprintf( 'HTTP %d %s', $code, $reason ) : sprintf( 'HTTP %d', $code ) )
+			: __( 'no HTTP status', 'mw-sales-toast' );
+
+		if ( $code < 200 || $code >= 300 ) {
+			return new WP_Error(
+				'mw_st_slack_http',
+				sprintf(
+					/* translators: %s: HTTP status, e.g. HTTP 404 Not Found */
+					__( 'The webhook did not accept the message (%s). Check the URL and try again.', 'mw-sales-toast' ),
+					$label
+				),
+				array( 'status' => $code )
+			);
+		}
+
+		return $code;
 	}
 
 	/**
@@ -126,24 +141,30 @@ class MW_Sales_Toast_Slack {
 	}
 
 	/**
-	 * Build a Slack payload from text + mrkdwn section.
+	 * Build a Slack-compatible payload (plain text + blocks) plus extra JSON fields.
 	 *
-	 * @param string $fallback Plain text fallback.
-	 * @param string $mrkdwn   Section mrkdwn.
+	 * @param string               $fallback Plain text fallback.
+	 * @param string               $mrkdwn   Section mrkdwn.
+	 * @param array<string, mixed> $extra    Extra keys for generic receivers.
 	 * @return array<string, mixed>
 	 */
-	public static function payload( $fallback, $mrkdwn ) {
-		return array(
-			'text'   => $fallback,
-			'blocks' => array(
-				array(
-					'type' => 'section',
-					'text' => array(
-						'type' => 'mrkdwn',
-						'text' => $mrkdwn,
+	public static function payload( $fallback, $mrkdwn, $extra = array() ) {
+		unset( $extra['text'], $extra['blocks'] );
+		return array_merge(
+			array(
+				'text'   => $fallback,
+				'blocks' => array(
+					array(
+						'type' => 'section',
+						'text' => array(
+							'type' => 'mrkdwn',
+							'text' => $mrkdwn,
+						),
 					),
 				),
+				'plugin' => 'merchant-whisper',
 			),
+			$extra
 		);
 	}
 
@@ -156,7 +177,7 @@ class MW_Sales_Toast_Slack {
 		$host = self::site_host();
 		$mrkdwn = sprintf(
 			/* translators: 1: plugin name, 2: site host */
-			__( "*%1\$s* is connected for `%2\$s`.\nWeekly digests will use this channel when enabled.", 'mw-sales-toast' ),
+			__( "*%1\$s* is connected for `%2\$s`.\nScheduled digests will use this webhook when enabled.", 'mw-sales-toast' ),
 			MW_SALES_TOAST_NAME,
 			$host
 		);
@@ -166,28 +187,84 @@ class MW_Sales_Toast_Slack {
 			MW_SALES_TOAST_NAME,
 			$host
 		);
-		return self::payload( $fallback, $mrkdwn );
+		return self::payload(
+			$fallback,
+			$mrkdwn,
+			array(
+				'event' => 'test',
+			)
+		);
+	}
+
+	/**
+	 * Digest cadence → stats window in days.
+	 *
+	 * @return array<string, int>
+	 */
+	public static function digest_intervals() {
+		return array(
+			'daily'   => 1,
+			'3days'   => 3,
+			'7days'   => 7,
+			'2weeks'  => 14,
+			'monthly' => 30,
+		);
+	}
+
+	/**
+	 * Normalize a saved digest mode (legacy weekly → 7 days).
+	 *
+	 * @param mixed $mode Raw mode.
+	 * @return string
+	 */
+	public static function normalize_digest_mode( $mode ) {
+		$mode = is_string( $mode ) ? $mode : 'off';
+		if ( 'weekly' === $mode ) {
+			$mode = '7days';
+		}
+		$intervals = self::digest_intervals();
+		return isset( $intervals[ $mode ] ) ? $mode : 'off';
+	}
+
+	/**
+	 * Stats window for a digest mode.
+	 *
+	 * @param mixed $mode Mode.
+	 * @return int 0 if off.
+	 */
+	public static function digest_days( $mode ) {
+		$mode      = self::normalize_digest_mode( $mode );
+		$intervals = self::digest_intervals();
+		return isset( $intervals[ $mode ] ) ? (int) $intervals[ $mode ] : 0;
 	}
 
 	/**
 	 * Weekly digest mrkdwn + fallback from analytics.
 	 *
+	 * @param int $days Window length.
 	 * @return array{0:string,1:string}|WP_Error Fallback text, mrkdwn.
 	 */
-	public static function digest_text() {
+	public static function digest_text( $days = 7 ) {
 		if ( ! class_exists( 'MW_Sales_Toast_Analytics' ) || ! MW_Sales_Toast_Analytics::is_enabled() ) {
 			return new WP_Error( 'mw_st_slack_analytics', __( 'Statistics collection is off. Turn it on under Statistics → Collection.', 'mw-sales-toast' ) );
 		}
 
-		$summary = MW_Sales_Toast_Analytics::summarize( 7 );
+		$days    = max( 1, min( 90, (int) $days ) );
+		$summary = MW_Sales_Toast_Analytics::summarize( $days );
 		$host    = self::site_host();
 		$stats   = self::stats_url();
+		$period  = sprintf(
+			/* translators: %d: number of days */
+			_n( 'last %d day', 'last %d days', $days, 'mw-sales-toast' ),
+			$days
+		);
 
 		$lines = array(
 			sprintf(
-				/* translators: 1: plugin name, 2: site host */
-				__( '*%1$s* — last 7 days on `%2$s`', 'mw-sales-toast' ),
+				/* translators: 1: plugin name, 2: period label, 3: site host */
+				__( '*%1$s* — %2$s on `%3$s`', 'mw-sales-toast' ),
 				MW_SALES_TOAST_NAME,
+				$period,
 				$host
 			),
 			'',
@@ -231,9 +308,10 @@ class MW_Sales_Toast_Slack {
 
 		$mrkdwn   = implode( "\n", $lines );
 		$fallback = sprintf(
-			/* translators: 1: plugin name, 2: site host, 3: impressions, 4: clicks, 5: CTR, 6: carts, 7: orders, 8: revenue */
-			__( '%1$s — last 7 days on %2$s: %3$s impressions, %4$s clicks (%5$s%% CTR), %6$s carts, %7$s orders, %8$s revenue.', 'mw-sales-toast' ),
+			/* translators: 1: plugin name, 2: period label, 3: site host, 4: impressions, 5: clicks, 6: CTR, 7: carts, 8: orders, 9: revenue */
+			__( '%1$s — %2$s on %3$s: %4$s impressions, %5$s clicks (%6$s%% CTR), %7$s carts, %8$s orders, %9$s revenue.', 'mw-sales-toast' ),
 			MW_SALES_TOAST_NAME,
+			$period,
 			$host,
 			number_format_i18n( (int) ( $summary['impressions'] ?? 0 ) ),
 			number_format_i18n( (int) ( $summary['clicks'] ?? 0 ) ),
@@ -247,22 +325,34 @@ class MW_Sales_Toast_Slack {
 	}
 
 	/**
-	 * AJAX: send a test Slack message.
+	 * AJAX: send a test webhook payload.
 	 */
 	public static function ajax_test() {
 		$cap = class_exists( 'MW_Sales_Toast_Settings' )
 			? MW_Sales_Toast_Settings::capability()
 			: ( class_exists( 'WooCommerce' ) ? 'manage_woocommerce' : 'manage_options' );
 		if ( ! current_user_can( $cap ) ) {
-			wp_send_json_error( array( 'message' => __( 'You do not have permission to test Slack.', 'mw-sales-toast' ) ), 403 );
+			wp_send_json_error( array( 'message' => __( 'You do not have permission to test the webhook.', 'mw-sales-toast' ) ), 403 );
 		}
 
 		check_ajax_referer( 'mw_st_slack_test', 'nonce' );
 
-		$user_id = get_current_user_id();
-		$lock    = 'mw_st_slack_test_lock_' . $user_id;
-		if ( get_transient( $lock ) ) {
-			wp_send_json_error( array( 'message' => __( 'Please wait a minute before sending another test.', 'mw-sales-toast' ) ), 429 );
+		$user_id  = get_current_user_id();
+		$lock     = 'mw_st_slack_test_lock_' . $user_id;
+		$cooldown = 15;
+		$until    = (int) get_transient( $lock );
+		if ( $until > time() ) {
+			$wait = max( 1, $until - time() );
+			wp_send_json_error(
+				array(
+					'message'    => sprintf(
+						/* translators: %d: seconds to wait */
+						_n( 'Please wait %d second before sending another test.', 'Please wait %d seconds before sending another test.', $wait, 'mw-sales-toast' ),
+						$wait
+					),
+					'retryAfter' => $wait,
+				)
+			);
 		}
 
 		$url = isset( $_POST['webhook'] ) ? self::sanitize_webhook( wp_unslash( $_POST['webhook'] ) ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
@@ -271,24 +361,36 @@ class MW_Sales_Toast_Slack {
 			$url = self::sanitize_webhook( $s['slack_webhook'] ?? '' );
 		}
 		if ( '' === $url ) {
-			wp_send_json_error( array( 'message' => __( 'Enter a valid Slack Incoming Webhook URL.', 'mw-sales-toast' ) ), 400 );
+			wp_send_json_error( array( 'message' => __( 'Enter a valid HTTPS webhook URL.', 'mw-sales-toast' ) ) );
 		}
 
 		$result = self::post( $url, self::test_payload() );
 		if ( is_wp_error( $result ) ) {
-			wp_send_json_error( array( 'message' => $result->get_error_message() ), 502 );
+			$data = $result->get_error_data();
+			wp_send_json_error(
+				array(
+					'message' => $result->get_error_message(),
+					'status'  => is_array( $data ) ? (int) ( $data['status'] ?? 0 ) : 0,
+				)
+			);
 		}
 
-		set_transient( $lock, 1, MINUTE_IN_SECONDS );
+		$code = (int) $result;
+		set_transient( $lock, time() + $cooldown, $cooldown );
 		wp_send_json_success(
 			array(
-				'message' => __( 'Test message sent. Check your Slack channel.', 'mw-sales-toast' ),
+				'message' => sprintf(
+					/* translators: %d: HTTP status code */
+					__( 'Test message sent (HTTP %d). Check your webhook receiver (e.g. Slack).', 'mw-sales-toast' ),
+					$code
+				),
+				'status'  => $code,
 			)
 		);
 	}
 
 	/**
-	 * Whether weekly digest should run.
+	 * Whether a digest cadence is active.
 	 *
 	 * @param array|null $settings Settings snapshot.
 	 * @return bool
@@ -296,8 +398,8 @@ class MW_Sales_Toast_Slack {
 	public static function digest_enabled( $settings = null ) {
 		$settings = is_array( $settings ) ? $settings : ( class_exists( 'MW_Sales_Toast_Settings' ) ? MW_Sales_Toast_Settings::get() : array() );
 		$url      = self::sanitize_webhook( $settings['slack_webhook'] ?? '' );
-		$mode     = isset( $settings['slack_digest'] ) ? (string) $settings['slack_digest'] : 'off';
-		return '' !== $url && 'weekly' === $mode;
+		$days     = self::digest_days( $settings['slack_digest'] ?? 'off' );
+		return '' !== $url && $days > 0;
 	}
 
 	/**
@@ -331,15 +433,16 @@ class MW_Sales_Toast_Slack {
 	}
 
 	/**
-	 * Daily cron: send digest on Mondays UTC (once per day).
+	 * Daily cron: send when the selected interval has elapsed (UTC).
 	 */
 	public static function run_digest_cron() {
 		if ( ! self::digest_enabled() ) {
 			return;
 		}
 
-		// Monday = 1 in gmdate( 'N' ).
-		if ( '1' !== gmdate( 'N' ) ) {
+		$settings = class_exists( 'MW_Sales_Toast_Settings' ) ? MW_Sales_Toast_Settings::get() : array();
+		$days     = self::digest_days( $settings['slack_digest'] ?? 'off' );
+		if ( $days < 1 ) {
 			return;
 		}
 
@@ -348,19 +451,43 @@ class MW_Sales_Toast_Slack {
 		if ( $last === $today ) {
 			return;
 		}
+		if ( '' !== $last ) {
+			$last_ts = strtotime( $last . ' UTC' );
+			$now_ts  = strtotime( $today . ' UTC' );
+			if ( false === $last_ts || false === $now_ts ) {
+				return;
+			}
+			$elapsed = (int) floor( ( $now_ts - $last_ts ) / DAY_IN_SECONDS );
+			if ( $elapsed < $days ) {
+				return;
+			}
+		}
 
-		$settings = class_exists( 'MW_Sales_Toast_Settings' ) ? MW_Sales_Toast_Settings::get() : array();
-		$url      = self::sanitize_webhook( $settings['slack_webhook'] ?? '' );
+		$url = self::sanitize_webhook( $settings['slack_webhook'] ?? '' );
 		if ( '' === $url ) {
 			return;
 		}
 
-		$text = self::digest_text();
+		$text = self::digest_text( $days );
 		if ( is_wp_error( $text ) ) {
 			return;
 		}
 
-		$result = self::post( $url, self::payload( $text[0], $text[1] ) );
+		$summary = class_exists( 'MW_Sales_Toast_Analytics' )
+			? MW_Sales_Toast_Analytics::summarize( $days )
+			: array();
+		$extra   = array(
+			'event'        => 'digest',
+			'days'         => $days,
+			'impressions'  => (int) ( $summary['impressions'] ?? 0 ),
+			'clicks'       => (int) ( $summary['clicks'] ?? 0 ),
+			'ctr'          => $summary['ctr'] ?? 0,
+			'carts'        => (int) ( $summary['atc'] ?? 0 ),
+			'orders'       => (int) ( $summary['purchases'] ?? 0 ),
+			'revenueLabel' => (string) ( $summary['revenueLabel'] ?? '0' ),
+		);
+
+		$result = self::post( $url, self::payload( $text[0], $text[1], $extra ) );
 		if ( is_wp_error( $result ) ) {
 			return;
 		}

@@ -1,6 +1,6 @@
 # Merchant Whisper
 
-**Version 2.2.2** — Social proof for WooCommerce: cached real orders, privacy controls, and optional demo fill.
+**Version 2.2.3** — Social proof for WooCommerce: cached real orders, privacy controls, and optional demo fill.
 
 Requires WordPress 5.8+, PHP 7.2+. WooCommerce is required for real orders; demo mode can run without it.
 
@@ -32,7 +32,7 @@ Requires WordPress 5.8+, PHP 7.2+. WooCommerce is required for real orders; demo
 - **Hide names** — always use the fallback name (default “Someone”)
 - Only first name and city are shown — never email or full address
 - Toast delivery and statistics stay on this site (no tracking pixels)
-- Admin Support form may POST to Webformatic when you send a message; optional Slack webhook (off by default) may send weekly aggregate stats
+- Admin Support form may POST to Webformatic when you send a message; optional HTTPS webhook (off by default) may send weekly aggregate stats (Slack Incoming Webhooks are the example)
 - New installs default consent **on**; upgraded 1.x installs keep it **off** until settings are saved
 
 ### Message & session controls
@@ -94,11 +94,11 @@ Requires WordPress 5.8+, PHP 7.2+. WooCommerce is required for real orders; demo
 - Completion funnel, skip reasons, dwell averages, per-product table, CSV export
 - Collection toggle and 15/30/60/120-minute attribution window (coupon clicks do not attribute)
 - Counts and product IDs only — no names, emails, IPs, or URLs
-- **Slack digest (optional)** — Incoming Webhook on Account; weekly Monday UTC aggregates (impressions, clicks, CTR, attributed carts/orders/revenue). Off by default; webhook is site-local and skipped on settings import
+- **Webhook digest (optional)** — HTTPS JSON POST on Account; weekly Monday UTC aggregates. Slack Incoming Webhooks are the example. Off by default; URL is site-local and skipped on settings import
 
 ### Import / export
-- Full settings JSON on Account (newsletter preference and Slack webhook stay local)
-- Product/category IDs are per-site — review targeting after import
+- Full settings JSON on Account (newsletter preference and webhook URL stay local)
+- Product, category, and URL targeting are **off** in the export unless you check the targeting boxes (those IDs only work on the same store)
 
 ## Architecture
 
@@ -141,7 +141,7 @@ Visitor JS ──► GET mw-st/v1/notifications ──────┘──► t
 | Custom CSS | Extra toast chrome overrides |
 | Theme JSON | Export/import design tokens + custom CSS |
 | Statistics | Toast engagement aggregates |
-| Slack webhook / digest | Optional weekly stats to Slack (Account; off by default) |
+| Webhook / digest | Optional weekly stats JSON POST (Account; Slack as example; off by default) |
 | Import / export | Full settings JSON (Account tab) |
 
 ## How checkout consent works
@@ -180,7 +180,7 @@ mw-sales-toast/
     ├── class-analytics.php     Toast engagement aggregates
     ├── class-privacy.php       Checkout consent meta
     ├── class-support.php       Admin contact form
-    ├── class-slack.php         Optional Slack Incoming Webhook digest
+    ├── class-slack.php         Optional HTTPS webhook digest (Slack-compatible JSON)
     └── class-frontend.php      Enqueue + page gates
 ```
 
@@ -230,6 +230,9 @@ Terms people may use in **WordPress Admin → Plugins → Add New** or Google:
 5. fomo
 
 ## Changelog
+
+### 2.2.3
+- Account webhook accepts any public HTTPS JSON URL (Slack Incoming Webhooks remain the example)
 
 ### 2.2.2
 - WordPress.org packaging: GPL header, `readme.txt`, Chart.js source attribution

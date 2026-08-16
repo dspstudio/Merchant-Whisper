@@ -4,7 +4,7 @@ Tags: woocommerce, ecommerce, notifications, social-proof, popup
 Requires at least: 5.8
 Tested up to: 7.0
 Requires PHP: 7.2
-Stable tag: 2.2.2
+Stable tag: 2.2.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -32,7 +32,7 @@ Merchant Whisper shows discreet sale and activity toasts on your storefront. Rea
 **Optional outbound requests (admin-initiated)**
 
 * Support form on the Support tab: sending a message posts to Webformatic so the author can reply. You choose whether to include system info (WordPress, PHP, WooCommerce, theme).
-* Slack Incoming Webhook on the Account tab (off by default): weekly aggregate stats only, never customer names or cities.
+* HTTPS webhook on the Account tab (off by default): weekly aggregate stats JSON. Slack Incoming Webhooks are the documented example. Local/private URLs are blocked.
 
 WooCommerce is required for real orders. Demo / simulated toasts can run without it.
 
@@ -47,7 +47,7 @@ WooCommerce is required for real orders. Demo / simulated toasts can run without
 
 = Does this phone home? =
 
-Toast delivery and statistics stay on your WordPress site. The only outbound HTTP is when an administrator sends the Support form (Webformatic) or saves a Slack webhook and enables the weekly digest. The Account newsletter checkbox is stored on your site only; it does not subscribe anyone until that feature ships.
+Toast delivery and statistics stay on your WordPress site. The only outbound HTTP is when an administrator sends the Support form (Webformatic) or saves an HTTPS webhook and enables the weekly digest. The Account newsletter checkbox is stored on your site only; it does not subscribe anyone until that feature ships.
 
 = Where is the source for minified JavaScript? =
 
@@ -55,13 +55,16 @@ Chart.js 4.4.8 (MIT) is bundled as `assets/vendor/chart.umd.min.js` for the Stat
 
 = Is this GDPR friendly? =
 
-You can require checkout consent before an order appears in toasts, hide names, and turn off first-party statistics. Document the checkout checkbox and the optional Slack/support flows in your own privacy policy.
+You can require checkout consent before an order appears in toasts, hide names, and turn off first-party statistics. Document the checkout checkbox and the optional webhook/support flows in your own privacy policy.
 
 = Will this slow down the shop? =
 
 Recent orders are queried on WP-Cron and order hooks, then stored in a transient. Storefront requests load a small REST payload (or inline events), not a live `wc_get_orders()` on every page view.
 
 == Changelog ==
+
+= 2.2.3 =
+* Weekly digest webhook accepts any public HTTPS JSON URL; Slack Incoming Webhooks remain the example
 
 = 2.2.2 =
 * WordPress.org packaging: GPL license header, readme.txt, Chart.js source attribution
@@ -86,6 +89,9 @@ Recent orders are queried on WP-Cron and order hooks, then stored in a transient
 * Initial toast UI and real/demo mix
 
 == Upgrade Notice ==
+
+= 2.2.3 =
+The Account webhook field is a general HTTPS JSON hook. Slack Incoming Webhooks still work as before.
 
 = 2.2.2 =
 Adds GPL metadata and directory readme. Newsletter preference stays local until mail is implemented.

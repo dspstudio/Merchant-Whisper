@@ -661,8 +661,18 @@
 	opacity: 0.55;
 }
 
+#mwst-account-slack[data-disabled="1"] .mwst-webhook-gated .button:disabled {
+	cursor: not-allowed;
+}
+
+#mwst-webhook-stats-off {
+	margin: 0 0 16px;
+}
+
 .mwst-field.is-disabled input:disabled,
-.mwst-field[data-disabled="1"] input:disabled {
+.mwst-field.is-disabled select:disabled,
+.mwst-field[data-disabled="1"] input:disabled,
+.mwst-field[data-disabled="1"] select:disabled {
 	cursor: not-allowed;
 	background: #f6f7f7;
 }
@@ -830,6 +840,35 @@
 
 .mwst-cache-rebuild-status.is-error {
 	color: #b32d2e;
+}
+
+.mwst-http-code {
+	display: inline-block;
+	margin: 0 2px;
+	padding: 1px 7px;
+	border-radius: 999px;
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+	letter-spacing: 0.02em;
+	line-height: 1.45;
+	vertical-align: baseline;
+}
+
+.mwst-http-code.is-2xx {
+	color: #166534;
+	background: #dcfce7;
+}
+
+.mwst-http-code.is-3xx {
+	color: #854d0e;
+	background: #fef3c7;
+}
+
+.mwst-http-code.is-4xx,
+.mwst-http-code.is-5xx,
+.mwst-http-code.is-0xx {
+	color: #991b1b;
+	background: #fee2e2;
 }
 
 .mwst-tokens {
@@ -1502,10 +1541,6 @@
 	height: 36px;
 }
 
-.mwst-save.is-nonsave-tab {
-	display: none;
-}
-
 .mwst-jump {
 	display: flex;
 	flex-wrap: wrap;
@@ -1592,8 +1627,27 @@
 #mwst-support-contact,
 #mwst-account-profile,
 #mwst-account-transfer,
-#mwst-theme-json {
+#mwst-theme-json,
+#mwst-stats-collection,
+#mwst-stats-record {
 	scroll-margin-top: 24px;
+}
+
+.mwst-notice a,
+.mwst-notice .mwst-tab-link {
+	font-weight: 600;
+	text-decoration: underline;
+	text-underline-offset: 2px;
+}
+
+.mwst-notice--warn a,
+.mwst-notice--warn .mwst-tab-link {
+	color: #78350f;
+}
+
+.mwst-notice--success a,
+.mwst-notice--success .mwst-tab-link {
+	color: #14532d;
 }
 
 .mwst-account {
@@ -2952,10 +3006,32 @@
 
 .mwst-transfer {
 	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 10px;
+	margin: 0 0 8px;
+}
+
+.mwst-transfer__opt {
+	display: flex;
+	align-items: flex-start;
+	gap: 8px;
+	margin: 0;
+	max-width: 42rem;
+	font-size: 13px;
+	line-height: 1.4;
+	color: var(--mwst-muted, #646970);
+}
+
+.mwst-transfer__opt input {
+	margin: 3px 0 0;
+}
+
+.mwst-transfer__actions {
+	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
 	gap: 14px 24px;
-	margin: 0 0 8px;
 }
 
 .mwst-transfer__export,
@@ -3058,13 +3134,25 @@ body.mwst-settings-dark #wpbody-content {
 }
 
 .mwst-admin.is-dark .mwst-notice--success .mwst-notice__body,
+.mwst-admin.is-dark .mwst-notice--success .mwst-notice__body p,
 .mwst-admin.is-dark .mwst-notice--success strong {
 	color: #dcfce7;
 }
 
 .mwst-admin.is-dark .mwst-notice--warn .mwst-notice__body,
+.mwst-admin.is-dark .mwst-notice--warn .mwst-notice__body p,
 .mwst-admin.is-dark .mwst-notice--warn strong {
 	color: #fef3c7;
+}
+
+.mwst-admin.is-dark .mwst-notice--success a,
+.mwst-admin.is-dark .mwst-notice--success .mwst-tab-link {
+	color: #dcfce7;
+}
+
+.mwst-admin.is-dark .mwst-notice--warn a,
+.mwst-admin.is-dark .mwst-notice--warn .mwst-tab-link {
+	color: #fde68a;
 }
 
 .mwst-admin.is-dark .mwst-notice__dismiss {
@@ -3087,10 +3175,21 @@ body.mwst-settings-dark #wpbody-content {
 	color: #dcfce7;
 }
 
-.mwst-admin.is-dark .mwst-support__status.is-error {
-	background: rgba(127, 29, 29, 0.35);
-	border-color: rgba(248, 113, 113, 0.35);
+.mwst-admin.is-dark .mwst-http-code.is-2xx {
+	color: #bbf7d0;
+	background: rgba(22, 163, 74, 0.28);
+}
+
+.mwst-admin.is-dark .mwst-http-code.is-3xx {
+	color: #fde68a;
+	background: rgba(245, 158, 11, 0.28);
+}
+
+.mwst-admin.is-dark .mwst-http-code.is-4xx,
+.mwst-admin.is-dark .mwst-http-code.is-5xx,
+.mwst-admin.is-dark .mwst-http-code.is-0xx {
 	color: #fecaca;
+	background: rgba(185, 28, 28, 0.4);
 }
 
 .mwst-admin.is-dark input[type="text"],
@@ -3244,7 +3343,9 @@ body.mwst-settings-dark .select2-search--dropdown .select2-search__field {
 .mwst-admin.is-dark .mwst-positions,
 .mwst-admin.is-dark .mwst-stats-spark,
 .mwst-admin.is-dark .mwst-field.is-disabled input:disabled,
-.mwst-admin.is-dark .mwst-field[data-disabled="1"] input:disabled {
+.mwst-admin.is-dark .mwst-field.is-disabled select:disabled,
+.mwst-admin.is-dark .mwst-field[data-disabled="1"] input:disabled,
+.mwst-admin.is-dark .mwst-field[data-disabled="1"] select:disabled {
 	background: var(--mwst-hover);
 	border-color: var(--mwst-border);
 	color: var(--mwst-text);
