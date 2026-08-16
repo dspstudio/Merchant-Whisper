@@ -1,0 +1,134 @@
+Merchant Whisper — WordPress.org plugin page
+============================================
+
+The public listing is generated from readme.txt after SVN. Use this file to fill
+https://wordpress.org/plugins/developers/add/ and to prepare assets.
+
+Do not ship this file in the plugin zip (listed in .distignore).
+
+
+1. Add Plugin form
+------------------
+
+Plugin Name:
+  Merchant Whisper
+
+Suggested slug (URL, cannot change later):
+  merchant-whisper
+  → https://wordpress.org/plugins/merchant-whisper/
+
+  The folder inside the zip is still mw-sales-toast (text domain). The slug is
+  the directory URL only.
+
+Short description (max 150 characters; already in readme.txt):
+  Social proof toasts for WooCommerce: recent purchases, viewing counts, reviews, and promos, with checkout consent and cached orders.
+
+Contributors (must match your .org username):
+  mwv3
+
+Tags (max 12):
+  woocommerce, ecommerce, notifications, social-proof, popup
+
+Requires:
+  WordPress 5.8+, PHP 7.2+, WooCommerce for real orders (demo works without it)
+
+Tested up to:
+  7.0
+
+Stable tag:
+  2.2.3
+
+License:
+  GPLv2 or later
+
+
+2. Description (paste if the form asks; otherwise readme.txt == Description ==)
+------------------------------------------------------------------------------
+
+Merchant Whisper shows discreet sale and activity toasts on your storefront. Real WooCommerce orders are cached in the background so product pages do not run heavy order queries.
+
+Toast types
+• Purchases from recent processing and completed orders
+• Viewing now (simulated count or live unique visitors on the product page)
+• Approved product reviews
+• Promo / coupon with an optional copyable code
+
+Privacy
+• Optional checkout consent
+• First name and city only — never email or full address
+• Hide names and use a fallback such as “Someone”
+• First-party statistics (counts and product IDs on your site). Turn collection off under Statistics → Collection
+• No third-party tracking pixels for toast delivery
+
+Optional admin-only outbound HTTP
+• Support tab: sending a message posts to Webformatic
+• Account webhook (off by default): HTTPS JSON digest (Slack Incoming Webhooks are the example). Local and private URLs are blocked
+
+WooCommerce is required for real orders. Demo / simulated toasts can run without it.
+
+
+3. Installation
+---------------
+
+1. Upload the plugin folder to /wp-content/plugins/mw-sales-toast, or install the zip via Plugins → Add New.
+2. Activate Merchant Whisper.
+3. Open WooCommerce → Merchant Whisper (or Settings → Merchant Whisper if WooCommerce is inactive).
+4. Choose a data source, keep checkout consent on if you show real orders, then save.
+
+
+4. Screenshot captions (readme.txt == Screenshots == + files in SVN assets/)
+----------------------------------------------------------------------------
+
+WordPress.org shows images named screenshot-1.png, screenshot-2.png, … in the
+plugin SVN assets folder (not inside the plugin zip).
+
+Suggested order and captions:
+
+1. Storefront toast — a recent purchase in the corner of a product page
+2. General settings — enable, position, targeting, and hide for roles
+3. Message & privacy — templates, checkout consent, and mute
+4. Design — colors, layout, and live preview
+5. Timing & cache — delay, duration, and rebuild cache
+6. Statistics — impressions, clicks, and attributed orders
+7. Support — FAQ and contact form
+8. Account — webhook digest and import/export
+
+Add matching lines to readme.txt when you have the images, for example:
+
+  == Screenshots ==
+
+  1. Storefront toast on a product page
+  2. General settings
+  …
+
+
+5. Banner and icon (SVN assets/, not in the plugin zip)
+-------------------------------------------------------
+
+icon-128x128.png
+icon-256x256.png
+banner-772x250.png
+banner-1544x500.png   (optional HiDPI)
+
+Optional:
+icon.svg
+banner-772x250.jpg / banner-1544x500.jpg
+
+
+6. What reviewers look for (already in the plugin)
+--------------------------------------------------
+
+• GPL header + license
+• readme.txt Contributors = your .org username (mwv3)
+• Chart.js source note in assets/vendor/README.txt
+• Support and webhook documented as admin-initiated HTTP
+• Newsletter checkbox is local only (no email yet)
+• No hidden telemetry
+
+
+7. After approval
+-----------------
+
+Commit readme.txt to trunk; the directory page updates from that file.
+Commit screenshots and banners to the assets/ directory in SVN (not trunk).
+Bump Stable tag when you tag a release.
