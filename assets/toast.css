@@ -261,7 +261,11 @@
   text-transform: lowercase;
 }
 
-.mw-sales-toast__close {
+.mw-sales-toast .mw-sales-toast__close {
+  all: unset;
+  appearance: none;
+  -webkit-appearance: none;
+  box-sizing: border-box;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -269,18 +273,27 @@
   align-self: center;
   width: 28px;
   height: 28px;
+  min-width: 28px;
+  min-height: 28px;
   margin: 0 var(--mw-st-padding) 0 0;
   padding: 0 0 2px;
   border: 0;
   border-radius: 999px;
   color: var(--mw-st-meta);
   background: var(--mw-st-close-bg);
+  box-shadow: none;
   cursor: pointer;
-  line-height: 1;
+  font: inherit;
   font-size: 1.125rem;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0;
+  text-align: center;
+  text-indent: 0;
+  text-transform: none;
 }
 
-.mw-sales-toast__close:hover {
+.mw-sales-toast .mw-sales-toast__close:hover {
   color: var(--mw-st-close-hover);
   background: var(--mw-st-close-bg-hover);
 }

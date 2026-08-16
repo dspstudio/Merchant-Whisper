@@ -1,6 +1,6 @@
 # Merchant Whisper
 
-**Version 2.2.1** — Social proof for WooCommerce: cached real orders, privacy controls, and optional demo fill.
+**Version 2.2.2** — Social proof for WooCommerce: cached real orders, privacy controls, and optional demo fill.
 
 Requires WordPress 5.8+, PHP 7.2+. WooCommerce is required for real orders; demo mode can run without it.
 
@@ -31,7 +31,8 @@ Requires WordPress 5.8+, PHP 7.2+. WooCommerce is required for real orders; demo
 - Order meta: `_mw_st_allow_public` (`yes` / `no`)
 - **Hide names** — always use the fallback name (default “Someone”)
 - Only first name and city are shown — never email or full address
-- No external network calls
+- Toast delivery and statistics stay on this site (no tracking pixels)
+- Admin Support form may POST to Webformatic when you send a message; optional Slack webhook (off by default) may send weekly aggregate stats
 - New installs default consent **on**; upgraded 1.x installs keep it **off** until settings are saved
 
 ### Message & session controls
@@ -96,7 +97,7 @@ Requires WordPress 5.8+, PHP 7.2+. WooCommerce is required for real orders; demo
 - **Slack digest (optional)** — Incoming Webhook on Account; weekly Monday UTC aggregates (impressions, clicks, CTR, attributed carts/orders/revenue). Off by default; webhook is site-local and skipped on settings import
 
 ### Import / export
-- Full settings JSON on Account (newsletter and Slack webhook stay local)
+- Full settings JSON on Account (newsletter preference and Slack webhook stay local)
 - Product/category IDs are per-site — review targeting after import
 
 ## Architecture
@@ -163,10 +164,13 @@ Visitor JS ──► GET mw-st/v1/notifications ──────┘──► t
 mw-sales-toast/
 ├── mw-sales-toast.php          Bootstrap, constants, activation/deactivation
 ├── uninstall.php               Deletes option + transients
+├── readme.txt
+├── LICENSE
 ├── README.md
 ├── assets/
 │   ├── toast.js                REST fetch, mute, session cap, hover-pause
-│   └── toast.css
+│   ├── toast.css
+│   └── vendor/                 Chart.js (MIT; see README.txt)
 └── includes/
     ├── class-settings.php      Options + admin UI
     ├── class-transfer.php      Settings / theme JSON import-export
@@ -179,10 +183,6 @@ mw-sales-toast/
     ├── class-slack.php         Optional Slack Incoming Webhook digest
     └── class-frontend.php      Enqueue + page gates
 ```
-
-## Out of scope (later)
-
-Geolocation targeting and WordPress.org submission packaging.
 
 ## Keywords / discovery
 
@@ -230,6 +230,10 @@ Terms people may use in **WordPress Admin → Plugins → Add New** or Google:
 5. fomo
 
 ## Changelog
+
+### 2.2.2
+- WordPress.org packaging: GPL header, `readme.txt`, Chart.js source attribution
+- Newsletter toggle kept as a local placeholder (no email is sent yet)
 
 ### 2.2.1
 - Multilingual toast copy for Polylang, WPML, and TranslatePress; product/category ID mapping for Polylang & WPML

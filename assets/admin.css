@@ -1178,13 +1178,7 @@
 }
 
 .mwst-sample-toast .mw-sales-toast__close {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
 	cursor: inherit;
-	line-height: 1;
-	padding: 0 0 2px;
-	font-size: 1.125rem;
 	pointer-events: none;
 }
 

@@ -4890,7 +4890,7 @@ class MW_Sales_Toast_Settings {
 													<?php
 													printf(
 														/* translators: %s: Account tab link */
-														esc_html__( '%s — profile, newsletter, optional Slack digest webhook, and settings import/export.', 'mw-sales-toast' ),
+														esc_html__( '%s — profile, newsletter preference, optional Slack digest webhook, and settings import/export.', 'mw-sales-toast' ),
 														self::tab_link( 'account', __( 'Account', 'mw-sales-toast' ) )
 													);
 													?>
@@ -5164,18 +5164,18 @@ class MW_Sales_Toast_Settings {
 							<div class="mwst-card" id="mwst-account-newsletter">
 								<div class="mwst-card__head">
 									<h2><?php esc_html_e( 'Newsletter', 'mw-sales-toast' ); ?></h2>
-									<p><?php esc_html_e( 'Occasional product updates, tips, and release notes. No spam.', 'mw-sales-toast' ); ?></p>
+									<p><?php esc_html_e( 'Product updates and release notes. Coming soon — nothing is emailed yet.', 'mw-sales-toast' ); ?></p>
 								</div>
 								<div class="mwst-card__body">
 									<div class="mwst-field">
 										<div class="mwst-field__label"><?php esc_html_e( 'Email updates', 'mw-sales-toast' ); ?></div>
 										<div class="mwst-field__control">
-											<?php self::toggle( $opt, 'newsletter', $s, 'mwst-newsletter', __( 'Subscribe to the Merchant Whisper newsletter', 'mw-sales-toast' ) ); ?>
+											<?php self::toggle( $opt, 'newsletter', $s, 'mwst-newsletter', __( 'I want Merchant Whisper news when this ships', 'mw-sales-toast' ) ); ?>
 											<p class="description">
 												<?php
 												printf(
 													/* translators: %s: admin email address */
-													esc_html__( 'We will use %s from your WordPress profile. You can unsubscribe anytime.', 'mw-sales-toast' ),
+													esc_html__( 'Your choice is stored on this site only. When newsletters go live, we will use %s from your WordPress profile. No message is sent today.', 'mw-sales-toast' ),
 													'<strong>' . esc_html( $current_user->user_email ) . '</strong>'
 												);
 												?>
