@@ -59,6 +59,7 @@ Privacy
 • Hide names and use a fallback such as “Someone”
 • First-party statistics (counts and product IDs on your site). Turn collection off under Statistics → Collection
 • No third-party tracking pixels for toast delivery
+• Multisite-ready: each subsite has its own settings, cache, and statistics
 
 Optional admin-only outbound HTTP
 • Support tab: sending a message posts to Webformatic

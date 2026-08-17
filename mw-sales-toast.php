@@ -63,9 +63,9 @@ function mw_sales_toast_cron_schedules( $schedules ) {
 add_filter( 'cron_schedules', 'mw_sales_toast_cron_schedules' );
 
 /**
- * Activate: schedule cache rebuild.
+ * Per-site setup: cron, cache, analytics table.
  */
-function mw_sales_toast_activate() {
+function mw_sales_toast_activate_site() {
 	MW_Sales_Toast_Cache::ensure_cron();
 	MW_Sales_Toast_Cache::rebuild();
 	if ( class_exists( 'MW_Sales_Toast_Analytics' ) ) {
@@ -75,16 +75,78 @@ function mw_sales_toast_activate() {
 		MW_Sales_Toast_Slack::ensure_cron();
 	}
 }
+
+/**
+ * Activate on one site or every site in a network.
+ *
+ * @param bool $network_wide Network activation flag.
+ */
+function mw_sales_toast_activate( $network_wide = false ) {
+	if ( is_multisite() && $network_wide ) {
+		$site_ids = get_sites( array( 'fields' => 'ids' ) );
+		foreach ( $site_ids as $site_id ) {
+			switch_to_blog( (int) $site_id );
+			mw_sales_toast_activate_site();
+			restore_current_blog();
+		}
+		return;
+	}
+
+	mw_sales_toast_activate_site();
+}
 register_activation_hook( __FILE__, 'mw_sales_toast_activate' );
 
 /**
- * Deactivate: clear cron.
+ * Bootstrap a new subsite when the plugin is network-active.
+ *
+ * @param int $blog_id New site ID.
  */
-function mw_sales_toast_deactivate() {
+function mw_sales_toast_on_new_blog( $blog_id ) {
+	if ( ! is_multisite() ) {
+		return;
+	}
+
+	if ( ! function_exists( 'is_plugin_active_for_network' ) ) {
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+	}
+
+	if ( ! is_plugin_active_for_network( plugin_basename( MW_SALES_TOAST_FILE ) ) ) {
+		return;
+	}
+
+	switch_to_blog( (int) $blog_id );
+	mw_sales_toast_activate_site();
+	restore_current_blog();
+}
+add_action( 'wpmu_new_blog', 'mw_sales_toast_on_new_blog', 10, 1 );
+
+/**
+ * Per-site deactivation: clear scheduled crons.
+ */
+function mw_sales_toast_deactivate_site() {
 	MW_Sales_Toast_Cache::clear_cron();
 	if ( class_exists( 'MW_Sales_Toast_Slack' ) ) {
 		MW_Sales_Toast_Slack::clear_cron();
 	}
+}
+
+/**
+ * Deactivate on one site or every site in a network.
+ *
+ * @param bool $network_wide Network deactivation flag.
+ */
+function mw_sales_toast_deactivate( $network_wide = false ) {
+	if ( is_multisite() && $network_wide ) {
+		$site_ids = get_sites( array( 'fields' => 'ids' ) );
+		foreach ( $site_ids as $site_id ) {
+			switch_to_blog( (int) $site_id );
+			mw_sales_toast_deactivate_site();
+			restore_current_blog();
+		}
+		return;
+	}
+
+	mw_sales_toast_deactivate_site();
 }
 register_deactivation_hook( __FILE__, 'mw_sales_toast_deactivate' );
 

@@ -28,6 +28,7 @@ Merchant Whisper shows discreet sale and activity toasts on your storefront. Rea
 * Hide names and use a fallback such as “Someone”
 * First-party statistics (counts and product IDs in a table on your site). Off is available under Statistics → Collection
 * No third-party tracking pixels for toast delivery
+* Multisite-ready: each subsite has its own settings, cache, statistics, and toasts (no cross-site data sharing)
 
 **Optional outbound requests (admin-initiated)**
 
@@ -61,6 +62,10 @@ You can require checkout consent before an order appears in toasts, hide names, 
 
 Recent orders are queried on WP-Cron and order hooks, then stored in a transient. Storefront requests load a small REST payload (or inline events), not a live `wc_get_orders()` on every page view.
 
+= Does it work on WordPress Multisite? =
+
+Yes. Activate per subsite or network-activate the plugin. Each site keeps its own settings, order cache, statistics table, and webhook URL. One store cannot read or change another site's toast data. Configure each subsite under that site's Merchant Whisper menu (WooCommerce must be active on that subsite for real orders).
+
 == Changelog ==
 
 = 0.9.1 =
@@ -68,6 +73,7 @@ Recent orders are queried on WP-Cron and order hooks, then stored in a transient
 * Coupon copy starts the same attribution window as a product-link click
 * By source statistics include carts, orders, and revenue
 * Account webhook is a general HTTPS JSON digest (Slack Incoming Webhooks remain the example)
+* Multisite-ready: per-site data, network activation, and full uninstall cleanup on every subsite
 
 = 2.2.3 =
 * Weekly digest webhook accepts any public HTTPS JSON URL; Slack Incoming Webhooks remain the example

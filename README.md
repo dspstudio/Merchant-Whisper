@@ -151,6 +151,10 @@ Visitor JS ──► GET mw-st/v1/notifications ──────┘──► t
 3. When the sales cache rebuilds, orders without `yes` are skipped if consent is required.
 4. With consent off, recent processing/completed orders can appear (subject to other settings).
 
+## Multisite
+
+Each subsite is independent: settings, sales cache, statistics table, crons, and webhook URL are stored per site. Network-activate or activate on individual subsites; new subsites are bootstrapped when the plugin is network-active. Uninstall removes data from every subsite. There is no Network Admin settings screen — configure each store under that site's **Merchant Whisper** menu.
+
 ## Installation
 
 1. Place this folder in `wp-content/plugins/mw-sales-toast`.
@@ -162,8 +166,8 @@ Visitor JS ──► GET mw-st/v1/notifications ──────┘──► t
 
 ```text
 mw-sales-toast/
-├── mw-sales-toast.php          Bootstrap, constants, activation/deactivation
-├── uninstall.php               Deletes option + transients
+├── mw-sales-toast.php          Bootstrap, constants, activation/deactivation (multisite-aware)
+├── uninstall.php               Deletes options, transients, stats table, order meta (all subsites)
 ├── readme.txt
 ├── LICENSE
 ├── README.md
