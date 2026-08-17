@@ -424,7 +424,7 @@ class MW_Sales_Toast_Transfer {
 						href="<?php echo esc_url( self::export_url( $kind, false ) ); ?>"
 						<?php echo ( 'settings' === $kind ) ? ' data-mwst-export-base="' . esc_url( self::export_url( $kind, false ) ) . '" data-mwst-export-catalog="' . esc_url( self::export_url( $kind, true ) ) . '"' : ''; ?>
 					>
-						<?php echo esc_html( $label ); ?>
+						<?php echo esc_html( $label ); ?><span class="dashicons dashicons-download" aria-hidden="true"></span>
 					</a>
 				</p>
 				<div class="mwst-transfer__import">
@@ -448,7 +448,7 @@ class MW_Sales_Toast_Transfer {
 						data-mwst-confirm="<?php echo esc_attr( $confirm ); ?>"
 						<?php echo ( 'settings' === $kind ) ? ' data-mwst-confirm-catalog="' . esc_attr( $confirm_catalog ) . '"' : ''; ?>
 					>
-						<?php echo esc_html( $import ); ?>
+						<span class="mwst-transfer__submit-label"><?php echo esc_html( $import ); ?></span><span class="dashicons dashicons-upload" aria-hidden="true"></span>
 					</button>
 					<span class="mwst-transfer__spinner" hidden aria-hidden="true"></span>
 				</div>

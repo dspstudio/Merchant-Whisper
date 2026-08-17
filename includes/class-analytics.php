@@ -12,7 +12,6 @@ defined( 'ABSPATH' ) || exit;
  */
 class MW_Sales_Toast_Analytics {
 
-	const OPTION          = 'mw_st_analytics';
 	const SCHEMA_OPTION   = 'mw_st_stats_schema';
 	const SCHEMA_VERSION  = 1;
 	const COOKIE          = 'mw_st_attr';
@@ -70,7 +69,7 @@ class MW_Sales_Toast_Analytics {
 	}
 
 	/**
-	 * Create table and migrate the legacy option blob once.
+	 * Create the stats table once.
 	 */
 	public static function maybe_install() {
 		$stored = (int) get_option( self::SCHEMA_OPTION, 0 );
@@ -78,7 +77,6 @@ class MW_Sales_Toast_Analytics {
 			return;
 		}
 		self::create_table();
-		self::migrate_option_blob();
 		update_option( self::SCHEMA_OPTION, self::SCHEMA_VERSION, false );
 	}
 
@@ -100,55 +98,6 @@ class MW_Sales_Toast_Analytics {
 			KEY day_dim (day, dim)
 		) {$charset};";
 		dbDelta( $sql );
-	}
-
-	/**
-	 * Copy legacy option aggregates into the table.
-	 */
-	private static function migrate_option_blob() {
-		$data = get_option( self::OPTION, array() );
-		if ( ! is_array( $data ) || empty( $data ) ) {
-			return;
-		}
-		foreach ( $data as $day => $row ) {
-			if ( ! is_string( $day ) || ! preg_match( '/^\d{4}-\d{2}-\d{2}$/', $day ) || ! is_array( $row ) ) {
-				continue;
-			}
-			foreach ( (array) ( $row['totals'] ?? array() ) as $event => $count ) {
-				$event = sanitize_key( (string) $event );
-				$count = (int) $count;
-				if ( $count && in_array( $event, self::EVENTS, true ) ) {
-					self::bump( $day, 'total', '', $event, $count );
-				}
-			}
-			foreach ( (array) ( $row['products'] ?? array() ) as $pid => $counts ) {
-				$pid = absint( $pid );
-				if ( $pid < 1 || ! is_array( $counts ) ) {
-					continue;
-				}
-				foreach ( $counts as $event => $count ) {
-					$event = sanitize_key( (string) $event );
-					$count = (int) $count;
-					if ( $count && in_array( $event, self::EVENTS, true ) ) {
-						self::bump( $day, 'product', (string) $pid, $event, $count );
-					}
-				}
-			}
-			foreach ( (array) ( $row['types'] ?? array() ) as $type_id => $counts ) {
-				$type_id = self::sanitize_toast_type( (string) $type_id );
-				if ( '' === $type_id || ! is_array( $counts ) ) {
-					continue;
-				}
-				foreach ( $counts as $event => $count ) {
-					$event = sanitize_key( (string) $event );
-					$count = (int) $count;
-					if ( $count && in_array( $event, self::TYPED_EVENTS, true ) ) {
-						self::bump( $day, 'type', $type_id, $event, $count );
-					}
-				}
-			}
-		}
-		delete_option( self::OPTION );
 	}
 
 	/**
@@ -276,7 +225,6 @@ class MW_Sales_Toast_Analytics {
 		global $wpdb;
 		self::maybe_install();
 		$wpdb->query( 'DELETE FROM ' . self::table() ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-		delete_option( self::OPTION );
 	}
 
 	/**

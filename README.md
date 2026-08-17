@@ -87,7 +87,7 @@ Requires WordPress 5.8+, PHP 7.2+. WooCommerce is required for real orders; demo
 - **Theme JSON** — export/import design (colors, layout, CSS) for reuse across stores
 
 ### Statistics
-- Daily totals in a site table (`wp_mw_st_stats`), kept 90 days; legacy option blob is migrated once
+- Daily totals in a site table (`wp_mw_st_stats`), kept 90 days
 - Overview: impressions, clicks, CTR, attributed carts/orders, click→order, attributed revenue
 - Daily impressions/clicks chart (Chart.js, bundled) with toggleable carts, orders, dismissals, auto-hides, and revenue
 - Breakdowns: toast type (including attributed carts/orders/revenue), real vs demo, page kind, trigger, click target (product vs coupon)

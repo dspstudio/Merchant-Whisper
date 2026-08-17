@@ -1999,6 +1999,8 @@ class MW_Sales_Toast_Settings {
 					'statsShowMore'    => __( 'Show more', 'mw-sales-toast' ),
 					'statsShowLess'    => __( 'Show fewer', 'mw-sales-toast' ),
 					'statsResetConfirm' => __( 'Delete all stored toast statistics? This cannot be undone.', 'mw-sales-toast' ),
+					'statsResetModalTitle' => __( 'Reset statistics?', 'mw-sales-toast' ),
+					'statsResetCancel' => __( 'Cancel', 'mw-sales-toast' ),
 					'statsResetting'   => __( 'Clearing…', 'mw-sales-toast' ),
 					'statsReset'       => __( 'Reset statistics', 'mw-sales-toast' ),
 					'statsResetError'  => __( 'Could not reset statistics. Please try again.', 'mw-sales-toast' ),
@@ -2011,6 +2013,9 @@ class MW_Sales_Toast_Settings {
 					'statsRevenue'     => __( 'Revenue', 'mw-sales-toast' ),
 					'transferNoFile'   => __( 'Choose a JSON file first.', 'mw-sales-toast' ),
 					'transferImporting' => __( 'Importing…', 'mw-sales-toast' ),
+					'designReset'      => __( 'Reset design to defaults', 'mw-sales-toast' ),
+					'designResetModalTitle' => __( 'Reset design to defaults?', 'mw-sales-toast' ),
+					'designResetConfirm' => __( 'Restore colors, layout, and shape to the Midnight preset? Unsaved design changes on this tab will be lost until you save settings.', 'mw-sales-toast' ),
 					/* translators: %s: duration label */
 					'cycleNominal'     => __( 'Estimated messages duration %s (first delay + visible + gaps).', 'mw-sales-toast' ),
 					/* translators: 1: min duration, 2: max duration */
@@ -3269,7 +3274,7 @@ class MW_Sales_Toast_Settings {
 										<div class="mwst-field__control">
 											<?php self::toggle( $opt, 'sound_enabled', $s, 'mwst-sound-enabled', __( 'Play a short sine-wave pop when a toast appears', 'mw-sales-toast' ) ); ?>
 											<p class="description" style="margin-top:8px;">
-												<button type="button" class="button" id="mwst-test-sound"><?php esc_html_e( 'Play sample', 'mw-sales-toast' ); ?></button>
+												<button type="button" class="button mwst-test-sound" id="mwst-test-sound"><?php esc_html_e( 'Play sample', 'mw-sales-toast' ); ?><span class="dashicons dashicons-controls-play" aria-hidden="true"></span></button>
 											</p>
 										</div>
 									</div>
@@ -3818,7 +3823,7 @@ class MW_Sales_Toast_Settings {
 									<div class="mwst-field">
 										<div class="mwst-field__label"><?php esc_html_e( 'Reset', 'mw-sales-toast' ); ?></div>
 										<div class="mwst-field__control">
-											<button type="button" class="button" id="mwst-reset-design"><?php esc_html_e( 'Reset design to defaults', 'mw-sales-toast' ); ?></button>
+											<button type="button" class="button mwst-reset-design" id="mwst-reset-design"><span class="mwst-reset-design__label"><?php esc_html_e( 'Reset design to defaults', 'mw-sales-toast' ); ?></span><span class="dashicons dashicons-trash" aria-hidden="true"></span></button>
 										</div>
 									</div>
 								</div>
@@ -3903,14 +3908,31 @@ class MW_Sales_Toast_Settings {
 									<p><?php esc_html_e( 'Reuse colors, layout, and custom CSS across stores. Does not change targeting, privacy, or demo data.', 'mw-sales-toast' ); ?></p>
 								</summary>
 								<div class="mwst-card__body">
-									<?php
-									if ( class_exists( 'MW_Sales_Toast_Transfer' ) ) {
-										MW_Sales_Toast_Transfer::render_controls( 'theme' );
-									}
-									?>
-									<p class="description"><?php esc_html_e( 'Import applies immediately. Elementor Site Kit sync is included when that toggle is on.', 'mw-sales-toast' ); ?></p>
+									<div class="mwst-field">
+										<div class="mwst-field__label"><?php esc_html_e( 'Theme file', 'mw-sales-toast' ); ?></div>
+										<div class="mwst-field__control">
+											<?php
+											if ( class_exists( 'MW_Sales_Toast_Transfer' ) ) {
+												MW_Sales_Toast_Transfer::render_controls( 'theme' );
+											}
+											?>
+											<p class="description"><?php esc_html_e( 'Import applies immediately. Elementor Site Kit sync is included when that toggle is on.', 'mw-sales-toast' ); ?></p>
+										</div>
+									</div>
 								</div>
 							</details>
+
+							<div class="mwst-modal" id="mwst-design-reset-modal" hidden role="dialog" aria-modal="true" aria-labelledby="mwst-design-reset-modal-title">
+								<button type="button" class="mwst-modal__backdrop" data-mwst-modal-close aria-label="<?php esc_attr_e( 'Close', 'mw-sales-toast' ); ?>"></button>
+								<div class="mwst-modal__panel" role="document">
+									<h2 class="mwst-modal__title" id="mwst-design-reset-modal-title"><?php esc_html_e( 'Reset design to defaults?', 'mw-sales-toast' ); ?></h2>
+									<p class="mwst-modal__text"><?php esc_html_e( 'Restore colors, layout, and shape to the Midnight preset? Unsaved design changes on this tab will be lost until you save settings.', 'mw-sales-toast' ); ?></p>
+									<div class="mwst-modal__actions">
+										<button type="button" class="button" data-mwst-modal-close><?php esc_html_e( 'Cancel', 'mw-sales-toast' ); ?></button>
+										<button type="button" class="button mwst-design-reset-confirm" id="mwst-design-reset-confirm"><?php esc_html_e( 'Reset design to defaults', 'mw-sales-toast' ); ?></button>
+									</div>
+								</div>
+							</div>
 						</div>
 
 						<!-- Timing & cache -->
@@ -4201,7 +4223,7 @@ class MW_Sales_Toast_Settings {
 										<button type="button" class="mwst-stats-range__btn" data-range="30" aria-pressed="false"><?php esc_html_e( '30 days', 'mw-sales-toast' ); ?></button>
 										<button type="button" class="mwst-stats-range__btn" data-range="90" aria-pressed="false"><?php esc_html_e( '90 days', 'mw-sales-toast' ); ?></button>
 									</div>
-									<button type="button" class="button mwst-stats-export" id="mwst-stats-export"><?php esc_html_e( 'Download CSV', 'mw-sales-toast' ); ?></button>
+									<button type="button" class="button mwst-stats-export" id="mwst-stats-export"><?php esc_html_e( 'Download CSV', 'mw-sales-toast' ); ?><span class="dashicons dashicons-download" aria-hidden="true"></span></button>
 								</div>
 							</div>
 
@@ -4655,7 +4677,7 @@ class MW_Sales_Toast_Settings {
 										</div>
 									</div>
 									<div class="mwst-stats-collection-actions">
-										<button type="button" class="button mwst-stats-reset" id="mwst-stats-reset"><?php esc_html_e( 'Reset statistics', 'mw-sales-toast' ); ?></button>
+										<button type="button" class="button mwst-stats-reset" id="mwst-stats-reset"><span class="mwst-stats-reset__label"><?php esc_html_e( 'Reset statistics', 'mw-sales-toast' ); ?></span><span class="dashicons dashicons-trash" aria-hidden="true"></span></button>
 										<span class="mwst-stats-collection-status" id="mwst-stats-collection-status" role="status"></span>
 									</div>
 								</div>
@@ -4676,6 +4698,18 @@ class MW_Sales_Toast_Settings {
 									</ul>
 								</div>
 							</details>
+
+							<div class="mwst-modal" id="mwst-stats-reset-modal" hidden role="dialog" aria-modal="true" aria-labelledby="mwst-stats-reset-modal-title">
+								<button type="button" class="mwst-modal__backdrop" data-mwst-modal-close aria-label="<?php esc_attr_e( 'Close', 'mw-sales-toast' ); ?>"></button>
+								<div class="mwst-modal__panel" role="document">
+									<h2 class="mwst-modal__title" id="mwst-stats-reset-modal-title"><?php esc_html_e( 'Reset statistics?', 'mw-sales-toast' ); ?></h2>
+									<p class="mwst-modal__text"><?php esc_html_e( 'Delete all stored toast statistics? This cannot be undone.', 'mw-sales-toast' ); ?></p>
+									<div class="mwst-modal__actions">
+										<button type="button" class="button" data-mwst-modal-close><?php esc_html_e( 'Cancel', 'mw-sales-toast' ); ?></button>
+										<button type="button" class="button mwst-stats-reset-confirm" id="mwst-stats-reset-confirm"><?php esc_html_e( 'Reset statistics', 'mw-sales-toast' ); ?></button>
+									</div>
+								</div>
+							</div>
 						</div>
 
 						<!-- Support (FAQ + documentation + contact) -->
@@ -5243,7 +5277,7 @@ class MW_Sales_Toast_Settings {
 											<pre class="mwst-support__sys"><?php echo esc_html( $sys_info ); ?></pre>
 										</details>
 										<div class="mwst-support__actions">
-											<button type="button" class="button button-primary" id="mwst-support-submit"><?php esc_html_e( 'Send message', 'mw-sales-toast' ); ?></button>
+											<button type="button" class="button button-primary mwst-support-submit" id="mwst-support-submit"><span class="mwst-support-submit__label"><?php esc_html_e( 'Send message', 'mw-sales-toast' ); ?></span><span class="dashicons dashicons-email-alt" aria-hidden="true"></span></button>
 										</div>
 									</div>
 								</div>
@@ -5407,7 +5441,7 @@ class MW_Sales_Toast_Settings {
 										<div class="mwst-field__label"><?php esc_html_e( 'Test', 'mw-sales-toast' ); ?></div>
 										<div class="mwst-field__control">
 											<div class="mwst-cache-actions">
-												<button type="button" class="button" id="mwst-slack-test" <?php disabled( ! $digest_stats_on ); ?>><?php esc_html_e( 'Send test', 'mw-sales-toast' ); ?></button>
+												<button type="button" class="button mwst-slack-test" id="mwst-slack-test" <?php disabled( ! $digest_stats_on ); ?>><span class="mwst-slack-test__label"><?php esc_html_e( 'Send test', 'mw-sales-toast' ); ?></span><span class="dashicons dashicons-share-alt2" aria-hidden="true"></span></button>
 												<p class="description mwst-cache-rebuild-status" id="mwst-slack-test-status" role="status" aria-live="polite"></p>
 											</div>
 											<p class="description"><?php esc_html_e( 'Uses the URL in the field above (save to keep it). Limited to one successful test every 15 seconds.', 'mw-sales-toast' ); ?></p>
@@ -5464,7 +5498,11 @@ class MW_Sales_Toast_Settings {
 							<?php esc_html_e( 'Cancel changes', 'mw-sales-toast' ); ?>
 						</button>
 						<span class="mwst-save__spinner" id="mwst-save-spinner" hidden aria-hidden="true"></span>
-						<?php submit_button( __( 'Save settings', 'mw-sales-toast' ), 'primary', 'submit', false ); ?>
+						<p class="submit">
+							<button type="submit" name="submit" id="submit" class="button button-primary mwst-save-submit" value="<?php echo esc_attr__( 'Save settings', 'mw-sales-toast' ); ?>">
+								<span class="mwst-save-submit__label"><?php esc_html_e( 'Save settings', 'mw-sales-toast' ); ?></span><span class="dashicons dashicons-saved" aria-hidden="true"></span>
+							</button>
+						</p>
 					</div>
 				</div>
 			</form>

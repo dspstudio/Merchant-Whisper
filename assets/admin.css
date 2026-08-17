@@ -1414,6 +1414,37 @@
 	font-weight: 600;
 }
 
+.mwst-admin .button.mwst-save-submit {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	line-height: 1;
+}
+
+.mwst-admin .button.mwst-save-submit .dashicons {
+	display: block;
+	width: 18px;
+	height: 18px;
+	font-size: 18px;
+	line-height: 18px;
+	margin: 0;
+	padding: 0;
+	vertical-align: middle;
+	color: currentColor;
+	flex: 0 0 18px;
+	position: relative;
+	top: 0;
+}
+
+.mwst-admin .button.mwst-save-submit .dashicons::before {
+	display: block;
+	width: 18px;
+	height: 18px;
+	line-height: 18px;
+	text-align: center;
+}
+
 .mwst-save .button-primary:hover,
 .mwst-save .button-primary:focus {
 	background: var(--mwst-accent-hover);
@@ -1539,6 +1570,99 @@
 .mwst-support__actions .button-primary {
 	min-width: 140px;
 	height: 36px;
+}
+
+.mwst-admin .button.mwst-support-submit {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	line-height: 1;
+}
+
+.mwst-admin .button.mwst-support-submit .dashicons {
+	display: block;
+	width: 18px;
+	height: 18px;
+	font-size: 18px;
+	line-height: 18px;
+	margin: 0;
+	padding: 0;
+	vertical-align: middle;
+	color: currentColor;
+	flex: 0 0 18px;
+	position: relative;
+	top: 0;
+}
+
+.mwst-admin .button.mwst-support-submit .dashicons::before {
+	display: block;
+	width: 18px;
+	height: 18px;
+	line-height: 18px;
+	text-align: center;
+}
+
+.mwst-admin .button.mwst-slack-test {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	line-height: 1;
+}
+
+.mwst-admin .button.mwst-slack-test .dashicons {
+	display: block;
+	width: 18px;
+	height: 18px;
+	font-size: 18px;
+	line-height: 18px;
+	margin: 0;
+	padding: 0;
+	vertical-align: middle;
+	color: currentColor;
+	flex: 0 0 18px;
+	position: relative;
+	top: 0;
+}
+
+.mwst-admin .button.mwst-slack-test .dashicons::before {
+	display: block;
+	width: 18px;
+	height: 18px;
+	line-height: 18px;
+	text-align: center;
+}
+
+.mwst-admin .button.mwst-test-sound {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	line-height: 1;
+}
+
+.mwst-admin .button.mwst-test-sound .dashicons {
+	display: block;
+	width: 18px;
+	height: 18px;
+	font-size: 18px;
+	line-height: 18px;
+	margin: 0;
+	padding: 0;
+	vertical-align: middle;
+	color: currentColor;
+	flex: 0 0 18px;
+	position: relative;
+	top: 0;
+}
+
+.mwst-admin .button.mwst-test-sound .dashicons::before {
+	display: block;
+	width: 18px;
+	height: 18px;
+	line-height: 18px;
+	text-align: center;
 }
 
 .mwst-jump {
@@ -2439,6 +2563,101 @@
 	outline-offset: 1px;
 }
 
+.mwst-admin .button.mwst-stats-export {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	line-height: 1;
+}
+
+.mwst-admin .button.mwst-stats-export .dashicons {
+	display: block;
+	width: 18px;
+	height: 18px;
+	font-size: 18px;
+	line-height: 18px;
+	margin: 0;
+	padding: 0;
+	vertical-align: middle;
+	color: currentColor;
+	flex: 0 0 18px;
+	position: relative;
+	top: 0;
+}
+
+.mwst-admin .button.mwst-stats-export .dashicons::before {
+	display: block;
+	width: 18px;
+	height: 18px;
+	line-height: 18px;
+	text-align: center;
+}
+
+.mwst-admin .button.mwst-stats-reset {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	line-height: 1;
+}
+
+.mwst-admin .button.mwst-stats-reset .dashicons {
+	display: block;
+	width: 18px;
+	height: 18px;
+	font-size: 18px;
+	line-height: 18px;
+	margin: 0;
+	padding: 0;
+	vertical-align: middle;
+	color: currentColor;
+	flex: 0 0 18px;
+	position: relative;
+	top: 0;
+}
+
+.mwst-admin .button.mwst-stats-reset .dashicons::before {
+	display: block;
+	width: 18px;
+	height: 18px;
+	line-height: 18px;
+	text-align: center;
+}
+
+.mwst-admin .button.mwst-reset-design {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	line-height: 1;
+	color: var(--mwst-danger) !important;
+	border-color: #f0c5c1 !important;
+}
+
+.mwst-admin .button.mwst-reset-design .dashicons {
+	display: block;
+	width: 18px;
+	height: 18px;
+	font-size: 18px;
+	line-height: 18px;
+	margin: 0;
+	padding: 0;
+	vertical-align: middle;
+	color: currentColor;
+	flex: 0 0 18px;
+	position: relative;
+	top: 0;
+}
+
+.mwst-admin .button.mwst-reset-design .dashicons::before {
+	display: block;
+	width: 18px;
+	height: 18px;
+	line-height: 18px;
+	text-align: center;
+}
+
 .mwst-stats-kpis {
 	display: grid;
 	grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -2784,6 +3003,73 @@
 	border-color: #f0c5c1 !important;
 }
 
+.mwst-modal {
+	position: fixed;
+	inset: 0;
+	z-index: 100050;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 20px;
+}
+
+.mwst-modal[hidden] {
+	display: none !important;
+}
+
+.mwst-modal__backdrop {
+	position: absolute;
+	inset: 0;
+	border: 0;
+	padding: 0;
+	margin: 0;
+	background: rgba(15, 23, 42, 0.55);
+	cursor: pointer;
+}
+
+.mwst-modal__panel {
+	position: relative;
+	z-index: 1;
+	width: min(100%, 420px);
+	padding: 20px 22px;
+	border-radius: var(--mwst-radius);
+	background: var(--mwst-surface);
+	border: 1px solid var(--mwst-border);
+	box-shadow: 0 18px 48px rgba(15, 23, 42, 0.22);
+}
+
+.mwst-modal__title {
+	margin: 0 0 8px;
+	font-size: 16px;
+	font-weight: 700;
+	color: var(--mwst-text);
+}
+
+.mwst-modal__text {
+	margin: 0 0 18px;
+	font-size: 13px;
+	line-height: 1.5;
+	color: var(--mwst-muted);
+}
+
+.mwst-modal__actions {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+	gap: 8px;
+}
+
+.mwst-modal__actions .mwst-stats-reset-confirm,
+.mwst-modal__actions .mwst-design-reset-confirm {
+	color: var(--mwst-danger) !important;
+	border-color: #f0c5c1 !important;
+}
+
+.mwst-admin.is-dark .mwst-modal__actions .mwst-stats-reset-confirm,
+.mwst-admin.is-dark .mwst-modal__actions .mwst-design-reset-confirm {
+	border-color: rgba(248, 113, 113, 0.45) !important;
+}
+
 .mwst-stats-collection-status {
 	font-size: 12.5px;
 	color: var(--mwst-muted);
@@ -3009,7 +3295,11 @@
 	flex-direction: column;
 	align-items: flex-start;
 	gap: 10px;
-	margin: 0 0 8px;
+	margin: 0;
+}
+
+.mwst-field__control > .mwst-transfer {
+	width: 100%;
 }
 
 .mwst-transfer__opt {
@@ -3075,6 +3365,40 @@
 .mwst-transfer__import.is-busy .mwst-transfer__submit {
 	opacity: 0.85;
 	pointer-events: none;
+}
+
+.mwst-admin .button.mwst-transfer__export-link,
+.mwst-admin .button.mwst-transfer__submit {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	line-height: 1;
+}
+
+.mwst-admin .button.mwst-transfer__export-link .dashicons,
+.mwst-admin .button.mwst-transfer__submit .dashicons {
+	display: block;
+	width: 18px;
+	height: 18px;
+	font-size: 18px;
+	line-height: 18px;
+	margin: 0;
+	padding: 0;
+	vertical-align: middle;
+	color: currentColor;
+	flex: 0 0 18px;
+	position: relative;
+	top: 0;
+}
+
+.mwst-admin .button.mwst-transfer__export-link .dashicons::before,
+.mwst-admin .button.mwst-transfer__submit .dashicons::before {
+	display: block;
+	width: 18px;
+	height: 18px;
+	line-height: 18px;
+	text-align: center;
 }
 
 /* Dark admin (class set from localStorage + system preference). */

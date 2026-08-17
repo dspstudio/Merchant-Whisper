@@ -181,7 +181,10 @@
 	function getSaveSubmitButton() {
 		return (
 			(saveBar && saveBar.querySelector('input[type="submit"], button[type="submit"]')) ||
-			(settingsForm && settingsForm.querySelector('input[type="submit"][name="submit"]'))
+			(settingsForm &&
+				settingsForm.querySelector(
+					'input[type="submit"][name="submit"], button[type="submit"][name="submit"]'
+				))
 		);
 	}
 
@@ -392,10 +395,15 @@
 			return;
 		}
 		if (on) {
+			var saveLabel = btn.querySelector('.mwst-save-submit__label');
 			if (!btn.dataset.mwstLabel) {
-				btn.dataset.mwstLabel = btn.value || btn.textContent || '';
+				btn.dataset.mwstLabel = saveLabel
+					? saveLabel.textContent
+					: btn.value || btn.textContent || '';
 			}
-			if (btn.tagName === 'INPUT') {
+			if (saveLabel) {
+				saveLabel.textContent = i18n.saving || 'Saving…';
+			} else if (btn.tagName === 'INPUT') {
 				btn.value = i18n.saving || 'Saving…';
 			} else {
 				btn.textContent = i18n.saving || 'Saving…';
@@ -407,7 +415,10 @@
 		} else {
 			btn.disabled = false;
 			var label = btn.dataset.mwstLabel || 'Save settings';
-			if (btn.tagName === 'INPUT') {
+			var saveLabel = btn.querySelector('.mwst-save-submit__label');
+			if (saveLabel) {
+				saveLabel.textContent = label;
+			} else if (btn.tagName === 'INPUT') {
 				btn.value = label;
 			} else {
 				btn.textContent = label;
@@ -2342,7 +2353,46 @@
 	}
 
 	if (resetDesignBtn) {
-		resetDesignBtn.addEventListener('click', resetDesign);
+		var designResetModal = root.querySelector('#mwst-design-reset-modal');
+		var designResetConfirmBtn = root.querySelector('#mwst-design-reset-confirm');
+
+		function openDesignResetModal() {
+			if (!designResetModal) {
+				return;
+			}
+			designResetModal.hidden = false;
+			if (designResetConfirmBtn) {
+				designResetConfirmBtn.focus();
+			}
+		}
+
+		function closeDesignResetModal() {
+			if (!designResetModal) {
+				return;
+			}
+			designResetModal.hidden = true;
+			resetDesignBtn.focus();
+		}
+
+		if (designResetModal) {
+			designResetModal.querySelectorAll('[data-mwst-modal-close]').forEach(function (el) {
+				el.addEventListener('click', closeDesignResetModal);
+			});
+			document.addEventListener('keydown', function (ev) {
+				if (ev.key === 'Escape' && designResetModal && !designResetModal.hidden) {
+					closeDesignResetModal();
+				}
+			});
+		}
+
+		if (designResetConfirmBtn) {
+			designResetConfirmBtn.addEventListener('click', function () {
+				resetDesign();
+				closeDesignResetModal();
+			});
+		}
+
+		resetDesignBtn.addEventListener('click', openDesignResetModal);
 	}
 
 	if (testSoundBtn) {
@@ -2510,7 +2560,12 @@
 				return;
 			}
 			slackTestBtn.disabled = true;
-			slackTestBtn.textContent = i18n.slackTesting || 'Sending…';
+			var slackTestLabel = slackTestBtn.querySelector('.mwst-slack-test__label');
+			if (slackTestLabel) {
+				slackTestLabel.textContent = i18n.slackTesting || 'Sending…';
+			} else {
+				slackTestBtn.textContent = i18n.slackTesting || 'Sending…';
+			}
 			if (slackTestStatus) {
 				slackTestStatus.classList.remove('is-ok', 'is-error');
 				slackTestStatus.textContent = i18n.slackTesting || 'Sending…';
@@ -2565,7 +2620,12 @@
 				})
 				.finally(function () {
 					slackTestBtn.disabled = analyticsUi.enabled === false;
-					slackTestBtn.textContent = i18n.slackTest || 'Send test';
+					var slackTestLabel = slackTestBtn.querySelector('.mwst-slack-test__label');
+					if (slackTestLabel) {
+						slackTestLabel.textContent = i18n.slackTest || 'Send test';
+					} else {
+						slackTestBtn.textContent = i18n.slackTest || 'Send test';
+					}
 				});
 		});
 	}
@@ -2587,7 +2647,12 @@
 
 			setSupportStatus('', '');
 			supportSubmit.disabled = true;
-			supportSubmit.textContent = i18n.supportSending || 'Sending…';
+			var supportLabel = supportSubmit.querySelector('.mwst-support-submit__label');
+			if (supportLabel) {
+				supportLabel.textContent = i18n.supportSending || 'Sending…';
+			} else {
+				supportSubmit.textContent = i18n.supportSending || 'Sending…';
+			}
 
 			var body = new window.FormData();
 			body.append('action', supportCfg.action || 'mw_st_support_request');
@@ -2640,7 +2705,12 @@
 				})
 				.finally(function () {
 					supportSubmit.disabled = false;
-					supportSubmit.textContent = i18n.supportSend || 'Send message';
+					var supportLabel = supportSubmit.querySelector('.mwst-support-submit__label');
+					if (supportLabel) {
+						supportLabel.textContent = i18n.supportSend || 'Send message';
+					} else {
+						supportSubmit.textContent = i18n.supportSend || 'Send message';
+					}
 				});
 		});
 	}
@@ -3829,67 +3899,119 @@
 	}
 
 	var resetBtn = root.querySelector('#mwst-stats-reset');
-	if (resetBtn) {
-		resetBtn.addEventListener('click', function () {
-			if (
-				!window.confirm(
-					i18n.statsResetConfirm ||
-						'Delete all stored toast statistics? This cannot be undone.'
-				)
-			) {
-				return;
-			}
-			var idle = resetBtn.textContent;
-			resetBtn.disabled = true;
+	var resetModal = root.querySelector('#mwst-stats-reset-modal');
+	var resetConfirmBtn = root.querySelector('#mwst-stats-reset-confirm');
+	var resetLabel = resetBtn ? resetBtn.querySelector('.mwst-stats-reset__label') : null;
+	var resetModalTrigger = resetBtn;
+
+	function openStatsResetModal() {
+		if (!resetModal) {
+			return;
+		}
+		resetModal.hidden = false;
+		if (resetConfirmBtn) {
+			resetConfirmBtn.focus();
+		}
+	}
+
+	function closeStatsResetModal() {
+		if (!resetModal) {
+			return;
+		}
+		resetModal.hidden = true;
+		if (resetModalTrigger) {
+			resetModalTrigger.focus();
+		}
+	}
+
+	function performStatsReset() {
+		if (!resetBtn) {
+			return;
+		}
+		var idle = resetLabel ? resetLabel.textContent : resetBtn.textContent;
+		resetBtn.disabled = true;
+		if (resetConfirmBtn) {
+			resetConfirmBtn.disabled = true;
+		}
+		if (resetLabel) {
+			resetLabel.textContent = i18n.statsResetting || 'Clearing…';
+		} else {
 			resetBtn.textContent = i18n.statsResetting || 'Clearing…';
-			var body = new window.FormData();
-			body.append('action', analyticsUi.actionReset || 'mw_st_analytics_reset');
-			body.append('nonce', analyticsUi.nonce || '');
-			window
-				.fetch(analyticsUi.ajaxUrl || (cfg.cache && cfg.cache.ajaxUrl) || '', {
-					method: 'POST',
-					credentials: 'same-origin',
-					body: body
-				})
-				.then(function (res) {
-					return res.json().then(function (data) {
-						return { ok: res.ok, data: data };
-					});
-				})
-				.then(function (result) {
-					var payload = result.data || {};
-					var inner = payload.data || {};
-					if (payload.success) {
-						analyticsData = {
-							'7': emptyStatsSummary(),
-							'30': emptyStatsSummary(),
-							'90': emptyStatsSummary()
-						};
-						productQuery = '';
-						productVisible = PRODUCT_PAGE;
-						if (productSearch) {
-							productSearch.value = '';
-						}
-						applyStats(currentStatsSummary());
-						setCollectionStatus(inner.message || '', true);
-					} else {
-						setCollectionStatus(
-							inner.message || payload.message || i18n.statsResetError,
-							false
-						);
+		}
+		var body = new window.FormData();
+		body.append('action', analyticsUi.actionReset || 'mw_st_analytics_reset');
+		body.append('nonce', analyticsUi.nonce || '');
+		window
+			.fetch(analyticsUi.ajaxUrl || (cfg.cache && cfg.cache.ajaxUrl) || '', {
+				method: 'POST',
+				credentials: 'same-origin',
+				body: body
+			})
+			.then(function (res) {
+				return res.json().then(function (data) {
+					return { ok: res.ok, data: data };
+				});
+			})
+			.then(function (result) {
+				var payload = result.data || {};
+				var inner = payload.data || {};
+				if (payload.success) {
+					analyticsData = {
+						'7': emptyStatsSummary(),
+						'30': emptyStatsSummary(),
+						'90': emptyStatsSummary()
+					};
+					productQuery = '';
+					productVisible = PRODUCT_PAGE;
+					if (productSearch) {
+						productSearch.value = '';
 					}
-				})
-				.catch(function () {
+					applyStats(currentStatsSummary());
+					setCollectionStatus(inner.message || '', true);
+					closeStatsResetModal();
+				} else {
 					setCollectionStatus(
-						i18n.statsResetError || 'Could not reset statistics. Please try again.',
+						inner.message || payload.message || i18n.statsResetError,
 						false
 					);
-				})
-				.then(function () {
-					resetBtn.disabled = false;
+				}
+			})
+			.catch(function () {
+				setCollectionStatus(
+					i18n.statsResetError || 'Could not reset statistics. Please try again.',
+					false
+				);
+			})
+			.then(function () {
+				resetBtn.disabled = false;
+				if (resetConfirmBtn) {
+					resetConfirmBtn.disabled = false;
+				}
+				if (resetLabel) {
+					resetLabel.textContent = idle || i18n.statsReset || 'Reset statistics';
+				} else {
 					resetBtn.textContent = idle || i18n.statsReset || 'Reset statistics';
-				});
+				}
+			});
+	}
+
+	if (resetModal) {
+		resetModal.querySelectorAll('[data-mwst-modal-close]').forEach(function (el) {
+			el.addEventListener('click', closeStatsResetModal);
 		});
+		document.addEventListener('keydown', function (ev) {
+			if (ev.key === 'Escape' && resetModal && !resetModal.hidden) {
+				closeStatsResetModal();
+			}
+		});
+	}
+
+	if (resetConfirmBtn) {
+		resetConfirmBtn.addEventListener('click', performStatsReset);
+	}
+
+	if (resetBtn) {
+		resetBtn.addEventListener('click', openStatsResetModal);
 	}
 
 	loadChartSeriesOn();
@@ -3920,7 +4042,8 @@
 		var form = formId ? document.getElementById(formId) : null;
 		var wrap = btn.closest('.mwst-transfer__import');
 		var spinner = wrap ? wrap.querySelector('.mwst-transfer__spinner') : null;
-		var idleLabel = btn.textContent;
+		var labelEl = btn.querySelector('.mwst-transfer__submit-label');
+		var idleLabel = labelEl ? labelEl.textContent : btn.textContent;
 
 		function setBusy(on) {
 			if (wrap) {
@@ -3930,7 +4053,12 @@
 			if (spinner) {
 				spinner.hidden = !on;
 			}
-			btn.textContent = on ? i18n.transferImporting || 'Importing…' : idleLabel;
+			var next = on ? i18n.transferImporting || 'Importing…' : idleLabel;
+			if (labelEl) {
+				labelEl.textContent = next;
+			} else {
+				btn.textContent = next;
+			}
 		}
 
 		btn.addEventListener('click', function () {
