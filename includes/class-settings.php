@@ -90,8 +90,8 @@ class MW_Sales_Toast_Settings {
 			'respect_reduced_motion' => 1,
 			'require_consent'        => 1,
 			'hide_names'             => 0,
-			'fallback_name'          => 'Someone',
-			'message_template'       => '{name} from {city} just bought {product}',
+			'fallback_name'          => $is_ro ? 'Cineva' : 'Someone',
+			'message_template'       => $is_ro ? '{name} din {city} a cumpărat {product}' : '{name} from {city} just bought {product}',
 			'max_per_session'        => 8,
 			'mute_hours'             => 24,
 			'disable_mobile'         => 0,
@@ -115,8 +115,12 @@ class MW_Sales_Toast_Settings {
 			'exclude_categories'     => array(),
 			'match_product_page'     => 0,
 			'hide_roles'             => array(),
-			'demo_people'            => "Ana, Bucharest\nMarco, Milan\nSofia, Lisbon\nJonas, Berlin\nLéa, Paris\nNoah, Amsterdam\nElena, Madrid\nOmar, Cairo",
-			'demo_whens'             => "just now\na few minutes ago\na couple of hours ago\nearlier today\nyesterday\nrecently",
+			'demo_people'            => $is_ro
+				? "Ana, București\nMarco, Milano\nSofia, Lisabona\nJonas, Berlin\nLéa, Paris\nNoah, Amsterdam\nElena, Madrid\nOmar, Cairo"
+				: "Ana, Bucharest\nMarco, Milan\nSofia, Lisbon\nJonas, Berlin\nLéa, Paris\nNoah, Amsterdam\nElena, Madrid\nOmar, Cairo",
+			'demo_whens'             => $is_ro
+				? "tocmai acum\nacum câteva minute\nacum două ore\nmai devreme astăzi\nierile\nrecent"
+				: "just now\na few minutes ago\na couple of hours ago\nearlier today\nyesterday\nrecently",
 			'i18n'                   => array(),
 			'i18n_enabled'           => 1,
 			'style_bg'               => '#0c1220',
@@ -248,6 +252,11 @@ class MW_Sales_Toast_Settings {
 		foreach ( self::string_i18n_keys() as $key ) {
 			if ( ! empty( $row[ $key ] ) ) {
 				$settings[ $key ] = $row[ $key ];
+				continue;
+			}
+			$default_loc = self::get_default_i18n_value( $key, $lang );
+			if ( '' !== $default_loc ) {
+				$settings[ $key ] = $default_loc;
 				continue;
 			}
 			if ( class_exists( 'MW_Sales_Toast_Language' ) ) {
@@ -1972,6 +1981,12 @@ class MW_Sales_Toast_Settings {
 					: null,
 				'previewSamples' => self::preview_samples(),
 				'i18n'           => array(
+					'posLabels'        => array(
+						'bottom-left'  => __( 'Bottom left', 'mw-sales-toast' ),
+						'bottom-right' => __( 'Bottom right', 'mw-sales-toast' ),
+						'top-left'     => __( 'Top left', 'mw-sales-toast' ),
+						'top-right'    => __( 'Top right', 'mw-sales-toast' ),
+					),
 					/* translators: %s: relative time */
 					'ago'            => __( '%s ago', 'mw-sales-toast' ),
 					'previewToast'     => __( 'Preview %s toast', 'mw-sales-toast' ),
@@ -2078,7 +2093,45 @@ class MW_Sales_Toast_Settings {
 	}
 
 	/**
-	 * Override value for a language/key (empty = inherit).
+	 * Default localized template or text for a given setting key and language.
+	 *
+	 * @param string $key  Setting key.
+	 * @param string $lang Language slug (e.g. 'ro', 'en').
+	 * @return string
+	 */
+	public static function get_default_i18n_value( $key, $lang = 'ro' ) {
+		$lang_short = strtolower( substr( (string) $lang, 0, 2 ) );
+		if ( 'ro' === $lang_short ) {
+			$defaults = array(
+				'message_template' => '{name} din {city} a cumpărat {product}',
+				'fallback_name'    => 'Cineva',
+				'demo_people'      => "Ana, București\nMarco, Milano\nSofia, Lisabona\nJonas, Berlin\nLéa, Paris\nNoah, Amsterdam\nElena, Madrid\nOmar, Cairo",
+				'demo_whens'       => "tocmai acum\nacum câteva minute\nacum două ore\nmai devreme astăzi\nierile\nrecent",
+				'viewing_template' => '{count} persoane vizualizează acest produs în acest moment',
+				'review_template'  => '{rating}★ „{excerpt}” de {name}',
+				'cta_message'      => 'Folosește codul {code} pentru {discount} reducere la comanda ta!',
+				'cta_button'       => 'Obține reducerea',
+			);
+			return isset( $defaults[ $key ] ) ? $defaults[ $key ] : '';
+		}
+		if ( 'en' === $lang_short ) {
+			$defaults = array(
+				'message_template' => '{name} from {city} just bought {product}',
+				'fallback_name'    => 'Someone',
+				'demo_people'      => "Ana, Bucharest\nMarco, Milan\nSofia, Lisbon\nJonas, Berlin\nLéa, Paris\nNoah, Amsterdam\nElena, Madrid\nOmar, Cairo",
+				'demo_whens'       => "just now\na few minutes ago\na couple of hours ago\nearlier today\nyesterday\nrecently",
+				'viewing_template' => '{count} people are viewing this right now',
+				'review_template'  => '{rating}★ "{excerpt}" by {name}',
+				'cta_message'      => 'Use code {code} for {discount} off your order!',
+				'cta_button'       => 'Get discount',
+			);
+			return isset( $defaults[ $key ] ) ? $defaults[ $key ] : '';
+		}
+		return '';
+	}
+
+	/**
+	 * Override value for a language/key (empty = inherit default localized value).
 	 *
 	 * @param array  $s    Settings.
 	 * @param string $lang Lang slug.
@@ -2087,10 +2140,10 @@ class MW_Sales_Toast_Settings {
 	 */
 	private static function i18n_override_value( $s, $lang, $key ) {
 		$i18n = isset( $s['i18n'] ) && is_array( $s['i18n'] ) ? $s['i18n'] : array();
-		if ( empty( $i18n[ $lang ][ $key ] ) ) {
-			return '';
+		if ( isset( $i18n[ $lang ][ $key ] ) && '' !== trim( (string) $i18n[ $lang ][ $key ] ) ) {
+			return (string) $i18n[ $lang ][ $key ];
 		}
-		return (string) $i18n[ $lang ][ $key ];
+		return self::get_default_i18n_value( $key, $lang );
 	}
 
 	/**
@@ -2219,9 +2272,12 @@ class MW_Sales_Toast_Settings {
 			if ( $slug === $default ) {
 				continue;
 			}
-			$val  = self::i18n_override_value( $s, $slug, $key );
-			$name = $opt . '[i18n][' . $slug . '][' . $key . ']';
-			$id   = 'mwst-i18n-' . $slug . '-' . $key;
+			$val             = self::i18n_override_value( $s, $slug, $key );
+			$name            = $opt . '[i18n][' . $slug . '][' . $key . ']';
+			$id              = 'mwst-i18n-' . $slug . '-' . $key;
+			$def_placeholder = self::get_default_i18n_value( $key, $slug );
+			$placeholder     = $def_placeholder ? $def_placeholder : __( 'Same as default', 'mw-sales-toast' );
+
 			echo '<div class="mwst-i18n-pane" data-lang="' . esc_attr( $slug ) . '" hidden>';
 			if ( 'textarea' === $type ) {
 				printf(
@@ -2230,7 +2286,7 @@ class MW_Sales_Toast_Settings {
 					esc_attr( $name ),
 					(int) $rows,
 					esc_attr( $class ),
-					esc_attr__( 'Same as default', 'mw-sales-toast' ),
+					esc_attr( $placeholder ),
 					esc_textarea( $val )
 				);
 			} else {
@@ -2240,7 +2296,7 @@ class MW_Sales_Toast_Settings {
 					esc_attr( $class ),
 					esc_attr( $name ),
 					esc_attr( $val ),
-					esc_attr__( 'Same as default', 'mw-sales-toast' )
+					esc_attr( $placeholder )
 				);
 			}
 			echo '</div>';

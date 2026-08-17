@@ -166,7 +166,7 @@ function mw_sales_toast_maybe_flush_cache_schema() {
  * Boot plugin modules.
  */
 function mw_sales_toast_init() {
-	load_plugin_textdomain( 'mw-sales-toast' );
+	load_plugin_textdomain( 'mw-sales-toast', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
 	mw_sales_toast_maybe_flush_cache_schema();
 	MW_Sales_Toast_Settings::init();
 	if ( class_exists( 'MW_Sales_Toast_Language' ) ) {

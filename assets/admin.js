@@ -149,7 +149,7 @@
 				'</svg>'
 		);
 
-	var posLabels = {
+	var posLabels = (cfg.i18n && cfg.i18n.posLabels) || {
 		'bottom-left': 'Bottom left',
 		'bottom-right': 'Bottom right',
 		'top-left': 'Top left',

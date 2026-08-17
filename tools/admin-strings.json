@@ -1,0 +1,2762 @@
+{
+  "Every %d minutes (Merchant Whisper)": [
+    "mw-sales-toast.php"
+  ],
+  "Relaxed": [
+    "includes/class-settings.php"
+  ],
+  "Slower first toast, longer quiet time": [
+    "includes/class-settings.php"
+  ],
+  "Balanced": [
+    "includes/class-settings.php"
+  ],
+  "Good default for most stores": [
+    "includes/class-settings.php"
+  ],
+  "Frequent": [
+    "includes/class-settings.php"
+  ],
+  "Faster cadence — use sparingly": [
+    "includes/class-settings.php"
+  ],
+  "Custom": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Set delay, visible time, and gap yourself": [
+    "includes/class-settings.php"
+  ],
+  "Page load": [
+    "includes/class-settings.php"
+  ],
+  "After First delay below": [
+    "includes/class-settings.php"
+  ],
+  "Scroll": [
+    "includes/class-settings.php"
+  ],
+  "After the visitor scrolls down the page": [
+    "includes/class-settings.php"
+  ],
+  "Exit intent": [
+    "includes/class-settings.php"
+  ],
+  "When the cursor leaves toward the top": [
+    "includes/class-settings.php"
+  ],
+  "Add to cart": [
+    "includes/class-settings.php"
+  ],
+  "After a WooCommerce add-to-cart": [
+    "includes/class-settings.php"
+  ],
+  "Inactivity": [
+    "includes/class-settings.php"
+  ],
+  "After no mouse, keyboard, or scroll": [
+    "includes/class-settings.php"
+  ],
+  "Click": [
+    "includes/class-settings.php"
+  ],
+  "When a matching element is clicked": [
+    "includes/class-settings.php"
+  ],
+  "Purchases": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Recent orders": [
+    "includes/class-settings.php"
+  ],
+  "Viewing now": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "“X people are viewing this”": [
+    "includes/class-settings.php"
+  ],
+  "Reviews": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Approved product reviews": [
+    "includes/class-settings.php"
+  ],
+  "CTA / coupon": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Promo line with optional code": [
+    "includes/class-settings.php"
+  ],
+  "Midnight": [
+    "includes/class-settings.php"
+  ],
+  "Dark glass with warm gold accent": [
+    "includes/class-settings.php"
+  ],
+  "Soft light": [
+    "includes/class-settings.php"
+  ],
+  "Clean white card with blue accent": [
+    "includes/class-settings.php"
+  ],
+  "Slate": [
+    "includes/class-settings.php"
+  ],
+  "Cool charcoal with sky accent": [
+    "includes/class-settings.php"
+  ],
+  "Ink": [
+    "includes/class-settings.php"
+  ],
+  "Minimal black with crisp edges": [
+    "includes/class-settings.php"
+  ],
+  "Forest": [
+    "includes/class-settings.php"
+  ],
+  "Deep green with mint accent": [
+    "includes/class-settings.php"
+  ],
+  "Tune colors and radius yourself": [
+    "includes/class-settings.php"
+  ],
+  "General": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Message & privacy": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Design": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Timing & cache": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Statistics": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Support": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Account": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Settings": [
+    "includes/class-settings.php"
+  ],
+  "Merchant Whisper": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "%s — Merchant Whisper": [
+    "includes/class-settings.php"
+  ],
+  "%s ago": [
+    "includes/class-settings.php"
+  ],
+  "Preview %s toast": [
+    "includes/class-settings.php"
+  ],
+  "Dismiss": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "2 minutes": [
+    "includes/class-settings.php"
+  ],
+  "just now": [
+    "includes/class-settings.php"
+  ],
+  "only 3 left": [
+    "includes/class-settings.php"
+  ],
+  "only a few left": [
+    "includes/class-settings.php"
+  ],
+  "Exactly what I needed.": [
+    "includes/class-settings.php"
+  ],
+  "now": [
+    "includes/class-settings.php"
+  ],
+  "person": [
+    "includes/class-settings.php"
+  ],
+  "people": [
+    "includes/class-settings.php"
+  ],
+  "Copy code": [
+    "includes/class-settings.php"
+  ],
+  "Saving…": [
+    "includes/class-settings.php"
+  ],
+  "Saving your settings and rebuilding the sales cache…": [
+    "includes/class-settings.php"
+  ],
+  "Unsaved changes": [
+    "includes/class-settings.php"
+  ],
+  "Cancel changes": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Sending…": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Send message": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Something went wrong. Please try again.": [
+    "includes/class-settings.php",
+    "includes/class-support.php"
+  ],
+  "No product data yet.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "minutes": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Download CSV": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Search products": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Show more": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Show fewer": [
+    "includes/class-settings.php"
+  ],
+  "Delete all stored toast statistics? This cannot be undone.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Reset statistics?": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Cancel": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Clearing…": [
+    "includes/class-settings.php"
+  ],
+  "Reset statistics": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Could not reset statistics. Please try again.": [
+    "includes/class-settings.php"
+  ],
+  "Impressions": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Clicks": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Auto-hid": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Dismissed": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Carts": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Orders": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Revenue": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Choose a JSON file first.": [
+    "includes/class-settings.php"
+  ],
+  "Importing…": [
+    "includes/class-settings.php"
+  ],
+  "Reset design to defaults": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Reset design to defaults?": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Restore colors, layout, and shape to the Midnight preset? Unsaved design changes on this tab will be lost until you save settings.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Estimated messages duration %s (first delay + visible + gaps).": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Estimated messages duration %1$s–%2$s (first delay + visible + gaps).": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Rebuild cache": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Rebuilding cache…": [
+    "includes/class-settings.php"
+  ],
+  "Could not rebuild the cache. Please try again.": [
+    "includes/class-settings.php"
+  ],
+  "Send test": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Could not send the webhook test. Please try again.": [
+    "includes/class-settings.php"
+  ],
+  "Write a different message for each language": [
+    "includes/class-settings.php"
+  ],
+  "Using %s.": [
+    "includes/class-settings.php"
+  ],
+  "You can also find them in Languages → Translations, group “%s”.": [
+    "includes/class-settings.php"
+  ],
+  "You can also find them in WPML → String Translation, context “%s”.": [
+    "includes/class-settings.php"
+  ],
+  "Same as default": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Empty": [
+    "includes/class-settings.php"
+  ],
+  "Expires in %s": [
+    "includes/class-settings.php"
+  ],
+  "Cached": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Next run in %s": [
+    "includes/class-settings.php"
+  ],
+  "Not scheduled": [
+    "includes/class-settings.php"
+  ],
+  "Active": [
+    "includes/class-settings.php"
+  ],
+  "Not detected": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Real orders only": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Demo only": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Real + demo fill": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "WooCommerce social proof": [
+    "includes/class-settings.php"
+  ],
+  "Social proof toasts": [
+    "includes/class-settings.php"
+  ],
+  "Enabled": [
+    "includes/class-settings.php"
+  ],
+  "Disabled": [
+    "includes/class-settings.php"
+  ],
+  "%1$s of %2$s cached events": [
+    "includes/class-settings.php"
+  ],
+  "Settings imported": [
+    "includes/class-settings.php"
+  ],
+  "The JSON pack was applied. Product and category filters may need a pass if this file came from another store.": [
+    "includes/class-settings.php"
+  ],
+  "Theme imported": [
+    "includes/class-settings.php"
+  ],
+  "Toast colors, layout, and custom CSS were replaced from the theme file.": [
+    "includes/class-settings.php"
+  ],
+  "Import failed": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "That file is not an Merchant Whisper settings or theme export.": [
+    "includes/class-settings.php"
+  ],
+  "No file selected": [
+    "includes/class-settings.php"
+  ],
+  "Choose a .json export before importing.": [
+    "includes/class-settings.php"
+  ],
+  "The file could not be read. Try exporting again and keep it under 512 KB.": [
+    "includes/class-settings.php"
+  ],
+  "Show toasts on the front end": [
+    "includes/class-settings.php"
+  ],
+  "Demo mode can fill gaps when order volume is low. Real orders require WooCommerce. Edit simulated names and times under %s → Purchases.": [
+    "includes/class-settings.php"
+  ],
+  "WooCommerce is not active — demo toasts still work (catalog products when available, otherwise a generic label). Edit simulated names and times under %s → Purchases.": [
+    "includes/class-settings.php"
+  ],
+  "Top left": [
+    "includes/class-settings.php"
+  ],
+  "Top right": [
+    "includes/class-settings.php"
+  ],
+  "Bottom left": [
+    "includes/class-settings.php"
+  ],
+  "Bottom right": [
+    "includes/class-settings.php"
+  ],
+  "Do not show on the homepage": [
+    "includes/class-settings.php"
+  ],
+  "Do not show on cart or checkout": [
+    "includes/class-settings.php"
+  ],
+  "Do not show on the order received (thank-you) page": [
+    "includes/class-settings.php"
+  ],
+  "Do not show on WooCommerce My Account pages": [
+    "includes/class-settings.php"
+  ],
+  "Show only to logged-out visitors (hide for logged-in users)": [
+    "includes/class-settings.php"
+  ],
+  "Hide toasts on small viewports": [
+    "includes/class-settings.php"
+  ],
+  "On product pages, only show toasts for that product": [
+    "includes/class-settings.php"
+  ],
+  "Play a short sine-wave pop when a toast appears": [
+    "includes/class-settings.php"
+  ],
+  "Show a short quote under the review": [
+    "includes/class-settings.php"
+  ],
+  "Show the promo toast at most once per browser session": [
+    "includes/class-settings.php"
+  ],
+  "Always use the fallback name instead of the customer first name": [
+    "includes/class-settings.php"
+  ],
+  "Hide orders where the customer declined the checkout consent checkbox (recommended)": [
+    "includes/class-settings.php"
+  ],
+  "Disable toasts when the visitor prefers reduced motion": [
+    "includes/class-settings.php"
+  ],
+  "Use Elementor colors & font": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Maps Site Kit Text → message, Accent → product link, Secondary → background/meta/close, and Text font → toast typeface. Opacity and radius still apply.": [
+    "includes/class-settings.php"
+  ],
+  "Elementor is active, but no Site Kit colors/fonts were found yet. Open Elementor → Site Settings → Global Colors / Global Fonts, then reload this page.": [
+    "includes/class-settings.php"
+  ],
+  "Show product thumbnail": [
+    "includes/class-settings.php"
+  ],
+  "%1$ds delay · %2$ds visible · %3$ds gap": [
+    "includes/class-settings.php"
+  ],
+  "Pause the visible timer while the visitor hovers the toast": [
+    "includes/class-settings.php"
+  ],
+  "How long the rebuilt event list is kept before it expires. Remaining: %s": [
+    "includes/class-settings.php"
+  ],
+  "How often WP-Cron rebuilds the sales cache in the background. %s": [
+    "includes/class-settings.php"
+  ],
+  "Currently cached: %1$s. %2$s": [
+    "includes/class-settings.php"
+  ],
+  "Existing totals stay on this tab. New storefront events are not recorded until you turn collection back on in %s.": [
+    "includes/class-settings.php"
+  ],
+  "Collection": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "vs prior": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-analytics.php"
+  ],
+  "Source": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "CTR": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Page": [
+    "includes/class-settings.php"
+  ],
+  "Trigger": [
+    "includes/class-settings.php"
+  ],
+  "Target": [
+    "includes/class-settings.php"
+  ],
+  "Share": [
+    "includes/class-settings.php"
+  ],
+  "Browser still in mute-after-dismiss. Lower mute hours in %s.": [
+    "includes/class-settings.php"
+  ],
+  "Toasts per visit already reached. Raise the cap in %s.": [
+    "includes/class-settings.php"
+  ],
+  "Visitor prefers reduced motion and the setting is on in %s.": [
+    "includes/class-settings.php"
+  ],
+  "Viewport below 768px with Disable on mobile on in %s.": [
+    "includes/class-settings.php"
+  ],
+  "Collect toast impressions, clicks, and skip reasons": [
+    "includes/class-settings.php"
+  ],
+  "%d minutes": [
+    "includes/class-settings.php"
+  ],
+  "Confirm Enable is on under %1$s, then check cached events under %2$s → Order cache (must be above 0; use Rebuild cache if empty). Try a private window — dismissing a toast can mute future ones. Also check Show on, Hide on cart & checkout, and Disable on mobile in %1$s, plus Mute after dismiss in %3$s.": [
+    "includes/class-settings.php"
+  ],
+  "Only processing and completed orders are used. Set Data source under %1$s to Real orders (or Real + demo fill). Checkout consent in %2$s hides customers who declined; admin/legacy orders without a choice can still appear. Check Lookback window in %3$s, then Save or use Rebuild cache so the list refreshes.": [
+    "includes/class-settings.php"
+  ],
+  "Why is Cached %1$s/%2$s when I have more products?": [
+    "includes/class-settings.php"
+  ],
+  "Cached counts toast events, not catalog products. The header shows %1$s of a %2$s-order query ceiling (Max cached orders). Only processing/completed orders in the last %3$s days are considered, one line item per order. Checkout consent can skip customers who declined. Sale events are then limited to Toasts per visit (%4$s); other toast types mix in and the stored list is capped at %5$s. Change those values under %6$s, then Save or Rebuild cache. Real + demo fill only adds demo events when there are fewer than 3 real sales — it does not pad the list to %2$s.": [
+    "includes/class-settings.php"
+  ],
+  "Choose the source in %1$s. Edit demo people and times under %2$s → Purchases → Simulated names & times (even if Real orders only is selected — they simply won’t show until you switch source).": [
+    "includes/class-settings.php"
+  ],
+  "Yes. Under %s → Toast types, enable Viewing now, Reviews, and/or CTA / coupon alongside (or instead of) Purchases. They rotate in the same loop. Viewing can be simulated or live unique visitors on the product page — live mode stores no IPs, only a short-lived session token. Simulated can pin specific products; live follows Include / Exclude products on the General tab. Reviews use approved WooCommerce product reviews (min stars). The coupon chip copies the code; the button can copy or open a URL.": [
+    "includes/class-settings.php"
+  ],
+  "Only first name and city are shown — never email or full address. In %s you can require checkout consent for real orders, or hide names and use a fallback like “Someone”. No external tracking calls are made for toast delivery.": [
+    "includes/class-settings.php"
+  ],
+  "Under %s, Stock display can be Off, Soft phrases (last one / only a few / low stock), or Exact when low (“only 3 left”). Stock only appears for real orders with WooCommerce stock management, and only when quantity is at or below your threshold. Demo toasts never show stock. Use {stock} / {stock_label} in the template, or leave them out to show the phrase next to the time.": [
+    "includes/class-settings.php"
+  ],
+  "Order queries run on WP-Cron and order hooks, not on every page view. Cache lifetime and cron interval (default 15 minutes each — keep them the same) are under %s → Order cache. Visitors fetch a small REST payload; an empty response means no toast loop runs.": [
+    "includes/class-settings.php"
+  ],
+  "Mute after dismiss (in %s) can hide toasts for a set number of hours in that browser. Set mute hours to 0 to only dismiss the current toast, or test in a private window.": [
+    "includes/class-settings.php"
+  ],
+  "Yes. Under %s → Triggers, choose Page load, Scroll, Exit intent, Add to cart, Inactivity, and/or Click. The first match starts the toast loop; duration and gap still apply after that. Uncheck Page load if you only want a behavioral trigger.": [
+    "includes/class-settings.php"
+  ],
+  "Click a toast in the sidebar preview. Tune colors in %1$s and cadence in %2$s, then Save. For a quiet store, use Demo only or Real + demo fill and edit people/times in %3$s → Purchases.": [
+    "includes/class-settings.php"
+  ],
+  "In %1$s, use Natural time labels and raise Jitter so delays feel less mechanical. Keep Demo times in %2$s → Purchases to a short recent band (just now, a few minutes ago…) and put freshest phrases first.": [
+    "includes/class-settings.php"
+  ],
+  "Open this settings page once, or deactivate and re-activate the plugin so the cache cron is scheduled. New orders also trigger a debounced rebuild. Use Rebuild cache under %s → Order cache for an immediate refresh. Cache lifetime and cron interval default to 15 minutes — keep those two values the same.": [
+    "includes/class-settings.php"
+  ],
+  "Both default to 15 minutes and should usually match. Cache lifetime is how long the rebuilt event list is reused. Cron interval is how often WP-Cron rebuilds that list in the background (WP-Cron only runs when someone visits the site). They are not synced to the same second. If lifetime is shorter than cron, the list can expire and the next visitor may trigger a rebuild. New orders also rebuild. Set them under %s → Order cache, or click Rebuild cache to refresh now. Toasts per visit (Timing) is how many unique toasts a session shows — the list does not repeat.": [
+    "includes/class-settings.php"
+  ],
+  "On %s you can paste any HTTPS webhook URL (Slack Incoming Webhooks are the example) and pick a cadence: daily, every 3 days, 7 days, 2 weeks, or monthly (30 days). Each POST covers that same window of impressions, clicks, CTR, attributed carts/orders, and revenue — aggregates only. The first digest can go out on the next cron after you save; then it waits the chosen interval (UTC). Statistics collection must be on. Local and private addresses are blocked.": [
+    "includes/class-settings.php"
+  ],
+  "Jump to %s, describe what you expected vs what happened, and leave Include system info checked so we can see WordPress, PHP, WooCommerce, and theme versions.": [
+    "includes/class-settings.php"
+  ],
+  "Contact": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Merchant Whisper %s — setup guide, features, and how the cache works.": [
+    "includes/class-settings.php"
+  ],
+  "%s — enable toasts, data source, event delivery (REST or inline), position, where they appear, targeting, sound, and mobile.": [
+    "includes/class-settings.php"
+  ],
+  "%s — toast types (purchases, viewing now, reviews, CTA/coupon), purchase templates, simulated names & times, fallback name, stock display, hide names, checkout consent, mute, and session limits.": [
+    "includes/class-settings.php"
+  ],
+  "%s — colors, radius, width, custom CSS, and theme JSON for the toast chrome.": [
+    "includes/class-settings.php"
+  ],
+  "%s — triggers, delay, visible time, gap, jitter, estimated loop duration, toasts per visit, cache lifetime, cron (default 15 min each), rebuild, and lookback days.": [
+    "includes/class-settings.php"
+  ],
+  "%s — toast impressions, clicks, CTR, funnel, skip reasons, CSV export, and per-product performance.": [
+    "includes/class-settings.php"
+  ],
+  "%s — profile, newsletter preference, optional digest webhook, and settings import/export.": [
+    "includes/class-settings.php"
+  ],
+  "Turn Enable on in %s and pick a data source.": [
+    "includes/class-settings.php"
+  ],
+  "Set position, edge distance, and which pages may show toasts (%s).": [
+    "includes/class-settings.php"
+  ],
+  "Edit the message and privacy options in %1$s, look in %2$s, and cadence in %3$s.": [
+    "includes/class-settings.php"
+  ],
+  "Recent orders are queried in the background (WP-Cron, default every 15 minutes) and on new orders — not on every page view. The result is stored for the cache lifetime (also 15 minutes by default). Keep lifetime and cron the same. Both live under %s → Order cache, with a Rebuild cache button. Visitors load a small REST payload and see one toast at a time after your trigger, then delay / visible time / gap (jitter randomizes waits, not which sales).": [
+    "includes/class-settings.php"
+  ],
+  "Open General to change source →": [
+    "includes/class-settings.php"
+  ],
+  "Edit simulated names →": [
+    "includes/class-settings.php"
+  ],
+  "Open Message & privacy →": [
+    "includes/class-settings.php"
+  ],
+  "Open Timing & cache →": [
+    "includes/class-settings.php"
+  ],
+  "Events are printed into the page as JSON (mwSalesToast.events). The REST route is not registered. Choose this under %s → Event delivery. No refetch until the next full page load — beware full-page caches serving stale events.": [
+    "includes/class-settings.php"
+  ],
+  "No toasts: Enable on, cached events above 0 under Timing & cache → Order cache, not muted — start in %s.": [
+    "includes/class-settings.php"
+  ],
+  "Real orders missing: %1$s (consent) and %2$s (lookback), plus processing/completed status.": [
+    "includes/class-settings.php"
+  ],
+  "Still stuck? Skim the FAQ above, or use %s and include system info.": [
+    "includes/class-settings.php"
+  ],
+  "Pulled from your WordPress user. Change your name or email in %s.": [
+    "includes/class-settings.php"
+  ],
+  "your profile": [
+    "includes/class-settings.php"
+  ],
+  "I want Merchant Whisper news when this ships": [
+    "includes/class-settings.php"
+  ],
+  "Your choice is stored on this site only. When newsletters go live, we will use %s from your WordPress profile. No message is sent today.": [
+    "includes/class-settings.php"
+  ],
+  "Off": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Daily": [
+    "includes/class-settings.php"
+  ],
+  "Every 3 days": [
+    "includes/class-settings.php"
+  ],
+  "Every 7 days": [
+    "includes/class-settings.php"
+  ],
+  "Every 2 weeks": [
+    "includes/class-settings.php"
+  ],
+  "Monthly (30 days)": [
+    "includes/class-settings.php"
+  ],
+  "Turn on Record events in %1$s → %2$s to send webhook digests.": [
+    "includes/class-settings.php"
+  ],
+  "HTTPS only. Example: create a Slack app, enable Incoming Webhooks, add it to a channel, then paste that URL. Make, n8n, and similar tools that accept JSON work the same way. Local and private addresses are blocked. %s": [
+    "includes/class-settings.php"
+  ],
+  "Slack Incoming Webhooks": [
+    "includes/class-settings.php"
+  ],
+  "Save settings": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Languages": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Show a different toast on each language of your shop.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Translations": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Turn this on, pick a language, then edit the text in the cards above. Turn it off to use the same text everywhere.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Language": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "If you leave a language blank, it uses your default text.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Add a language plugin first (Polylang, WPML, or TranslatePress).": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Search products…": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Product IDs, comma-separated": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Select categories…": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Category IDs, comma-separated": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "No data yet.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Show recent purchases as discreet toasts — cached for performance, privacy-aware by default.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Admin appearance": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "System": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Light": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Dark": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "System status": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Toasts": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "WooCommerce": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Settings saved": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Your Merchant Whisper settings were updated. The sales cache was cleared and will rebuild with the new options.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "No toast events cached": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Real orders are enabled, but nothing is cached yet. Check Lookback window under Timing & cache, and Message & privacy → Checkout consent (customers who declined are hidden; admin/legacy orders without a choice still count).": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Real orders are enabled, but nothing is cached yet. Confirm you have processing/completed orders inside the Lookback window (Timing & cache), then reload this page.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Settings sections": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Status": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Master switch for front-end toasts.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Enable": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Data source": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Demo / simulated only": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Real orders, fill with demo if needed": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Event delivery": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "REST API — fetch with nonce (default)": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Inline — embed JSON in the page (no REST)": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Inline disables the notifications REST route and prints events into the page script. Good for removing a public API; events refresh only when the HTML does (watch full-page caches).": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Where toasts appear": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Control placement and which pages can show notifications.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Position": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Toast position": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Edge distance": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Horizontal": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Vertical": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Gap from the screen edges (0–80px).": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Show on": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Entire site": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Shop, categories & products": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Product pages only": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Homepage only": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Shop options need WooCommerce. Homepage uses your site’s front page setting.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Homepage": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Cart & checkout": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Thank-you page": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "My Account": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Visitors": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Mobile": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Mobile breakpoint": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Hide when the viewport is narrower than this width (used when Mobile is on). Default 768.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Advanced targeting": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "URL rules, product/category filters, PDP matching, and role exclusions.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Include URLs": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "One path per line. Use * as a wildcard. Leave empty to allow all (after other rules).": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Add /sale/*": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Exclude URLs": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "One path per line. Matching pages never show toasts.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Add /blog/*": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Include products": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Only sales of these products appear in toasts. Combined with Include categories as a union (product listed or in a listed category).": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Exclude products": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Never toast these products, and hide toasts on their product pages.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Include categories": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Only sales of products in these categories (including child categories). Combined with Include products as a union.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Exclude categories": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Never toast products in these categories, and hide toasts on those category/product pages.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Product page match": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Stronger social proof on the product the visitor is viewing.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Hide for roles": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Roles to hide toasts from": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Logged-in users with any selected role will not see toasts. Useful for admins and shop managers.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Sound": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Optional audio cue when a toast appears.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Pop sound": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Play sample": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Toast types": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Mix purchase social proof with viewing counts, reviews, and a promo toast. Types rotate in the same loop.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Include": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "If none are selected, Purchases is used. Uncheck Purchases to show only extra types.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Template, fallback name, stock, and simulated names for purchase toasts.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Template": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Insert placeholder": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "If you omit stock tokens, a stock phrase still appears next to the time when stock display is on (real orders only).": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Fallback name": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Used when a name is missing, or when “Hide names” is on.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Stock display": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Soft phrases — last one / only a few / low stock": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Exact when low — “only 3 left”": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Real orders only. Demo toasts never show stock. Requires WooCommerce stock management on the product.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Show stock when ≤": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "units": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Hide stock above this quantity so high inventory does not look odd.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Simulated names & times": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Used when Data source is Demo only or Real + demo fill (General tab). Edit anytime — they stay saved even if Real orders only is selected.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Demo people": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "One per line: Name, City": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Demo times": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "One per line, shown as-is (e.g. “just now”). No automatic “ago” is added.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Show how many people are looking at a product. Simulated picks a stable count in your range; Live counts unique visitors on product pages (no IPs stored).": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Count mode": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Simulated — set a range (no tracking)": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Live — unique visitors on this product (last N minutes)": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Count": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Min": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Max": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Live window": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Each product gets a stable count in this range.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Uses real unique pings, then clamps to max. Window is minutes. Product targeting follows Include / Exclude on the General tab.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Products": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Leave empty for random catalog products.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Approved WooCommerce product reviews. Demo source (or Real + demo fill) can add simulated reviews when volume is low.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Filters": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Min stars": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Max shown": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Lookback": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Lookback is days. Hide names still applies. Stars appear under the line when you omit {stars}.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Excerpt": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "A promo toast with an optional coupon chip (click to copy) and button.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Message": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Shown as the toast line. Use {coupon} to insert the code in the text.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Coupon code": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "SAVE10": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Button label": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Button URL": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Leave empty to copy the coupon when the button is clicked.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Once per visit": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Privacy": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Keep customer data minimal and consent-aware.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Hide names": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Checkout consent": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Admin-created or older orders without a consent choice can still appear. Customers who unchecked the box never appear.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Session limits": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Reduce fatigue so toasts stay helpful, not noisy.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Mute after dismiss": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "hours": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "0 = only hide the current toast; dismiss does not mute future ones.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Reduced motion": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Colors & shape": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Quick controls map to CSS variables. Preview updates live — save to apply on the storefront.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Theme": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Design theme": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Pick a coherent palette, then fine-tune below. Editing colors switches to Custom.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Elementor": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Install and activate Elementor to match toast colors and font to your Site Kit.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Colors": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Meta / time / close": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Product accent": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Background": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Opacity": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Border": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Width": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Shape": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Corner radius": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Padding": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Max width": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Radius 0–40px. Padding 4–32px. Max width 220–560px.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Shadow": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "None": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Soft": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Medium (default)": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Strong": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Drop shadow under the toast. Choose None for a flat look.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Product image": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Thumbnail layout": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Full height": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Same padding as text": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Reset": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Custom CSS": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Advanced overrides. Loaded after the base toast styles.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "CSS": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Structure": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Layout & state": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "CSS variables": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Theme JSON": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Reuse colors, layout, and custom CSS across stores. Does not change targeting, privacy, or demo data.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Theme file": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Import applies immediately. Elementor Site Kit sync is included when that toggle is on.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Close": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Triggers": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "When the first toast may appear. Select one or more — the first match starts the loop. Later toasts still follow duration and gap.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Start when": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Toast triggers": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "If none are selected, Page load is used. Exit intent is desktop-only. Add to cart needs WooCommerce.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Scroll depth": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Start after this percent of the page has been scrolled. Short pages that cannot scroll count as 100%.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Idle time": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "seconds": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "No pointer, keyboard, or scroll activity for this long.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Click selector": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  ".add-to-wishlist, #cta-button": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "CSS selector. A click on a matching element starts the toast loop.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Timing": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Show a toast, then wait a quiet gap before the next one. Pick a preset or fine-tune custom values.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Preset": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Timing preset": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Custom timing": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "First delay": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Visible for": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Gap after hide": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Seconds. First delay applies when Page load is a trigger. Gap is the quiet time after a toast hides before the next one appears.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Jitter": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Randomizes page-load delay and gap by up to this percent so the rhythm feels less robotic. 0 = exact timing. Visible duration is never jittered.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Pause on hover": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "When off, the toast still hides after the visible duration even if the pointer is over it.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Time label": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Natural — just now, a few minutes ago…": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Exact — 2 minutes ago, 3 days ago…": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "How real-order timestamps appear under the toast. Demo times are always shown exactly as written.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Toasts per visit": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "How many toasts a visitor sees in one browser session. The list does not repeat. Resets when they open a new tab or window.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Order cache": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Real orders are rebuilt on a schedule — not on every page view.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Cache lifetime": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Cron interval": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Max cached orders": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "How many recent orders to query when rebuilding. Keep this at least as high as Toasts per visit. Visitors still only see that visit cap.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Lookback window": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "days": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Rebuild": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Clears and rebuilds the sales event cache now, using saved settings. Save first if you changed lookback, source, or filters.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Toast performance": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Aggregate engagement only — no names, emails, or IPs.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Date range": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "7 days": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "30 days": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "90 days": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Collection is off": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Waiting for data": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Numbers appear after visitors see toasts on the storefront. Keep toasts enabled and browse the shop in a private window to generate the first events.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Overview": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Visibility, clicks, and soft-attributed carts and orders in the selected range.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Key metrics": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Attributed carts": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Attributed purchases": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Click → order": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Attributed revenue": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Daily toast metrics": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Chart series": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "By toast type": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Impressions, clicks, and last-click attributed carts, orders, and revenue per type.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Type": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Carts, orders, and revenue use the last toast click (product link or coupon copy) in the attribution window. Coupon / CTA toasts count any order in that window by toast type. Older attributed totals stay in Overview only.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "By source": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Real-order toasts versus demo fill in the selected range.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "By page": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Where the toast was shown. Page kinds only — never URLs.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "By trigger": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Which storefront trigger started the toast loop.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Click target": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Product links versus coupon copy. Both start the attribution window.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Completion funnel": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "What happened after a toast was shown, as a share of impressions. Click and auto-hide can both count for the same toast.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Shown": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Muted (after dismiss)": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Clicked": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Toast rendered on the storefront.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Visible duration ended without a dismiss.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Visitor closed the toast.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Muted": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Mute-after-dismiss applied in that browser.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Product (or toast) link opened.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Carts / purchases": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Soft-attributed after a toast click in the attribution window.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Time visible (dismiss)": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Average until close.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Time visible (auto-hide)": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Average until the duration ended.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Why toasts did not show": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Storefront loads that skipped the toast loop. Bars are a share of shown + skipped in this range.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Muted already": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Session cap": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Mobile gate": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Soft attribution": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Window after a toast click (product link or coupon copy). CTA toasts with no product still count carts and orders by type.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Window": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Click → add to cart or purchase": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Add-to-cart after toast click": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Orders in the same window": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Soft attribution is correlation, not proven causation. Stored counts never include customer PII.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Per-product performance": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Products with toast activity in the selected range (all types combined). Click a column to sort.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Product": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-analytics.php"
+  ],
+  "Product names link to the WooCommerce edit screen when available. The table shows 20 rows at a time.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Record events and attribution save immediately. Reset clears stored totals. Other plugin settings still use Save settings below.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Record events": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Off stops new beacons. Historical numbers remain until you reset.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Attribution window": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "How long a toast click (product link or coupon copy) can count toward a cart or order. Saved immediately.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "What this dashboard stores.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Counts only: impressions, auto-hides, dismissals, mutes, skips, clicks, toast type, source, page kind, trigger, click target, dwell averages, soft-attributed carts/orders, and order totals as revenue.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Product IDs only — never customer names, emails, IPs, or page URLs.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "No cross-site tracking pixels; daily totals stay in a table on your WordPress site (90 days).": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Optional HTTPS webhook (Account tab) may send aggregate digests when you save a URL — never customer names, cities, or the webhook URL in support system info. Slack Incoming Webhooks are the usual example.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "You can turn collection off or reset totals from this tab. Export is a CSV of aggregates only.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Support sections": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "FAQ": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Documentation": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Common questions about setup, privacy, and troubleshooting.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Why aren’t toasts showing on my site?": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Why don’t my real orders appear?": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "What’s the difference between data sources?": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Recent eligible WooCommerce sales.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Simulated people/times using your catalog products.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Prefer real sales; fill with demo when volume is low.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Can I show “X viewing now”, reviews, or a coupon on the toast?": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Is this GDPR / privacy friendly?": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "How does stock display work?": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Will this slow down my store?": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "I closed a toast and they stopped appearing. Why?": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Can I wait for scroll, exit intent, or add to cart instead of page load?": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "How do I preview before going live?": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Time labels feel jumpy or robotic. What can I change?": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Cron isn’t updating the sales cache. What should I do?": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "What’s the difference between cache lifetime and cron interval?": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "How does the webhook digest work?": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Still stuck — how do I get help?": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Settings map": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Getting started": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Click a toast in the sidebar preview, then Save settings (Enter works in most fields).": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "How it works": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Data sources": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Processing/completed orders inside the lookback window, respecting consent and privacy.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Simulated people/times; products from your published catalog when available.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Message, types & privacy": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Purchase tokens: {name}, {city}, {product}, {stock}, {stock_label}.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Simulated names & times: under Purchases; used for Demo only and Real + demo fill.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Viewing now: {count}, {people}, {product}. Simulated range or live unique visitors on the product page (no IPs).": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Reviews: {name}, {rating}, {stars}, {product}, {excerpt} from approved WooCommerce reviews.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "CTA / coupon: promo line, optional code (click to copy), and button URL.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Stock: Off / Soft phrases / Exact when low — real orders only, qty at or below threshold; demo never shows stock.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Only first name and city are shown — never email or full address.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Checkout consent hides customers who declined; legacy/admin orders without a choice can still appear.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Hide names always uses the fallback name (e.g. “Someone”).": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Consent meta key on the order: _mw_st_allow_public.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Page load, scroll depth, exit intent, add to cart, inactivity, or a CSS click selector. The first match starts the loop.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Wait after page load before the first toast (when Page load is a trigger).": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "How long each toast stays on screen.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Quiet time after a toast hides before the next one.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Randomizes delay and gap (±%) so the rhythm feels less robotic. Visible time is never jittered. Does not shuffle which events appear.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "When on, hovering a toast pauses the visible timer until the pointer leaves. When off, the toast still auto-hides on schedule.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Natural (just now…) or Exact (2 minutes ago) for real orders; demo lines are shown as written.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "How many unique toasts a visitor sees in one session (newest first). The list does not repeat. The estimate under this field is delay + visible + gaps for that count.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "How long the rebuilt list is kept (default 15 minutes). Remaining time is shown next to the field.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "How often WP-Cron rebuilds the list (default 15 minutes). Keep this equal to cache lifetime.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "How many recent WooCommerce orders are queried during a rebuild. Keep this ≥ Toasts per visit.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "How far back orders are considered.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Clears and rebuilds the list immediately from saved settings.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Closing with × can mute future toasts for N hours (0 = current toast only).": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "REST API": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Front end fetches events from": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "with an X-MW-ST-Nonce header. Bare requests get 403. Supports background refetch.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Inline": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Troubleshooting": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Cron not scheduled: open this settings page once or re-activate the plugin. Use Rebuild cache for an immediate refresh.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Questions, bugs, or setup help for Merchant Whisper. We usually reply within 1–2 business days.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Name": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Email": [
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Subject": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "e.g. Toast not showing on product pages": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Describe what you expected, what happened, and any steps to reproduce…": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Include system info (WordPress, PHP, WooCommerce, theme)": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Preview system info": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Profile": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "WordPress account details used for support communication.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Newsletter": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Product updates and release notes. Coming soon — nothing is emailed yet.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Email updates": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Webhook": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Optional stats digest to any HTTPS JSON webhook. Off by default. Slack Incoming Webhooks are the usual example.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Webhook URL": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Digest": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "How often to send the digest.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Test": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Uses the URL in the field above (save to keep it). Limited to one successful test every 15 seconds.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Import / export": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Copy messages, timing, and design to another site. Newsletter and webhook URL stay here.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Leave the targeting boxes unchecked unless this is the same store (or a clone). Product and category IDs from another catalog will not match. Colors-only: Design → Theme JSON.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Preview": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Click a toast to preview it on this page using the form values above (save to apply on the storefront).": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Tips": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Prefer “Real + demo fill” until you have steady order volume.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Keep checkout consent on for GDPR-friendly social proof.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Saving settings clears the sales cache so the next rebuild uses your new options.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Changes apply after save. The front-end cache rebuilds automatically.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "%dh": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "%1$dh %2$dm": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "%dm": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "%1$dm %2$ds": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "%ds": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "You do not have permission to export Merchant Whisper settings.": [
+    "includes/class-transfer.php"
+  ],
+  "Could not build the export file.": [
+    "includes/class-transfer.php"
+  ],
+  "You do not have permission to import Merchant Whisper settings.": [
+    "includes/class-transfer.php"
+  ],
+  "Export theme JSON": [
+    "includes/class-transfer.php"
+  ],
+  "Export settings": [
+    "includes/class-transfer.php"
+  ],
+  "Import theme": [
+    "includes/class-transfer.php"
+  ],
+  "Import settings": [
+    "includes/class-transfer.php"
+  ],
+  "Replace the current toast design with this theme file?": [
+    "includes/class-transfer.php"
+  ],
+  "Replace messages, timing, and other settings? This store’s product, category, and URL targeting will be kept.": [
+    "includes/class-transfer.php"
+  ],
+  "Replace settings including product, category, and URL targeting from the file? Those IDs only match the store they were exported from.": [
+    "includes/class-transfer.php"
+  ],
+  "Include product, category, and URL targeting in the export": [
+    "includes/class-transfer.php",
+    "includes/class-transfer.php"
+  ],
+  "On import, apply that targeting from the file": [
+    "includes/class-transfer.php",
+    "includes/class-transfer.php"
+  ],
+  "You do not have permission to send this request.": [
+    "includes/class-support.php"
+  ],
+  "Please wait a few minutes before sending another message.": [
+    "includes/class-support.php"
+  ],
+  "Please fill in name, email, subject, and message.": [
+    "includes/class-support.php"
+  ],
+  "Message is too long.": [
+    "includes/class-support.php"
+  ],
+  "Could not reach the support form service. Please try again later.": [
+    "includes/class-support.php"
+  ],
+  "Message sent. We’ll get back to you as soon as we can.": [
+    "includes/class-support.php"
+  ],
+  "Enter a valid HTTPS webhook URL.": [
+    "includes/class-slack.php",
+    "includes/class-slack.php"
+  ],
+  "No HTTP response (%s).": [
+    "includes/class-slack.php"
+  ],
+  "no HTTP status": [
+    "includes/class-slack.php"
+  ],
+  "The webhook did not accept the message (%s). Check the URL and try again.": [
+    "includes/class-slack.php"
+  ],
+  "%1$s is connected for %2$s.": [
+    "includes/class-slack.php"
+  ],
+  "Statistics collection is off. Turn it on under Statistics → Collection.": [
+    "includes/class-slack.php"
+  ],
+  "*%1$s* — %2$s on `%3$s`": [
+    "includes/class-slack.php"
+  ],
+  "• Impressions: *%s*": [
+    "includes/class-slack.php"
+  ],
+  "• Clicks: *%s*": [
+    "includes/class-slack.php"
+  ],
+  "• CTR: *%s%%*": [
+    "includes/class-slack.php"
+  ],
+  "• Attributed carts: *%s*": [
+    "includes/class-slack.php"
+  ],
+  "• Attributed orders: *%s*": [
+    "includes/class-slack.php"
+  ],
+  "• Attributed revenue: *%s*": [
+    "includes/class-slack.php"
+  ],
+  "Open Statistics": [
+    "includes/class-slack.php"
+  ],
+  "%1$s — %2$s on %3$s: %4$s impressions, %5$s clicks (%6$s%% CTR), %7$s carts, %8$s orders, %9$s revenue.": [
+    "includes/class-slack.php"
+  ],
+  "You do not have permission to test the webhook.": [
+    "includes/class-slack.php"
+  ],
+  "Test message sent (HTTP %d). Check your webhook receiver (e.g. Slack).": [
+    "includes/class-slack.php"
+  ],
+  "last %d day": [
+    "includes/class-slack.php"
+  ],
+  "last %d days": [
+    "includes/class-slack.php"
+  ],
+  "Please wait %d second before sending another test.": [
+    "includes/class-slack.php"
+  ],
+  "Please wait %d seconds before sending another test.": [
+    "includes/class-slack.php"
+  ],
+  "You do not have permission to reset statistics.": [
+    "includes/class-analytics.php"
+  ],
+  "Statistics cleared.": [
+    "includes/class-analytics.php"
+  ],
+  "You do not have permission to change this setting.": [
+    "includes/class-analytics.php",
+    "includes/class-analytics.php"
+  ],
+  "Toast statistics collection is on.": [
+    "includes/class-analytics.php"
+  ],
+  "Toast statistics collection is off.": [
+    "includes/class-analytics.php"
+  ],
+  "Attribution window set to %d minutes.": [
+    "includes/class-analytics.php"
+  ],
+  "Missing analytics nonce.": [
+    "includes/class-analytics.php"
+  ],
+  "Invalid or expired analytics nonce.": [
+    "includes/class-analytics.php"
+  ],
+  "Analytics unavailable.": [
+    "includes/class-analytics.php"
+  ],
+  "Unknown event.": [
+    "includes/class-analytics.php"
+  ],
+  "Real orders": [
+    "includes/class-analytics.php"
+  ],
+  "Demo": [
+    "includes/class-analytics.php"
+  ],
+  "Shop": [
+    "includes/class-analytics.php"
+  ],
+  "Category / tag": [
+    "includes/class-analytics.php"
+  ],
+  "Home": [
+    "includes/class-analytics.php"
+  ],
+  "Other": [
+    "includes/class-analytics.php"
+  ],
+  "Product link": [
+    "includes/class-analytics.php"
+  ],
+  "Coupon copy": [
+    "includes/class-analytics.php"
+  ],
+  "%d ms": [
+    "includes/class-analytics.php"
+  ],
+  "%s s": [
+    "includes/class-analytics.php"
+  ],
+  "%s%% vs prior": [
+    "includes/class-analytics.php",
+    "includes/class-analytics.php"
+  ]
+}
