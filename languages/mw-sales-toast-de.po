@@ -10,8 +10,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-18 02:42+0000\n"
-"PO-Revision-Date: 2026-08-18 02:42+0000\n"
+"POT-Creation-Date: 2026-08-18 02:50+0000\n"
+"PO-Revision-Date: 2026-08-18 02:50+0000\n"
 "X-Generator: Antigravity\n"
 "X-Domain: mw-sales-toast\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -595,11 +595,11 @@ msgstr "Could not send the webhook test. Please try again."
 
 #: includes/class-settings.php:3448
 msgid "Count"
-msgstr "Count"
+msgstr "Anzahl"
 
 #: includes/class-settings.php:3439
 msgid "Count mode"
-msgstr "Count mode"
+msgstr "Zählmodus"
 
 #: includes/class-settings.php:4693
 msgid "Counts only: impressions, auto-hides, dismissals, mutes, skips, clicks, toast type, source, page kind, trigger, click target, dwell averages, soft-attributed carts/orders, and order totals as revenue."
@@ -611,7 +611,7 @@ msgstr "Gutscheincode"
 
 #: includes/class-analytics.php:820
 msgid "Coupon copy"
-msgstr "Coupon copy"
+msgstr "Gutschein kopieren"
 
 #: includes/class-settings.php:4124 includes/class-settings.php:5170
 msgid "Cron interval"
@@ -699,11 +699,11 @@ msgstr "Nur Demo"
 
 #: includes/class-settings.php:3388
 msgid "Demo people"
-msgstr "Demo people"
+msgstr "Simulierte Personen"
 
 #: includes/class-settings.php:3400
 msgid "Demo times"
-msgstr "Demo times"
+msgstr "Simulierte Zeiten"
 
 #: includes/class-settings.php:5269
 msgid "Describe what you expected, what happened, and any steps to reproduce…"
@@ -715,7 +715,7 @@ msgstr "Design"
 
 #: includes/class-settings.php:3657
 msgid "Design theme"
-msgstr "Design theme"
+msgstr "Design-Theme"
 
 #: includes/class-settings.php:5423
 msgid "Digest"
@@ -731,7 +731,7 @@ msgstr "Deaktiviert"
 
 #: includes/class-settings.php:1978 includes/class-settings.php:2911 includes/class-settings.php:2951
 msgid "Dismiss"
-msgstr "Dismiss"
+msgstr "Schließen"
 
 #: includes/class-settings.php:2010 includes/class-settings.php:4307 includes/class-settings.php:4434 includes/class-settings.php:4471
 msgid "Dismissed"
@@ -767,7 +767,7 @@ msgstr "Schlagschatten unter der Benachrichtigung. Wählen Sie Keiner für ein f
 
 #: includes/class-settings.php:3464
 msgid "Each product gets a stable count in this range."
-msgstr "Each product gets a stable count in this range."
+msgstr "Jedes Produkt erhält eine stabile Anzahl in diesem Bereich."
 
 #: includes/class-settings.php:3085
 msgid "Edge distance"
@@ -787,7 +787,7 @@ msgstr "Elementor"
 
 #: includes/class-settings.php:3710
 msgid "Elementor is active, but no Site Kit colors/fonts were found yet. Open Elementor → Site Settings → Global Colors / Global Fonts, then reload this page."
-msgstr "Elementor is active, but no Site Kit colors/fonts were found yet. Open Elementor → Site Settings → Global Colors / Global Fonts, then reload this page."
+msgstr "Elementor ist aktiv, aber es wurden noch keine Site Kit Farben/Schriftarten gefunden. Öffnen Sie Elementor → Website-Einstellungen → Globale Farben / Globale Schriftarten und laden Sie diese Seite neu."
 
 #: includes/class-settings.php:5259 includes/class-settings.php:5311
 msgid "Email"
@@ -811,7 +811,7 @@ msgstr "Aktiviert"
 
 #: includes/class-slack.php:367 includes/class-slack.php:68
 msgid "Enter a valid HTTPS webhook URL."
-msgstr "Enter a valid HTTPS webhook URL."
+msgstr "Geben Sie eine gültige HTTPS-Webhook-URL ein."
 
 #: includes/class-settings.php:3111
 msgid "Entire site"
@@ -835,7 +835,7 @@ msgstr "Ereignisse werden als JSON in die Seite gedruckt."
 
 #: mw-sales-toast.php:56
 msgid "Every %d minutes (Merchant Whisper)"
-msgstr "Every %d minutes (Merchant Whisper)"
+msgstr "Alle %d Minuten (Merchant Whisper)"
 
 #: includes/class-settings.php:5362
 msgid "Every 2 weeks"
@@ -859,11 +859,11 @@ msgstr "Exakt — vor 2 Minuten, vor 3 Tagen…"
 
 #: includes/class-settings.php:1983 includes/class-types.php:579
 msgid "Exactly what I needed."
-msgstr "Exactly what I needed."
+msgstr "Genau das, was ich brauchte."
 
 #: includes/class-settings.php:3531
 msgid "Excerpt"
-msgstr "Excerpt"
+msgstr "Auszug"
 
 #: includes/class-settings.php:3184
 msgid "Exclude URLs"
@@ -887,7 +887,7 @@ msgstr "Exit-Intent (Verlassensabsicht)"
 
 #: includes/class-cache.php:70 includes/class-settings.php:2509
 msgid "Expires in %s"
-msgstr "Expires in %s"
+msgstr "Läuft ab in %s"
 
 #: includes/class-transfer.php:393
 msgid "Export settings"
@@ -911,7 +911,7 @@ msgstr "Schnellerer Rhythmus — sparsam verwenden"
 
 #: includes/class-settings.php:3511
 msgid "Filters"
-msgstr "Filters"
+msgstr "Filter"
 
 #: includes/class-settings.php:4050 includes/class-settings.php:5162
 msgid "First delay"
@@ -955,7 +955,7 @@ msgstr "Gute Standardeinstellung für die meisten Shops"
 
 #: includes/class-types.php:580
 msgid "Great quality — will order again."
-msgstr "Great quality — will order again."
+msgstr "Tolle Qualität — werde wieder bestellen."
 
 #: includes/class-settings.php:5415
 msgid "HTTPS only. Example: create a Slack app, enable Incoming Webhooks, add it to a channel, then paste that URL. Make, n8n, and similar tools that accept JSON work the same way. Local and private addresses are blocked. %s"
@@ -963,7 +963,7 @@ msgstr "Nur HTTPS. Beispiel: Erstellen Sie eine Slack-App, aktivieren Sie Incomi
 
 #: includes/class-types.php:582
 msgid "Happy with this purchase."
-msgstr "Happy with this purchase."
+msgstr "Sehr zufrieden mit diesem Kauf."
 
 #: includes/class-settings.php:3239
 msgid "Hide for roles"
@@ -995,7 +995,7 @@ msgstr "Ausblenden, wenn der Bildschirm schmäler als diese Breite ist (verwende
 
 #: includes/class-analytics.php:809
 msgid "Home"
-msgstr "Home"
+msgstr "Startseite"
 
 #: includes/class-settings.php:3120
 msgid "Homepage"
@@ -1115,7 +1115,7 @@ msgstr "Import wird sofort angewendet."
 
 #: includes/class-settings.php:2927 includes/class-settings.php:2937
 msgid "Import failed"
-msgstr "Import failed"
+msgstr "Import fehlgeschlagen"
 
 #: includes/class-transfer.php:396
 msgid "Import settings"
@@ -1127,7 +1127,7 @@ msgstr "Theme importieren"
 
 #: includes/class-settings.php:2015
 msgid "Importing…"
-msgstr "Importing…"
+msgstr "Importieren…"
 
 #: includes/class-settings.php:2007 includes/class-settings.php:2727 includes/class-settings.php:4262 includes/class-settings.php:4304 includes/class-settings.php:4327 includes/class-settings.php:4618
 msgid "Impressions"
@@ -1147,7 +1147,7 @@ msgstr "Inaktivität"
 
 #: includes/class-settings.php:3294
 msgid "Include"
-msgstr "Include"
+msgstr "Einschließen"
 
 #: includes/class-settings.php:3174
 msgid "Include URLs"
@@ -1187,7 +1187,7 @@ msgstr "Inline — JSON in die Seite einbetten (keine REST-API)"
 
 #: includes/class-settings.php:3333
 msgid "Insert placeholder"
-msgstr "Insert placeholder"
+msgstr "Platzhalter einfügen"
 
 #: includes/class-settings.php:3719
 msgid "Install and activate Elementor to match toast colors and font to your Site Kit."
@@ -1195,11 +1195,11 @@ msgstr "Installieren und aktivieren Sie Elementor, um die Farben und die Schrift
 
 #: includes/class-analytics.php:326
 msgid "Invalid or expired analytics nonce."
-msgstr "Invalid or expired analytics nonce."
+msgstr "Ungültiges oder abgelaufenes Analyse-Nonce."
 
 #: includes/class-rest.php:104
 msgid "Invalid or expired notifications nonce."
-msgstr "Invalid or expired notifications nonce."
+msgstr "Ungültiges oder abgelaufenes Benachrichtigungs-Nonce."
 
 #: includes/class-settings.php:4830
 msgid "Is this GDPR / privacy friendly?"
@@ -1227,7 +1227,7 @@ msgstr "Wichtige Kennzahlen"
 
 #: includes/class-settings.php:2152
 msgid "Language"
-msgstr "Language"
+msgstr "Sprache"
 
 #: includes/class-settings.php:2112 includes/class-settings.php:2871
 msgid "Languages"
@@ -1235,15 +1235,15 @@ msgstr "Sprachen"
 
 #: includes/class-settings.php:3866
 msgid "Layout & state"
-msgstr "Layout & state"
+msgstr "Layout & Status"
 
 #: includes/class-settings.php:3480
 msgid "Leave empty for random catalog products."
-msgstr "Leave empty for random catalog products."
+msgstr "Leer lassen für zufällige Katalogprodukte."
 
 #: includes/class-settings.php:3578
 msgid "Leave empty to copy the coupon when the button is clicked."
-msgstr "Leave empty to copy the coupon when the button is clicked."
+msgstr "Leer lassen, um den Gutschein beim Klicken auf den Button zu kopieren."
 
 #: includes/class-settings.php:5464
 msgid "Leave the targeting boxes unchecked unless this is the same store (or a clone). Product and category IDs from another catalog will not match. Colors-only: Design → Theme JSON."
@@ -1255,11 +1255,11 @@ msgstr "Hell"
 
 #: includes/class-settings.php:3460
 msgid "Live window"
-msgstr "Live window"
+msgstr "Live-Fenster"
 
 #: includes/class-settings.php:3443
 msgid "Live — unique visitors on this product (last N minutes)"
-msgstr "Live — unique visitors on this product (last N minutes)"
+msgstr "Live — eindeutige Besucher für dieses Produkt (letzte N Minuten)"
 
 #: includes/class-settings.php:3259
 msgid "Logged-in users with any selected role will not see toasts. Useful for admins and shop managers."
@@ -1271,7 +1271,7 @@ msgstr "Rückblick"
 
 #: includes/class-settings.php:3527
 msgid "Lookback is days. Hide names still applies. Stars appear under the line when you omit {stars}."
-msgstr "Lookback is days. Hide names still applies. Stars appear under the line when you omit {stars}."
+msgstr "Rückblick in Tagen. Namen ausblenden gilt weiterhin. Sterne erscheinen unter der Zeile, wenn Sie {stars} weglassen."
 
 #: includes/class-settings.php:4147
 msgid "Lookback window"
@@ -1279,7 +1279,7 @@ msgstr "Rückblick-Fenster"
 
 #: includes/class-settings.php:3709
 msgid "Maps Site Kit Text → message, Accent → product link, Secondary → background/meta/close, and Text font → toast typeface. Opacity and radius still apply."
-msgstr "Maps Site Kit Text → message, Accent → product link, Secondary → background/meta/close, and Text font → toast typeface. Opacity and radius still apply."
+msgstr "Verknüpft Site Kit Text → Nachricht, Akzent → Produktlink, Sekundär → Hintergrund/Meta/Schließen und Textschriftart → Benachrichtigungsschriftart."
 
 #: includes/class-settings.php:2996
 msgid "Master switch for front-end toasts."
@@ -1287,7 +1287,7 @@ msgstr "Hauptschalter für Frontend-Benachrichtigungen."
 
 #: includes/class-settings.php:3456
 msgid "Max"
-msgstr "Max"
+msgstr "Max."
 
 #: includes/class-settings.php:4140 includes/class-settings.php:5171
 msgid "Max cached orders"
@@ -1295,7 +1295,7 @@ msgstr "Maximal gecachte Bestellungen"
 
 #: includes/class-settings.php:3519
 msgid "Max shown"
-msgstr "Max shown"
+msgstr "Max. angezeigt"
 
 #: includes/class-settings.php:3782
 msgid "Max width"
@@ -1323,11 +1323,11 @@ msgstr "Nachricht & Datenschutz"
 
 #: includes/class-support.php:84
 msgid "Message is too long."
-msgstr "Message is too long."
+msgstr "Nachricht ist zu lang."
 
 #: includes/class-support.php:149
 msgid "Message sent. We’ll get back to you as soon as we can."
-msgstr "Message sent. We’ll get back to you as soon as we can."
+msgstr "Nachricht gesendet. Wir melden uns so schnell wie möglich bei Ihnen."
 
 #: includes/class-settings.php:5138
 msgid "Message, types & privacy"
@@ -1343,11 +1343,11 @@ msgstr "Mitternacht"
 
 #: includes/class-settings.php:3452
 msgid "Min"
-msgstr "Min"
+msgstr "Min."
 
 #: includes/class-settings.php:3515
 msgid "Min stars"
-msgstr "Min stars"
+msgstr "Mindeststerne"
 
 #: includes/class-settings.php:1023
 msgid "Minimal black with crisp edges"
@@ -1355,11 +1355,11 @@ msgstr "Minimales Schwarz mit scharfen Kanten"
 
 #: includes/class-analytics.php:319
 msgid "Missing analytics nonce."
-msgstr "Missing analytics nonce."
+msgstr "Fehlendes Analyse-Nonce."
 
 #: includes/class-rest.php:96
 msgid "Missing notifications nonce."
-msgstr "Missing notifications nonce."
+msgstr "Fehlendes Benachrichtigungs-Nonce."
 
 #: includes/class-settings.php:3290
 msgid "Mix purchase social proof with viewing counts, reviews, and a promo toast. Types rotate in the same loop."
@@ -1439,7 +1439,7 @@ msgstr "Nächster Lauf in %s"
 
 #: includes/class-slack.php:90
 msgid "No HTTP response (%s)."
-msgstr "No HTTP response (%s)."
+msgstr "Keine HTTP-Antwort (%s)."
 
 #: includes/class-settings.php:4695
 msgid "No cross-site tracking pixels; daily totals stay in a table on your WordPress site (90 days)."
@@ -1447,11 +1447,11 @@ msgstr "Keine Cross-Site-Tracking-Pixel; tägliche Summen bleiben in einer Tabel
 
 #: includes/class-settings.php:2736
 msgid "No data yet."
-msgstr "No data yet."
+msgstr "Noch keine Daten vorhanden."
 
 #: includes/class-settings.php:2932
 msgid "No file selected"
-msgstr "No file selected"
+msgstr "Keine Datei ausgewählt"
 
 #: includes/class-settings.php:3981
 msgid "No pointer, keyboard, or scroll activity for this long."
@@ -1463,7 +1463,7 @@ msgstr "Noch keine Produktdaten vorhanden."
 
 #: includes/class-settings.php:2960
 msgid "No toast events cached"
-msgstr "No toast events cached"
+msgstr "Keine Benachrichtigungsereignisse gecacht"
 
 #: includes/class-settings.php:5212
 msgid "No toasts: Enable on, cached events above 0 under Timing & cache → Order cache, not muted — start in %s."
@@ -1507,7 +1507,7 @@ msgstr "Auf Produktseiten nur Benachrichtigungen für dieses Produkt anzeigen"
 
 #: includes/class-settings.php:3582
 msgid "Once per visit"
-msgstr "Once per visit"
+msgstr "Einmal pro Besuch"
 
 #: includes/class-settings.php:3187
 msgid "One path per line. Matching pages never show toasts."
@@ -1519,11 +1519,11 @@ msgstr "Ein Pfad pro Zeile. Verwenden Sie * als Platzhalter. Leer lassen, um all
 
 #: includes/class-settings.php:3408
 msgid "One per line, shown as-is (e.g. “just now”). No automatic “ago” is added."
-msgstr "One per line, shown as-is (e.g. “just now”). No automatic “ago” is added."
+msgstr "Zeile für Zeile wie eingegeben angezeigt (z. B. „gerade eben”)."
 
 #: includes/class-settings.php:3396
 msgid "One per line: Name, City"
-msgstr "One per line: Name, City"
+msgstr "Eine pro Zeile: Name, Stadt"
 
 #: includes/class-settings.php:5146
 msgid "Only first name and city are shown — never email or full address."
@@ -1559,7 +1559,7 @@ msgstr "Nachricht & Datenschutz öffnen →"
 
 #: includes/class-slack.php:308
 msgid "Open Statistics"
-msgstr "Open Statistics"
+msgstr "Statistiken öffnen"
 
 #: includes/class-settings.php:5178
 msgid "Open Timing & cache →"
@@ -1599,7 +1599,7 @@ msgstr "Bestellungen im selben Fenster"
 
 #: includes/class-analytics.php:810
 msgid "Other"
-msgstr "Other"
+msgstr "Sonstige"
 
 #: includes/class-settings.php:4256
 msgid "Overview"
@@ -1647,17 +1647,17 @@ msgstr "Beispiel abspielen"
 
 #: includes/class-support.php:81
 msgid "Please fill in name, email, subject, and message."
-msgstr "Please fill in name, email, subject, and message."
+msgstr "Bitte füllen Sie Name, E-Mail, Betreff und Nachricht aus."
 
 #: includes/class-slack.php:353
 msgid "Please wait %d second before sending another test."
 msgid_plural "Please wait %d seconds before sending another test."
-msgstr[0] "Please wait %d second before sending another test."
-msgstr[1] "Please wait %d second before sending another test."
+msgstr[0] "Bitte warten Sie %d Sekunde, bevor Sie einen weiteren Test senden."
+msgstr[1] "Bitte warten Sie %d Sekunde, bevor Sie einen weiteren Test senden."
 
 #: includes/class-support.php:71
 msgid "Please wait a few minutes before sending another message."
-msgstr "Please wait a few minutes before sending another message."
+msgstr "Bitte warten Sie einige Minuten, bevor Sie eine weitere Nachricht senden."
 
 #: includes/class-settings.php:3273
 msgid "Pop sound"
@@ -1669,7 +1669,7 @@ msgstr "Position"
 
 #: includes/class-settings.php:4801 includes/class-settings.php:5126
 msgid "Prefer real sales; fill with demo when volume is low."
-msgstr "Bevorzugt echte Verkäufe; füllt bei geringem Volumen mit Demo auf."
+msgstr "Bevorzugt echte Verkäufe; fällt bei geringem Volumen mit Demo auf."
 
 #: includes/class-settings.php:5485
 msgid "Prefer “Real + demo fill” until you have steady order volume."
@@ -1685,7 +1685,7 @@ msgstr "Vorschau"
 
 #: includes/class-settings.php:1977
 msgid "Preview %s toast"
-msgstr "Preview %s toast"
+msgstr "Vorschau für %s Benachrichtigung"
 
 #: includes/class-settings.php:5276
 msgid "Preview system info"
@@ -1713,7 +1713,7 @@ msgstr "Nur Produkt-IDs — niemals Kundennamen, E-Mails, IP-Adressen oder Seite
 
 #: includes/class-settings.php:2313
 msgid "Product IDs, comma-separated"
-msgstr "Product IDs, comma-separated"
+msgstr "Produkt-IDs, kommagetrennt"
 
 #: includes/class-settings.php:3737
 msgid "Product accent"
@@ -1725,7 +1725,7 @@ msgstr "Produktbild"
 
 #: includes/class-analytics.php:819
 msgid "Product link"
-msgstr "Product link"
+msgstr "Produktlink"
 
 #: includes/class-settings.php:4404
 msgid "Product links versus coupon copy. Both start the attribution window."
@@ -1749,7 +1749,7 @@ msgstr "Produkt-Updates und Release-Notes. Demnächst verfügbar — es wird noc
 
 #: includes/class-settings.php:3469
 msgid "Products"
-msgstr "Products"
+msgstr "Produkte"
 
 #: includes/class-settings.php:4600
 msgid "Products with toast activity in the selected range (all types combined). Click a column to sort."
@@ -1813,7 +1813,7 @@ msgstr "Echte + Demo-Auffüllung"
 
 #: includes/class-analytics.php:802
 msgid "Real orders"
-msgstr "Real orders"
+msgstr "Echte Bestellungen"
 
 #: includes/class-settings.php:2964
 msgid "Real orders are enabled, but nothing is cached yet. Check Lookback window under Timing & cache, and Message & privacy → Checkout consent (customers who declined are hidden; admin/legacy orders without a choice still count)."
@@ -1857,7 +1857,7 @@ msgstr "Cache neu aufbauen"
 
 #: includes/class-settings.php:2034
 msgid "Rebuilding cache…"
-msgstr "Rebuilding cache…"
+msgstr "Cache wird neu aufgebaut…"
 
 #: includes/class-settings.php:4799
 msgid "Recent eligible WooCommerce sales."
@@ -1877,7 +1877,7 @@ msgstr "Ereignisse aufzeichnen"
 
 #: includes/class-settings.php:4642
 msgid "Record events and attribution save immediately. Reset clears stored totals. Other plugin settings still use Save settings below."
-msgstr "Record events and attribution save immediately. Reset clears stored totals. Other plugin settings still use Save settings below."
+msgstr "Ereignisaufzeichnung und Attribution werden sofort gespeichert. Zurücksetzen löscht gespeicherte Summen."
 
 #: includes/class-settings.php:3617
 msgid "Reduce fatigue so toasts stay helpful, not noisy."
@@ -1897,7 +1897,7 @@ msgstr "Möchten Sie Nachrichten, Timing und andere Einstellungen ersetzen?"
 
 #: includes/class-transfer.php:400
 msgid "Replace settings including product, category, and URL targeting from the file? Those IDs only match the store they were exported from."
-msgstr "Replace settings including product, category, and URL targeting from the file? Those IDs only match the store they were exported from."
+msgstr "Einstellungen inkl. Produkt-, Kategorie- und URL-Targeting aus der Datei ersetzen?"
 
 #: includes/class-transfer.php:398
 msgid "Replace the current toast design with this theme file?"
@@ -1913,7 +1913,7 @@ msgstr "Design auf Standardwerte zurücksetzen"
 
 #: includes/class-settings.php:2017 includes/class-settings.php:3928
 msgid "Reset design to defaults?"
-msgstr "Reset design to defaults?"
+msgstr "Design auf Standardwerte zurücksetzen?"
 
 #: includes/class-settings.php:2005 includes/class-settings.php:4680 includes/class-settings.php:4709
 msgid "Reset statistics"
@@ -1925,7 +1925,7 @@ msgstr "Statistiken zurücksetzen?"
 
 #: includes/class-settings.php:2018 includes/class-settings.php:3929
 msgid "Restore colors, layout, and shape to the Midnight preset? Unsaved design changes on this tab will be lost until you save settings."
-msgstr "Restore colors, layout, and shape to the Midnight preset? Unsaved design changes on this tab will be lost until you save settings."
+msgstr "Farben, Layout und Form auf die Voreinstellung Mitternacht zurücksetzen?"
 
 #: includes/class-settings.php:3908
 msgid "Reuse colors, layout, and custom CSS across stores. Does not change targeting, privacy, or demo data."
@@ -2021,7 +2021,7 @@ msgstr "Sitzungs-Limits"
 
 #: includes/class-settings.php:774
 msgid "Set delay, visible time, and gap yourself"
-msgstr "Set delay, visible time, and gap yourself"
+msgstr "Verzögerung, sichtbare Zeit und Pause selbst einstellen"
 
 #: includes/class-settings.php:5081
 msgid "Set position, edge distance, and which pages may show toasts (%s)."
