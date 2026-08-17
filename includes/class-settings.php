@@ -18,6 +18,8 @@ class MW_Sales_Toast_Settings {
 	public static function init() {
 		add_action( 'admin_init', array( __CLASS__, 'register' ) );
 		add_action( 'admin_menu', array( __CLASS__, 'menu' ) );
+		add_filter( 'parent_file', array( __CLASS__, 'parent_file' ) );
+		add_filter( 'submenu_file', array( __CLASS__, 'submenu_file' ), 10, 2 );
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_admin' ) );
 		add_filter(
 			'plugin_action_links_' . plugin_basename( MW_SALES_TOAST_FILE ),
@@ -1634,6 +1636,120 @@ class MW_Sales_Toast_Settings {
 	}
 
 	/**
+	 * Settings tabs (id => label).
+	 *
+	 * @return array<string, string>
+	 */
+	public static function tabs() {
+		return array(
+			'general'    => __( 'General', 'mw-sales-toast' ),
+			'message'    => __( 'Message & privacy', 'mw-sales-toast' ),
+			'design'     => __( 'Design', 'mw-sales-toast' ),
+			'timing'     => __( 'Timing & cache', 'mw-sales-toast' ),
+			'statistics' => __( 'Statistics', 'mw-sales-toast' ),
+			'support'    => __( 'Support', 'mw-sales-toast' ),
+			'account'    => __( 'Account', 'mw-sales-toast' ),
+		);
+	}
+
+	/**
+	 * Admin page slug for a tab.
+	 *
+	 * @param string $tab Tab id.
+	 * @return string
+	 */
+	public static function page_slug( $tab ) {
+		$tab = sanitize_key( $tab );
+		if ( 'general' === $tab || ! isset( self::tabs()[ $tab ] ) ) {
+			return 'mw-sales-toast';
+		}
+		return 'mw-sales-toast-' . $tab;
+	}
+
+	/**
+	 * Admin URL for a settings tab.
+	 *
+	 * @param string $tab Tab id.
+	 * @return string
+	 */
+	public static function tab_url( $tab ) {
+		return admin_url( 'admin.php?page=' . rawurlencode( self::page_slug( $tab ) ) );
+	}
+
+	/**
+	 * Whether the current admin screen is this plugin.
+	 *
+	 * @param string|null $page Optional page slug.
+	 * @return bool
+	 */
+	public static function is_plugin_page( $page = null ) {
+		if ( null === $page ) {
+			$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		} else {
+			$page = sanitize_key( $page );
+		}
+		return 'mw-sales-toast' === $page || 0 === strpos( $page, 'mw-sales-toast-' );
+	}
+
+	/**
+	 * Tab id from the current request (page slug, with ?tab= fallback).
+	 *
+	 * @return string
+	 */
+	public static function tab_from_request() {
+		$allowed = array_keys( self::tabs() );
+		$page    = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : 'mw-sales-toast'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$tab     = 'general';
+		if ( 0 === strpos( $page, 'mw-sales-toast-' ) ) {
+			$tab = substr( $page, strlen( 'mw-sales-toast-' ) );
+		}
+		if ( isset( $_GET['tab'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$tab = sanitize_key( wp_unslash( $_GET['tab'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		}
+		if ( 'contact' === $tab ) {
+			$tab = 'support';
+		}
+		if ( 'license' === $tab ) {
+			$tab = 'account';
+		}
+		if ( 'demo' === $tab ) {
+			$tab = 'message';
+		}
+		if ( ! in_array( $tab, $allowed, true ) ) {
+			$tab = 'general';
+		}
+		return $tab;
+	}
+
+	/**
+	 * Keep the Merchant Whisper top-level menu open on tab screens.
+	 *
+	 * @param string $parent_file Parent file.
+	 * @return string
+	 */
+	public static function parent_file( $parent_file ) {
+		if ( self::is_plugin_page() ) {
+			return 'mw-sales-toast';
+		}
+		return $parent_file;
+	}
+
+	/**
+	 * Highlight the matching submenu item.
+	 *
+	 * @param string $submenu_file Submenu file.
+	 * @param string $parent_file  Parent file.
+	 * @return string
+	 */
+	public static function submenu_file( $submenu_file, $parent_file ) {
+		unset( $parent_file );
+		if ( ! self::is_plugin_page() ) {
+			return $submenu_file;
+		}
+		return self::page_slug( self::tab_from_request() );
+	}
+
+	/**
 	 * Settings link on Plugins → Installed Plugins.
 	 *
 	 * @param array<string, string> $links Action links.
@@ -1662,7 +1778,8 @@ class MW_Sales_Toast_Settings {
 	 * Top-level admin menu (always). Also listed under WooCommerce when present.
 	 */
 	public static function menu() {
-		$cap = self::capability();
+		$cap  = self::capability();
+		$tabs = self::tabs();
 
 		add_menu_page(
 			__( 'Merchant Whisper', 'mw-sales-toast' ),
@@ -1674,15 +1791,20 @@ class MW_Sales_Toast_Settings {
 			58
 		);
 
-		// Rename the auto-added first submenu item.
-		add_submenu_page(
-			'mw-sales-toast',
-			__( 'Merchant Whisper', 'mw-sales-toast' ),
-			__( 'Settings', 'mw-sales-toast' ),
-			$cap,
-			'mw-sales-toast',
-			array( __CLASS__, 'render' )
-		);
+		foreach ( $tabs as $id => $label ) {
+			add_submenu_page(
+				'mw-sales-toast',
+				sprintf(
+					/* translators: %s: tab name */
+					__( '%s — Merchant Whisper', 'mw-sales-toast' ),
+					$label
+				),
+				$label,
+				$cap,
+				self::page_slug( $id ),
+				array( __CLASS__, 'render' )
+			);
+		}
 
 		if ( class_exists( 'WooCommerce' ) ) {
 			add_submenu_page(
@@ -2555,7 +2677,7 @@ class MW_Sales_Toast_Settings {
 		}
 		return sprintf(
 			'<a href="%1$s" class="mwst-tab-link" data-tab="%2$s">%3$s</a>',
-			'' !== $hash ? esc_url( $hash ) : esc_url( add_query_arg( 'tab', $tab ) ),
+			'' !== $hash ? esc_url( $hash ) : esc_url( self::tab_url( $tab ) ),
 			esc_attr( $tab ),
 			esc_html( $label )
 		);
@@ -2641,23 +2763,7 @@ class MW_Sales_Toast_Settings {
 		$saved    = isset( $_GET['settings-updated'] ) && 'true' === $_GET['settings-updated']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$transfer = isset( $_GET['mwst_transfer'] ) ? sanitize_key( wp_unslash( $_GET['mwst_transfer'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-		$allowed_tabs = array( 'general', 'message', 'design', 'timing', 'statistics', 'support', 'account' );
-		$current_tab  = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'general'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		// Legacy Contact tab now lives under Support → Contact.
-		if ( 'contact' === $current_tab ) {
-			$current_tab = 'support';
-		}
-		// Legacy License tab → Account.
-		if ( 'license' === $current_tab ) {
-			$current_tab = 'account';
-		}
-		// Legacy Demo data tab → Message & privacy → Purchases.
-		if ( 'demo' === $current_tab ) {
-			$current_tab = 'message';
-		}
-		if ( ! in_array( $current_tab, $allowed_tabs, true ) ) {
-			$current_tab = 'general';
-		}
+		$current_tab  = self::tab_from_request();
 
 		$source_labels = array(
 			'real_orders'    => __( 'Real orders only', 'mw-sales-toast' ),

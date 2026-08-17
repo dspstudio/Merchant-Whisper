@@ -131,6 +131,9 @@ class MW_Sales_Toast_Slack {
 	 * @return string
 	 */
 	public static function stats_url() {
+		if ( class_exists( 'MW_Sales_Toast_Settings' ) ) {
+			return MW_Sales_Toast_Settings::tab_url( 'statistics' );
+		}
 		return add_query_arg(
 			array(
 				'page' => 'mw-sales-toast',

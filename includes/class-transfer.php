@@ -115,14 +115,16 @@ class MW_Sales_Toast_Transfer {
 		if ( ! in_array( $tab, array( 'design', 'account' ), true ) ) {
 			$tab = 'account';
 		}
-		return add_query_arg(
-			array(
-				'page'          => 'mw-sales-toast',
-				'tab'           => $tab,
-				'mwst_transfer' => sanitize_key( $status ),
-			),
-			admin_url( 'admin.php' )
-		);
+		$url = class_exists( 'MW_Sales_Toast_Settings' )
+			? MW_Sales_Toast_Settings::tab_url( $tab )
+			: add_query_arg(
+				array(
+					'page' => 'mw-sales-toast',
+					'tab'  => $tab,
+				),
+				admin_url( 'admin.php' )
+			);
+		return add_query_arg( 'mwst_transfer', sanitize_key( $status ), $url );
 	}
 
 	/**

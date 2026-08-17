@@ -541,9 +541,31 @@
 		}
 	});
 
+	function pageSlugForTab(id) {
+		if (!id || id === 'general') {
+			return 'mw-sales-toast';
+		}
+		return 'mw-sales-toast-' + id;
+	}
+
+	function applyTabToUrl(url, id) {
+		url.searchParams.set('page', pageSlugForTab(id));
+		url.searchParams.delete('tab');
+		return url;
+	}
+
 	function tabFromUrl() {
 		try {
-			var id = new URL(window.location.href).searchParams.get('tab') || 'general';
+			var url = new URL(window.location.href);
+			var id = url.searchParams.get('tab') || '';
+			if (!id) {
+				var page = url.searchParams.get('page') || 'mw-sales-toast';
+				if (page.indexOf('mw-sales-toast-') === 0) {
+					id = page.slice('mw-sales-toast-'.length);
+				} else {
+					id = 'general';
+				}
+			}
 			// Legacy Contact tab → Support (Contact section).
 			if (id === 'contact') {
 				return 'support';
@@ -559,6 +581,31 @@
 		} catch (err) {
 			return 'general';
 		}
+	}
+
+	function syncWpAdminMenu(id) {
+		var want = pageSlugForTab(id);
+		var links = document.querySelectorAll('#toplevel_page_mw-sales-toast .wp-submenu a');
+		links.forEach(function (a) {
+			var on = false;
+			try {
+				on = new URL(a.href, window.location.origin).searchParams.get('page') === want;
+			} catch (err) {
+				var href = a.getAttribute('href') || '';
+				on =
+					href.indexOf('page=' + want) !== -1 &&
+					(want !== 'mw-sales-toast' || href.indexOf('page=mw-sales-toast-') === -1);
+			}
+			var li = a.parentElement;
+			if (li) {
+				li.classList.toggle('current', on);
+			}
+			if (on) {
+				a.setAttribute('aria-current', 'page');
+			} else {
+				a.removeAttribute('aria-current');
+			}
+		});
 	}
 
 	function scrollToHashTarget() {
@@ -596,8 +643,7 @@
 
 	function syncTabUrl(id) {
 		try {
-			var url = new URL(window.location.href);
-			url.searchParams.set('tab', id);
+			var url = applyTabToUrl(new URL(window.location.href), id);
 			window.history.replaceState({}, '', url.pathname + url.search + url.hash);
 		} catch (err) {
 			// Ignore URL sync failures (older browsers).
@@ -609,13 +655,13 @@
 				return;
 			}
 			try {
-				var ref = new URL(referer.value, window.location.origin);
-				ref.searchParams.set('tab', id);
+				var ref = applyTabToUrl(new URL(referer.value, window.location.origin), id);
 				referer.value = ref.pathname + ref.search + ref.hash;
 			} catch (err2) {
 				// Ignore referer sync failures.
 			}
 		});
+		syncWpAdminMenu(id);
 	}
 
 	function currentTabId() {
@@ -2749,7 +2795,8 @@
 	if (requestedTab === 'contact' && !window.location.hash) {
 		try {
 			var contactUrl = new URL(window.location.href);
-			contactUrl.searchParams.set('tab', 'support');
+			contactUrl.searchParams.set('page', pageSlugForTab('support'));
+			contactUrl.searchParams.delete('tab');
 			contactUrl.hash = 'mwst-support-contact';
 			window.history.replaceState(
 				{},
@@ -2767,7 +2814,8 @@
 		}
 		try {
 			var demoUrl = new URL(window.location.href);
-			demoUrl.searchParams.set('tab', 'message');
+			demoUrl.searchParams.set('page', pageSlugForTab('message'));
+			demoUrl.searchParams.delete('tab');
 			demoUrl.hash = 'mwst-demo-fold';
 			window.history.replaceState(
 				{},
@@ -2781,7 +2829,8 @@
 	} else if (requestedTab === 'license' && !window.location.hash) {
 		try {
 			var accountUrl = new URL(window.location.href);
-			accountUrl.searchParams.set('tab', 'account');
+			accountUrl.searchParams.set('page', pageSlugForTab('account'));
+			accountUrl.searchParams.delete('tab');
 			window.history.replaceState(
 				{},
 				'',
