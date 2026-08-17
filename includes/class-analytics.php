@@ -429,9 +429,11 @@ class MW_Sales_Toast_Analytics {
 		);
 		self::track( $event, $product_id, $type, $ctx );
 
-		$click_target = self::sanitize_click_target( $ctx['clickTarget'] );
-		if ( 'click' === $event && $product_id > 0 && 'coupon' !== $click_target ) {
-			self::set_attr_cookie( $product_id, $type );
+		if ( 'click' === $event ) {
+			$type_key = self::sanitize_toast_type( $type );
+			if ( $product_id > 0 || '' !== $type_key ) {
+				self::set_attr_cookie( $product_id, $type_key );
+			}
 		}
 
 		return rest_ensure_response( array( 'ok' => true ) );
@@ -555,12 +557,12 @@ class MW_Sales_Toast_Analytics {
 	 */
 	public static function set_attr_cookie( $product_id, $type = '' ) {
 		$product_id = absint( $product_id );
-		if ( $product_id < 1 ) {
+		$type       = self::sanitize_toast_type( $type );
+		if ( $product_id < 1 && '' === $type ) {
 			return;
 		}
 		$ttl   = self::attr_window_sec();
 		$value = $product_id . '.' . time();
-		$type  = self::sanitize_toast_type( $type );
 		if ( '' !== $type ) {
 			$value .= '.' . $type;
 		}
@@ -602,12 +604,16 @@ class MW_Sales_Toast_Analytics {
 		}
 		$product_id = (int) $m[1];
 		$ts         = (int) $m[2];
-		if ( $product_id < 1 || $ts < 1 || ( time() - $ts ) > self::attr_window_sec() ) {
+		$type       = isset( $m[3] ) ? self::sanitize_toast_type( $m[3] ) : '';
+		if ( $ts < 1 || ( time() - $ts ) > self::attr_window_sec() ) {
+			return $empty;
+		}
+		if ( $product_id < 1 && '' === $type ) {
 			return $empty;
 		}
 		return array(
 			'product_id' => $product_id,
-			'type'       => isset( $m[3] ) ? self::sanitize_toast_type( $m[3] ) : '',
+			'type'       => $type,
 		);
 	}
 
@@ -634,25 +640,28 @@ class MW_Sales_Toast_Analytics {
 	public static function on_add_to_cart( $cart_item_key, $product_id, $quantity, $variation_id = 0, $variation = array(), $cart_item_data = array() ) {
 		$attr    = self::get_attr();
 		$attr_id = (int) $attr['product_id'];
-		if ( $attr_id < 1 ) {
+		$type    = isset( $attr['type'] ) ? (string) $attr['type'] : '';
+		if ( $attr_id < 1 && '' === $type ) {
 			return;
 		}
-		$pid    = absint( $variation_id ? $variation_id : $product_id );
-		$parent = $pid;
-		if ( function_exists( 'wc_get_product' ) ) {
-			$product = wc_get_product( $pid );
-			if ( $product && $product->get_parent_id() ) {
-				$parent = (int) $product->get_parent_id();
+		if ( $attr_id > 0 ) {
+			$pid    = absint( $variation_id ? $variation_id : $product_id );
+			$parent = $pid;
+			if ( function_exists( 'wc_get_product' ) ) {
+				$product = wc_get_product( $pid );
+				if ( $product && $product->get_parent_id() ) {
+					$parent = (int) $product->get_parent_id();
+				}
+			}
+			if ( $attr_id !== $pid && $attr_id !== $parent ) {
+				return;
 			}
 		}
-		if ( $attr_id !== $pid && $attr_id !== $parent ) {
-			return;
-		}
-		$flag = 'mw_st_atc_' . $attr_id;
+		$flag = $attr_id > 0 ? 'mw_st_atc_' . $attr_id : 'mw_st_atc_type_' . $type;
 		if ( ! empty( $_COOKIE[ $flag ] ) ) {
 			return;
 		}
-		self::track( 'atc', $attr_id, $attr['type'] );
+		self::track( 'atc', $attr_id, $type );
 		$ttl = self::attr_window_sec();
 		if ( PHP_VERSION_ID >= 70300 ) {
 			setcookie(
@@ -711,26 +720,28 @@ class MW_Sales_Toast_Analytics {
 
 		$attr    = self::get_attr();
 		$attr_id = (int) $attr['product_id'];
-		if ( $attr_id < 1 ) {
+		$type    = isset( $attr['type'] ) ? (string) $attr['type'] : '';
+		if ( $attr_id < 1 && '' === $type ) {
 			return;
 		}
 
-		$matched = false;
-		foreach ( $order->get_items() as $item ) {
-			$pid = (int) $item->get_product_id();
-			$vid = (int) $item->get_variation_id();
-			if ( $attr_id === $pid || $attr_id === $vid ) {
-				$matched = true;
-				break;
+		if ( $attr_id > 0 ) {
+			$matched = false;
+			foreach ( $order->get_items() as $item ) {
+				$pid = (int) $item->get_product_id();
+				$vid = (int) $item->get_variation_id();
+				if ( $attr_id === $pid || $attr_id === $vid ) {
+					$matched = true;
+					break;
+				}
 			}
-		}
-		if ( ! $matched ) {
-			return;
+			if ( ! $matched ) {
+				return;
+			}
 		}
 
 		$order->update_meta_data( '_mw_st_attr_tracked', '1' );
 		$order->save();
-		$type = isset( $attr['type'] ) ? $attr['type'] : '';
 		self::track( 'purchase', $attr_id, $type );
 
 		$cents = (int) round( (float) $order->get_total() * 100 );
@@ -738,7 +749,9 @@ class MW_Sales_Toast_Analytics {
 			$day = gmdate( 'Y-m-d' );
 			self::maybe_install();
 			self::bump( $day, 'total', '', 'revenue', $cents );
-			self::bump( $day, 'product', (string) $attr_id, 'revenue', $cents );
+			if ( $attr_id > 0 ) {
+				self::bump( $day, 'product', (string) $attr_id, 'revenue', $cents );
+			}
 			$type_key = self::sanitize_toast_type( $type );
 			if ( '' !== $type_key ) {
 				self::bump( $day, 'type', $type_key, 'revenue', $cents );

@@ -1,6 +1,6 @@
 # Merchant Whisper
 
-**Version 2.2.3** — Social proof for WooCommerce: cached real orders, privacy controls, and optional demo fill.
+**Version 0.9.1** — Social proof for WooCommerce: cached real orders, privacy controls, and optional demo fill.
 
 Requires WordPress 5.8+, PHP 7.2+. WooCommerce is required for real orders; demo mode can run without it.
 
@@ -92,7 +92,7 @@ Requires WordPress 5.8+, PHP 7.2+. WooCommerce is required for real orders; demo
 - Daily impressions/clicks chart (Chart.js, bundled) with toggleable carts, orders, dismissals, auto-hides, and revenue
 - Breakdowns: toast type (including attributed carts/orders/revenue), real vs demo, page kind, trigger, click target (product vs coupon)
 - Completion funnel, skip reasons, dwell averages, per-product table, CSV export
-- Collection toggle and 15/30/60/120-minute attribution window (coupon clicks do not attribute)
+- Collection toggle and 15/30/60/120-minute attribution window (product-link and coupon copy both attribute)
 - Counts and product IDs only — no names, emails, IPs, or URLs
 - **Webhook digest (optional)** — HTTPS JSON POST on Account; weekly Monday UTC aggregates. Slack Incoming Webhooks are the example. Off by default; URL is site-local and skipped on settings import
 
@@ -230,6 +230,12 @@ Terms people may use in **WordPress Admin → Plugins → Add New** or Google:
 5. fomo
 
 ## Changelog
+
+### 0.9.1
+- Settings tabs are also admin submenu items under Merchant Whisper
+- Coupon copy starts the same attribution window as a product-link click
+- By source statistics include carts, orders, and revenue
+- Account webhook accepts any public HTTPS JSON URL (Slack Incoming Webhooks remain the example)
 
 ### 2.2.3
 - Account webhook accepts any public HTTPS JSON URL (Slack Incoming Webhooks remain the example)

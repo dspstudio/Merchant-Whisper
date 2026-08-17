@@ -4,7 +4,7 @@ Tags: woocommerce, ecommerce, notifications, social-proof, popup
 Requires at least: 5.8
 Tested up to: 7.0
 Requires PHP: 7.2
-Stable tag: 2.2.3
+Stable tag: 0.9.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -63,6 +63,12 @@ Recent orders are queried on WP-Cron and order hooks, then stored in a transient
 
 == Changelog ==
 
+= 0.9.1 =
+* Settings tabs are also WordPress admin submenu items under Merchant Whisper
+* Coupon copy starts the same attribution window as a product-link click
+* By source statistics include carts, orders, and revenue
+* Account webhook is a general HTTPS JSON digest (Slack Incoming Webhooks remain the example)
+
 = 2.2.3 =
 * Weekly digest webhook accepts any public HTTPS JSON URL; Slack Incoming Webhooks remain the example
 
@@ -89,6 +95,9 @@ Recent orders are queried on WP-Cron and order hooks, then stored in a transient
 * Initial toast UI and real/demo mix
 
 == Upgrade Notice ==
+
+= 0.9.1 =
+Public version is now 0.9.1. Coupon copy attributes carts and orders; settings tabs appear under Merchant Whisper in the admin menu.
 
 = 2.2.3 =
 The Account webhook field is a general HTTPS JSON hook. Slack Incoming Webhooks still work as before.

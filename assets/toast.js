@@ -57,11 +57,13 @@
 
   function setAttrCookie(productId, type) {
     var id = Number(productId) || 0;
-    if (id < 1) return;
+    var t = String(type || '')
+      .toLowerCase()
+      .replace(/[^a-z0-9_]/g, '');
+    if (id < 1 && !t) return;
     try {
       var maxAge = Math.max(60, Number(analyticsCfg.attrWindowSec) || 1800);
       var secure = location.protocol === 'https:' ? '; Secure' : '';
-      var t = String(type || '').toLowerCase().replace(/[^a-z0-9_]/g, '');
       document.cookie =
         'mw_st_attr=' +
         id +
@@ -649,6 +651,7 @@
           var couponPayload = eventPayload(currentEvent);
           couponPayload.clickTarget = 'coupon';
           track('click', couponPayload);
+          setAttrCookie(couponPayload.productId, couponPayload.type);
         }
         return;
       }
@@ -657,9 +660,7 @@
       var payload = eventPayload(currentEvent);
       payload.clickTarget = 'product';
       track('click', payload);
-      if (payload.productId) {
-        setAttrCookie(payload.productId, payload.type);
-      }
+      setAttrCookie(payload.productId, payload.type);
     });
 
     return el;

@@ -4342,7 +4342,7 @@ class MW_Sales_Toast_Settings {
 											</tbody>
 										</table>
 									</div>
-									<p class="description"><?php esc_html_e( 'Carts, orders, and revenue use the last product-link click in the attribution window. Coupon copy does not count. Older attributed totals stay in Overview only.', 'mw-sales-toast' ); ?></p>
+									<p class="description"><?php esc_html_e( 'Carts, orders, and revenue use the last toast click (product link or coupon copy) in the attribution window. Coupon / CTA toasts count any order in that window by toast type. Older attributed totals stay in Overview only.', 'mw-sales-toast' ); ?></p>
 								</div>
 							</details>
 
@@ -4379,7 +4379,7 @@ class MW_Sales_Toast_Settings {
 							<details class="mwst-card mwst-fold mwst-fold--card" id="mwst-stats-clicks" open>
 								<summary class="mwst-card__head">
 									<h2><?php echo self::dashicon_html( 'dashicons-admin-links' ); ?><?php esc_html_e( 'Click target', 'mw-sales-toast' ); ?></h2>
-									<p><?php esc_html_e( 'Product links versus coupon copy. Coupon clicks do not start attribution.', 'mw-sales-toast' ); ?></p>
+									<p><?php esc_html_e( 'Product links versus coupon copy. Both start the attribution window.', 'mw-sales-toast' ); ?></p>
 								</summary>
 								<div class="mwst-card__body">
 									<?php self::stats_metric_table( 'mwst-stats-clicks-body', $stats_seed['clickTargets'] ?? array(), __( 'Target', 'mw-sales-toast' ), __( 'Share', 'mw-sales-toast' ), true ); ?>
@@ -4548,7 +4548,7 @@ class MW_Sales_Toast_Settings {
 							<details class="mwst-card mwst-fold mwst-fold--card" id="mwst-stats-attribution" open>
 								<summary class="mwst-card__head">
 									<h2><?php echo self::dashicon_html( 'dashicons-randomize' ); ?><?php esc_html_e( 'Soft attribution', 'mw-sales-toast' ); ?></h2>
-									<p><?php esc_html_e( 'Window after a product-link toast click — product ID only. Coupon copy does not start this window.', 'mw-sales-toast' ); ?></p>
+									<p><?php esc_html_e( 'Window after a toast click (product link or coupon copy). CTA toasts with no product still count carts and orders by type.', 'mw-sales-toast' ); ?></p>
 								</summary>
 								<div class="mwst-card__body">
 									<div class="mwst-stats-attr">
@@ -4651,7 +4651,7 @@ class MW_Sales_Toast_Settings {
 													</option>
 												<?php endforeach; ?>
 											</select>
-											<p class="description"><?php esc_html_e( 'How long a product-link click can count toward a cart or order. Saved immediately.', 'mw-sales-toast' ); ?></p>
+											<p class="description"><?php esc_html_e( 'How long a toast click (product link or coupon copy) can count toward a cart or order. Saved immediately.', 'mw-sales-toast' ); ?></p>
 										</div>
 									</div>
 									<div class="mwst-stats-collection-actions">
