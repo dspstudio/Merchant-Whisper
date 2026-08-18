@@ -806,7 +806,7 @@
 	});
 
 	function parseDemoPeople() {
-		var raw = fieldValue('#mwst-people', '');
+		var raw = copyFieldValue('#mwst-people', '');
 		if (!raw) {
 			return [];
 		}
@@ -848,7 +848,7 @@
 			city = people[0].city;
 		}
 		if (hideNames && hideNames.checked) {
-			name = (fallback && fallback.value.trim()) || 'Someone';
+			name = copyFieldValue('#mwst-fallback', 'Someone');
 		}
 		return { name: name, city: city };
 	}
@@ -869,9 +869,18 @@
 	}
 
 	function sampleWhen(type) {
-		var ev = previewEvent(type);
-		if (ev && ev.when) {
-			return ev.when;
+		var raw = copyFieldValue('#mwst-whens', '');
+		if (raw) {
+			var lines = [];
+			raw.split(/\n/).forEach(function (line) {
+				line = String(line || '').trim();
+				if (line) {
+					lines.push(line);
+				}
+			});
+			if (lines.length) {
+				return lines[0];
+			}
 		}
 		return agoLabel();
 	}
@@ -1165,12 +1174,12 @@
 		if (mode === 'exact_low') {
 			return {
 				stock: '3',
-				stockLabel: i18n.sampleStockExact || 'only 3 left'
+				stockLabel: previewCopyText('sampleStockExact', 'only 3 left')
 			};
 		}
 		return {
 			stock: '3',
-			stockLabel: i18n.sampleStockSoft || 'only a few left'
+			stockLabel: previewCopyText('sampleStockSoft', 'only a few left')
 		};
 	}
 
@@ -1192,26 +1201,78 @@
 	}
 
 	function fieldValue(selector, fallback) {
-		var activePane = root.querySelector('.mwst-i18n-pane.is-active');
-		if (activePane) {
-			var fieldKey = selector.replace('#mwst-', '').replace(/-/g, '_');
-			var paneInput = activePane.querySelector('[name*="[' + fieldKey + ']"]') || activePane.querySelector(selector);
-			if (paneInput) {
-				var paneVal = String(paneInput.value || paneInput.placeholder || '').trim();
-				if (paneVal && paneVal !== 'La fel ca implicit' && paneVal !== 'Same as default' && paneVal !== 'Gleich wie Standard') {
-					return paneVal;
-				}
-			}
-		}
 		var el = root.querySelector(selector);
 		if (!el) {
 			return fallback;
 		}
-		var val = String(el.value || el.placeholder || '').trim();
-		if (val && val !== 'La fel ca implicit' && val !== 'Same as default' && val !== 'Gleich wie Standard') {
-			return val;
+		return String(el.value || '').trim() || fallback;
+	}
+
+	var COPY_FIELD_KEYS = {
+		'#mwst-template': 'message_template',
+		'#mwst-fallback': 'fallback_name',
+		'#mwst-people': 'demo_people',
+		'#mwst-whens': 'demo_whens',
+		'#mwst-viewing-template': 'viewing_template',
+		'#mwst-review-template': 'review_template',
+		'#mwst-cta-message': 'cta_message',
+		'#mwst-cta-button': 'cta_button'
+	};
+
+	function i18nCopyEnabled() {
+		var tog = root.querySelector('#mwst-i18n-enabled');
+		return !!(tog && tog.checked && cfg.languages);
+	}
+
+	function previewShopLang() {
+		if (!i18nCopyEnabled()) {
+			return 'en';
+		}
+		var panel = document.getElementById('mwst-panel-message');
+		var lang = panel && panel.getAttribute('data-mwst-lang');
+		if (lang) {
+			return lang;
+		}
+		var tab = root.querySelector('.mwst-i18n-tab.is-active');
+		if (tab && tab.getAttribute('data-lang')) {
+			return tab.getAttribute('data-lang');
+		}
+		return (cfg.languages && cfg.languages.default) || 'en';
+	}
+
+	function previewCopy() {
+		var map = cfg.previewI18n || {};
+		var lang = previewShopLang();
+		var short = String(lang || 'en').toLowerCase().slice(0, 2);
+		return map[lang] || map[short] || map.en || {};
+	}
+
+	function previewCopyText(key, fallback) {
+		var row = previewCopy();
+		if (row && row[key]) {
+			return row[key];
 		}
 		return fallback;
+	}
+
+	function copyFieldValue(selector, fallback) {
+		var key = COPY_FIELD_KEYS[selector];
+		var lang = previewShopLang();
+		var defaultLang = (cfg.languages && cfg.languages.default) || '';
+		if (key && i18nCopyEnabled() && lang && lang !== defaultLang) {
+			var el = root.querySelector('#mwst-i18n-' + lang + '-' + key);
+			if (el) {
+				var typed = String(el.value || '').trim();
+				if (typed) {
+					return typed;
+				}
+				var ph = String(el.getAttribute('placeholder') || '').trim();
+				if (ph && (ph.indexOf('{') !== -1 || ph.indexOf('\n') !== -1)) {
+					return ph;
+				}
+			}
+		}
+		return fieldValue(selector, fallback);
 	}
 
 	function starsHtml(rating) {
@@ -1270,10 +1331,10 @@
 
 	function agoLabel() {
 		if (whenStyle && whenStyle.value === 'exact') {
-			var when = i18n.sampleWhen || '2 minutes';
-			return (i18n.ago || '%s ago').replace('%s', when);
+			var when = previewCopyText('sampleWhen', '2 minutes');
+			return previewCopyText('ago', '%s ago').replace('%s', when);
 		}
-		return i18n.sampleNatural || 'just now';
+		return previewCopyText('sampleNatural', 'just now');
 	}
 
 	function sampleViewingCount() {
@@ -1292,7 +1353,6 @@
 
 	function sampleMaps() {
 		var stock = sampleStockFields();
-		var saleEv = previewEvent('sale');
 		var viewEv = previewEvent('viewing');
 		var reviewEv = previewEvent('review');
 		var salePerson = samplePerson('sale');
@@ -1306,7 +1366,8 @@
 				? Math.max(1, Math.min(5, Number(reviewEv.rating) || 5))
 				: 5;
 		var excerpt =
-			(reviewEv && reviewEv.excerpt) || i18n.sampleExcerpt || 'Exactly what I needed.';
+			(reviewEv && reviewEv.excerpt) ||
+			previewCopyText('sampleExcerpt', 'Exactly what I needed.');
 		var viewCount =
 			viewEv && viewEv.count
 				? Number(viewEv.count)
@@ -1314,48 +1375,18 @@
 		if (!viewCount || viewCount < 1) {
 			viewCount = sampleViewingCount();
 		}
-
-		var activePane = root.querySelector('.mwst-i18n-pane.is-active');
-		var activeLang = activePane ? (activePane.getAttribute('data-lang') || '') : (root.getAttribute('data-mwst-lang') || '');
-
-		var viewingTpl = fieldValue(
-			'#mwst-viewing-template',
-			'{count} {people} are viewing {product}'
-		);
-
-		var isEn = activeLang === 'en' || (!activeLang && (viewingTpl.indexOf('are viewing') !== -1 || viewingTpl.indexOf('viewing this') !== -1));
-		var isRo = activeLang === 'ro' || (!activeLang && (viewingTpl.indexOf('vizualizează') !== -1 || viewingTpl.indexOf('persoane') !== -1));
-		var isDe = activeLang === 'de' || (!activeLang && (viewingTpl.indexOf('sehen sich') !== -1 || viewingTpl.indexOf('Personen') !== -1));
-
-		var viewPeople;
-		var viewNow;
-		if (isEn) {
-			viewPeople = viewCount === 1 ? 'person' : 'people';
-			viewNow = 'now';
-		} else if (isRo) {
-			viewPeople = viewCount === 1 ? 'persoană' : 'persoane';
-			viewNow = 'acum';
-		} else if (isDe) {
-			viewPeople = viewCount === 1 ? 'Person' : 'Personen';
-			viewNow = 'jetzt';
-		} else {
-			viewPeople = viewCount === 1 ? (i18n.person || 'person') : ((viewEv && viewEv.people) || i18n.people || 'people');
-			viewNow = i18n.now || 'now';
-		}
-
-		if (saleEv && saleEv.stockLabel && stock.stockLabel) {
-			stock = {
-				stock: saleEv.stock || stock.stock,
-				stockLabel: saleEv.stockLabel || stock.stockLabel
-			};
-		}
+		var viewPeople =
+			viewCount === 1
+				? previewCopyText('person', 'person')
+				: previewCopyText('people', 'people');
 		var city = salePerson.city;
 
 		return {
 			sale: {
-				tpl:
-					(template && template.value) ||
-					'{name} from {city} just bought {product}',
+				tpl: copyFieldValue(
+					'#mwst-template',
+					'{name} from {city} just bought {product}'
+				),
 				map: {
 					'{name}': salePerson.name,
 					'{city}': city,
@@ -1369,23 +1400,25 @@
 				image: saleProduct.image
 			},
 			viewing: {
-				tpl: viewingTpl,
+				tpl: copyFieldValue(
+					'#mwst-viewing-template',
+					'{count} {people} are viewing {product}'
+				),
 				map: {
 					'{count}': String(viewCount),
 					'{people}': viewPeople,
 					'{product}': viewProduct.html
 				},
-				meta: viewNow,
+				meta: previewCopyText('now', 'now'),
 				cta: '',
 				showMedia: true,
 				image: viewProduct.image
 			},
 			review: {
-				tpl:
-					fieldValue(
-						'#mwst-review-template',
-						'{name} left a {rating}-star review of {product}'
-					),
+				tpl: copyFieldValue(
+					'#mwst-review-template',
+					'{name} left a {rating}-star review of {product}'
+				),
 				map: {
 					'{name}': reviewPerson.name,
 					'{rating}': String(rating),
@@ -1399,9 +1432,11 @@
 				image: reviewProduct.image
 			},
 			cta: {
-				tpl: fieldValue('#mwst-cta-message', 'Get 10% off your next order'),
+				tpl: copyFieldValue('#mwst-cta-message', 'Get 10% off your next order'),
 				map: {
 					'{coupon}': coupon,
+					'{code}': coupon,
+					'{discount}': '',
 					'{product}': saleProduct.html
 				},
 				meta: '',
@@ -1414,7 +1449,7 @@
 
 	function sampleSaleMeta(stock, type) {
 		var when = sampleWhen(type || 'sale');
-		var tpl = (template && template.value) || '';
+		var tpl = copyFieldValue('#mwst-template', '');
 		var usesStock = /\{stock(_label)?\}/.test(tpl);
 		if (stock.stockLabel && !usesStock) {
 			return when + ' · ' + stock.stockLabel;
@@ -1423,7 +1458,7 @@
 	}
 
 	function sampleReviewMeta(rating, excerpt) {
-		var tpl = fieldValue('#mwst-review-template', '');
+		var tpl = copyFieldValue('#mwst-review-template', '');
 		var bits = [];
 		if (!/\{stars\}/.test(tpl)) {
 			bits.push('★'.repeat(Math.max(1, Math.min(5, rating))));
@@ -1433,14 +1468,17 @@
 			root.querySelector('#mwst-review-excerpt').checked &&
 			!/\{excerpt\}/.test(tpl)
 		) {
-			bits.push(excerpt || i18n.sampleExcerpt || 'Exactly what I needed.');
+			bits.push(excerpt || previewCopyText('sampleExcerpt', 'Exactly what I needed.'));
 		}
 		bits.push(sampleWhen('review'));
 		return bits.join(' · ');
 	}
 
 	function sampleCtaMarkup(coupon) {
-		var label = fieldValue('#mwst-cta-button', i18n.copyCode || 'Copy code');
+		var label = copyFieldValue(
+			'#mwst-cta-button',
+			previewCopyText('copyCode', 'Copy code')
+		);
 		var url = fieldValue('#mwst-cta-url', '');
 		var html = '';
 		if (coupon) {
@@ -2234,12 +2272,18 @@
 		'#mwst-cta-message',
 		'#mwst-cta-coupon',
 		'#mwst-cta-button',
-		'#mwst-cta-url'
+		'#mwst-cta-url',
+		'#mwst-people',
+		'#mwst-whens'
 	].forEach(function (selector) {
 		var el = root.querySelector(selector);
 		if (!el) {
 			return;
 		}
+		el.addEventListener('input', syncSample);
+		el.addEventListener('change', syncSample);
+	});
+	root.querySelectorAll('.mwst-i18n-pane input, .mwst-i18n-pane textarea').forEach(function (el) {
 		el.addEventListener('input', syncSample);
 		el.addEventListener('change', syncSample);
 	});
@@ -4136,6 +4180,15 @@
 		}
 		var langsCfg = cfg.languages || {};
 		var active = langsCfg.default || '';
+		var langList = langsCfg.list || [];
+		var i;
+		for (i = 0; i < langList.length; i++) {
+			var slug = langList[i] && langList[i].slug ? String(langList[i].slug) : '';
+			if (slug && slug.toLowerCase().slice(0, 2) === 'en') {
+				active = slug;
+				break;
+			}
+		}
 		var tabs = bar.querySelectorAll('.mwst-i18n-tab');
 
 		function setLang(lang) {

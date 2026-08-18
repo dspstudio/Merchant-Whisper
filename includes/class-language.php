@@ -224,6 +224,72 @@ class MW_Sales_Toast_Language {
 	}
 
 	/**
+	 * WordPress locale for a shop language slug (for loading plugin translations).
+	 *
+	 * @param string $slug Language slug (e.g. en, ro, de).
+	 * @return string Locale like en_US, or empty.
+	 */
+	public static function locale_for_lang( $slug ) {
+		$slug = sanitize_key( (string) $slug );
+		if ( '' === $slug ) {
+			return '';
+		}
+
+		$provider = self::provider();
+
+		if ( 'polylang' === $provider && function_exists( 'pll_languages_list' ) ) {
+			$slugs   = pll_languages_list( array( 'fields' => 'slug' ) );
+			$locales = pll_languages_list( array( 'fields' => 'locale' ) );
+			if ( is_array( $slugs ) && is_array( $locales ) ) {
+				foreach ( array_values( $slugs ) as $i => $row_slug ) {
+					if ( sanitize_key( (string) $row_slug ) === $slug && ! empty( $locales[ $i ] ) ) {
+						return str_replace( '-', '_', (string) $locales[ $i ] );
+					}
+				}
+			}
+		} elseif ( 'wpml' === $provider ) {
+			$langs = apply_filters( 'wpml_active_languages', null, array( 'skip_missing' => 0 ) );
+			if ( is_array( $langs ) ) {
+				foreach ( $langs as $code => $row ) {
+					$row_slug = sanitize_key( is_array( $row ) && isset( $row['code'] ) ? (string) $row['code'] : (string) $code );
+					if ( $row_slug !== $slug || ! is_array( $row ) ) {
+						continue;
+					}
+					if ( ! empty( $row['default_locale'] ) ) {
+						return str_replace( '-', '_', (string) $row['default_locale'] );
+					}
+					if ( ! empty( $row['locale'] ) ) {
+						return str_replace( '-', '_', (string) $row['locale'] );
+					}
+				}
+			}
+		} elseif ( 'translatepress' === $provider ) {
+			$settings = get_option( 'trp_settings', array() );
+			if ( is_array( $settings ) && ! empty( $settings['publish-languages'] ) && is_array( $settings['publish-languages'] ) ) {
+				foreach ( $settings['publish-languages'] as $code ) {
+					if ( self::normalize_trp_slug( (string) $code ) === $slug ) {
+						return str_replace( '-', '_', (string) $code );
+					}
+				}
+			}
+		}
+
+		$short = strtolower( substr( $slug, 0, 2 ) );
+		$map   = array(
+			'en' => 'en_US',
+			'ro' => 'ro_RO',
+			'de' => 'de_DE',
+		);
+		if ( isset( $map[ $short ] ) ) {
+			return $map[ $short ];
+		}
+		if ( strlen( $slug ) > 2 ) {
+			return str_replace( '-', '_', $slug );
+		}
+		return '';
+	}
+
+	/**
 	 * Default / site language slug.
 	 *
 	 * @return string

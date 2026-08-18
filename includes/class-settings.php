@@ -90,8 +90,8 @@ class MW_Sales_Toast_Settings {
 			'respect_reduced_motion' => 1,
 			'require_consent'        => 1,
 			'hide_names'             => 0,
-			'fallback_name'          => $is_ro ? 'Cineva' : 'Someone',
-			'message_template'       => $is_ro ? '{name} din {city} a cumpărat {product}' : '{name} from {city} just bought {product}',
+			'fallback_name'          => 'Someone',
+			'message_template'       => '{name} from {city} just bought {product}',
 			'max_per_session'        => 8,
 			'mute_hours'             => 24,
 			'disable_mobile'         => 0,
@@ -115,12 +115,8 @@ class MW_Sales_Toast_Settings {
 			'exclude_categories'     => array(),
 			'match_product_page'     => 0,
 			'hide_roles'             => array(),
-			'demo_people'            => $is_ro
-				? "Ana, București\nMarco, Milano\nSofia, Lisabona\nJonas, Berlin\nLéa, Paris\nNoah, Amsterdam\nElena, Madrid\nOmar, Cairo"
-				: "Ana, Bucharest\nMarco, Milan\nSofia, Lisbon\nJonas, Berlin\nLéa, Paris\nNoah, Amsterdam\nElena, Madrid\nOmar, Cairo",
-			'demo_whens'             => $is_ro
-				? "tocmai acum\nacum câteva minute\nacum două ore\nmai devreme astăzi\nierile\nrecent"
-				: "just now\na few minutes ago\na couple of hours ago\nearlier today\nyesterday\nrecently",
+			'demo_people'            => "Ana, Bucharest\nMarco, Milan\nSofia, Lisbon\nJonas, Berlin\nLéa, Paris\nNoah, Amsterdam\nElena, Madrid\nOmar, Cairo",
+			'demo_whens'             => "just now\na few minutes ago\na couple of hours ago\nearlier today\nyesterday\nrecently",
 			'i18n'                   => array(),
 			'i18n_enabled'           => 1,
 			'style_bg'               => '#0c1220',
@@ -235,7 +231,7 @@ class MW_Sales_Toast_Settings {
 			$lang = MW_Sales_Toast_Language::current_lang();
 		}
 		$lang = is_string( $lang ) ? sanitize_key( $lang ) : '';
-		if ( '' === $lang || empty( $settings['i18n_enabled'] ) ) {
+		if ( '' === $lang ) {
 			return $settings;
 		}
 
@@ -245,11 +241,22 @@ class MW_Sales_Toast_Settings {
 		if ( $default && $lang === $default ) {
 			return $settings;
 		}
+		$copy_on = ! empty( $settings['i18n_enabled'] );
 
 		$i18n = isset( $settings['i18n'] ) && is_array( $settings['i18n'] ) ? $settings['i18n'] : array();
 		$row  = ( isset( $i18n[ $lang ] ) && is_array( $i18n[ $lang ] ) ) ? $i18n[ $lang ] : array();
 
 		foreach ( self::string_i18n_keys() as $key ) {
+			if ( ! $copy_on ) {
+				if ( class_exists( 'MW_Sales_Toast_Language' ) ) {
+					$settings[ $key ] = MW_Sales_Toast_Language::translate_string(
+						(string) ( $settings[ $key ] ?? '' ),
+						$lang,
+						$key
+					);
+				}
+				continue;
+			}
 			if ( ! empty( $row[ $key ] ) ) {
 				$settings[ $key ] = $row[ $key ];
 				continue;
@@ -1980,6 +1987,7 @@ class MW_Sales_Toast_Settings {
 					)
 					: null,
 				'previewSamples' => self::preview_samples(),
+				'previewI18n'    => self::preview_toast_i18n(),
 				'i18n'           => array(
 					'posLabels'        => array(
 						'bottom-left'  => __( 'Bottom left', 'mw-sales-toast' ),
@@ -2093,13 +2101,96 @@ class MW_Sales_Toast_Settings {
 	}
 
 	/**
+	 * Toast-copy strings for the admin sidebar preview, keyed by shop language.
+	 * English is always included so preview is not tied to the WP admin locale.
+	 *
+	 * @return array<string, array<string, string>>
+	 */
+	public static function preview_toast_i18n() {
+		$en  = self::preview_toast_strings_en();
+		$out = array( 'en' => $en );
+
+		if ( ! class_exists( 'MW_Sales_Toast_Language' ) || ! MW_Sales_Toast_Language::is_multilingual() ) {
+			return $out;
+		}
+
+		foreach ( MW_Sales_Toast_Language::languages() as $lang ) {
+			$slug = isset( $lang['slug'] ) ? sanitize_key( (string) $lang['slug'] ) : '';
+			if ( '' === $slug ) {
+				continue;
+			}
+			$out[ $slug ] = self::preview_toast_strings_for_lang( $slug, $en );
+		}
+
+		return $out;
+	}
+
+	/**
+	 * English source strings used in toast previews (not admin UI).
+	 *
+	 * @return array<string, string>
+	 */
+	private static function preview_toast_strings_en() {
+		return array(
+			'ago'              => '%s ago',
+			'sampleWhen'       => '2 minutes',
+			'sampleNatural'    => 'just now',
+			'sampleStockExact' => 'only 3 left',
+			'sampleStockSoft'  => 'only a few left',
+			'sampleExcerpt'    => 'Exactly what I needed.',
+			'now'              => 'now',
+			'person'           => 'person',
+			'people'           => 'people',
+			'copyCode'         => 'Copy code',
+		);
+	}
+
+	/**
+	 * Plugin toast strings in the current locale.
+	 *
+	 * @return array<string, string>
+	 */
+	private static function preview_toast_strings_for_lang( $lang, $fallback ) {
+		$short = strtolower( substr( sanitize_key( (string) $lang ), 0, 2 ) );
+		if ( 'ro' === $short ) {
+			return array(
+				'ago'              => 'acum %s',
+				'sampleWhen'       => '2 minute',
+				'sampleNatural'    => 'chiar acum',
+				'sampleStockExact' => 'doar 3 rămase',
+				'sampleStockSoft'  => 'doar câteva rămase',
+				'sampleExcerpt'    => 'Exact ce aveam nevoie.',
+				'now'              => 'acum',
+				'person'           => 'persoană',
+				'people'           => 'persoane',
+				'copyCode'         => 'Copy code',
+			);
+		}
+		if ( 'de' === $short ) {
+			return array(
+				'ago'              => 'vor %s',
+				'sampleWhen'       => '2 minutes',
+				'sampleNatural'    => 'gerade eben',
+				'sampleStockExact' => 'nur noch 3 übrig',
+				'sampleStockSoft'  => 'nur noch wenige übrig',
+				'sampleExcerpt'    => 'Exactly what I needed.',
+				'now'              => 'jetzt',
+				'person'           => 'Person',
+				'people'           => 'Personen',
+				'copyCode'         => 'Copy code',
+			);
+		}
+		return $fallback;
+	}
+
+	/**
 	 * Default localized template or text for a given setting key and language.
 	 *
 	 * @param string $key  Setting key.
 	 * @param string $lang Language slug (e.g. 'ro', 'en').
 	 * @return string
 	 */
-	public static function get_default_i18n_value( $key, $lang = 'ro' ) {
+	public static function get_default_i18n_value( $key, $lang = 'en' ) {
 		$lang_short = strtolower( substr( (string) $lang, 0, 2 ) );
 		if ( 'ro' === $lang_short ) {
 			$defaults = array(
@@ -2109,7 +2200,7 @@ class MW_Sales_Toast_Settings {
 				'demo_whens'       => "tocmai acum\nacum câteva minute\nacum două ore\nmai devreme astăzi\nierile\nrecent",
 				'viewing_template' => '{count} persoane vizualizează acest produs în acest moment',
 				'review_template'  => '{rating}★ „{excerpt}” de {name}',
-				'cta_message'      => 'Folosește codul {code} pentru {discount} reducere la comanda ta!',
+				'cta_message'      => 'Folosește codul {coupon} pentru 10% reducere la comanda ta!',
 				'cta_button'       => 'Obține reducerea',
 			);
 			return isset( $defaults[ $key ] ) ? $defaults[ $key ] : '';
@@ -2122,7 +2213,7 @@ class MW_Sales_Toast_Settings {
 				'demo_whens'       => "just now\na few minutes ago\na couple of hours ago\nearlier today\nyesterday\nrecently",
 				'viewing_template' => '{count} people are viewing this right now',
 				'review_template'  => '{rating}★ "{excerpt}" by {name}',
-				'cta_message'      => 'Use code {code} for {discount} off your order!',
+				'cta_message'      => 'Use code {coupon} for 10% off your order!',
 				'cta_button'       => 'Get discount',
 			);
 			return isset( $defaults[ $key ] ) ? $defaults[ $key ] : '';
@@ -2204,10 +2295,20 @@ class MW_Sales_Toast_Settings {
 									role="tablist"
 									aria-label="<?php esc_attr_e( 'Language', 'mw-sales-toast' ); ?>"
 								>
+									<?php
+									$preview_lang = $default;
+									foreach ( $langs as $lang ) {
+										$cand = isset( $lang['slug'] ) ? (string) $lang['slug'] : '';
+										if ( $cand && 0 === strpos( strtolower( $cand ), 'en' ) ) {
+											$preview_lang = $cand;
+											break;
+										}
+									}
+									?>
 									<?php foreach ( $langs as $lang ) : ?>
 										<?php
 										$slug   = $lang['slug'];
-										$active = ( $slug === $default );
+										$active = ( $slug === $preview_lang );
 										?>
 										<button
 											type="button"
@@ -4877,6 +4978,24 @@ class MW_Sales_Toast_Settings {
 														/* translators: %s: Message & privacy tab link */
 														esc_html__( 'Yes. Under %s → Toast types, enable Viewing now, Reviews, and/or CTA / coupon alongside (or instead of) Purchases. They rotate in the same loop. Viewing can be simulated or live unique visitors on the product page — live mode stores no IPs, only a short-lived session token. Simulated can pin specific products; live follows Include / Exclude products on the General tab. Reviews use approved WooCommerce product reviews (min stars). The coupon chip copies the code; the button can copy or open a URL.', 'mw-sales-toast' ),
 														self::tab_link( 'message', __( 'Message & privacy', 'mw-sales-toast' ) )
+													);
+													?>
+												</p>
+											</div>
+										</details>
+										<details class="mwst-faq__item">
+											<summary><?php esc_html_e( 'How do multilingual message translations work?', 'mw-sales-toast' ); ?></summary>
+											<div class="mwst-faq__answer">
+												<p>
+													<?php
+													printf(
+														/* translators: 1: Message & privacy tab link, 2: language plugin translations screen label, 3: string group name */
+														esc_html__( 'Under %1$s, turn on “Write a different message for each language” if you want to manage per-language toast copy inside this plugin. If you leave it off, Merchant Whisper uses your language plugin string translations instead, so the main/default field becomes the source string. After editing that source text, update its translations in %2$s under the “%3$s” group/context.', 'mw-sales-toast' ),
+														self::tab_link( 'message', __( 'Message & privacy', 'mw-sales-toast' ) ),
+														'polylang' === MW_Sales_Toast_Language::provider()
+															? __( 'Languages → Translations', 'mw-sales-toast' )
+															: __( 'WPML → String Translation', 'mw-sales-toast' ),
+														MW_Sales_Toast_Language::string_group()
 													);
 													?>
 												</p>
