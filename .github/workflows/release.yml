@@ -1,0 +1,42 @@
+name: Create WordPress Plugin Release Zip
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build WordPress Plugin Zip
+        run: |
+          PLUGIN_SLUG="mw-sales-toast"
+          BUILD_DIR="build_tmp/${PLUGIN_SLUG}"
+          
+          mkdir -p "$BUILD_DIR"
+          
+          # Copy files excluding git, github actions, dev tools and ignored files
+          rsync -rc --exclude-from='.distignore' \
+            --exclude='.git*' \
+            --exclude='.github' \
+            --exclude='build_tmp' \
+            ./ "$BUILD_DIR/"
+          
+          cd build_tmp
+          zip -r "../${PLUGIN_SLUG}.zip" "${PLUGIN_SLUG}"
+          cd ..
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: mw-sales-toast.zip
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
