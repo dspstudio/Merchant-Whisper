@@ -1192,11 +1192,26 @@
 	}
 
 	function fieldValue(selector, fallback) {
+		var activePane = root.querySelector('.mwst-i18n-pane.is-active');
+		if (activePane) {
+			var fieldKey = selector.replace('#mwst-', '').replace(/-/g, '_');
+			var paneInput = activePane.querySelector('[name*="[' + fieldKey + ']"]') || activePane.querySelector(selector);
+			if (paneInput) {
+				var paneVal = String(paneInput.value || paneInput.placeholder || '').trim();
+				if (paneVal && paneVal !== 'La fel ca implicit' && paneVal !== 'Same as default' && paneVal !== 'Gleich wie Standard') {
+					return paneVal;
+				}
+			}
+		}
 		var el = root.querySelector(selector);
 		if (!el) {
 			return fallback;
 		}
-		return String(el.value || '').trim() || fallback;
+		var val = String(el.value || el.placeholder || '').trim();
+		if (val && val !== 'La fel ca implicit' && val !== 'Same as default' && val !== 'Gleich wie Standard') {
+			return val;
+		}
+		return fallback;
 	}
 
 	function starsHtml(rating) {
@@ -1299,10 +1314,35 @@
 		if (!viewCount || viewCount < 1) {
 			viewCount = sampleViewingCount();
 		}
-		var viewPeople =
-			viewCount === 1
-				? i18n.person || 'person'
-				: (viewEv && viewEv.people) || i18n.people || 'people';
+
+		var activePane = root.querySelector('.mwst-i18n-pane.is-active');
+		var activeLang = activePane ? (activePane.getAttribute('data-lang') || '') : (root.getAttribute('data-mwst-lang') || '');
+
+		var viewingTpl = fieldValue(
+			'#mwst-viewing-template',
+			'{count} {people} are viewing {product}'
+		);
+
+		var isEn = activeLang === 'en' || (!activeLang && (viewingTpl.indexOf('are viewing') !== -1 || viewingTpl.indexOf('viewing this') !== -1));
+		var isRo = activeLang === 'ro' || (!activeLang && (viewingTpl.indexOf('vizualizează') !== -1 || viewingTpl.indexOf('persoane') !== -1));
+		var isDe = activeLang === 'de' || (!activeLang && (viewingTpl.indexOf('sehen sich') !== -1 || viewingTpl.indexOf('Personen') !== -1));
+
+		var viewPeople;
+		var viewNow;
+		if (isEn) {
+			viewPeople = viewCount === 1 ? 'person' : 'people';
+			viewNow = 'now';
+		} else if (isRo) {
+			viewPeople = viewCount === 1 ? 'persoană' : 'persoane';
+			viewNow = 'acum';
+		} else if (isDe) {
+			viewPeople = viewCount === 1 ? 'Person' : 'Personen';
+			viewNow = 'jetzt';
+		} else {
+			viewPeople = viewCount === 1 ? (i18n.person || 'person') : ((viewEv && viewEv.people) || i18n.people || 'people');
+			viewNow = i18n.now || 'now';
+		}
+
 		if (saleEv && saleEv.stockLabel && stock.stockLabel) {
 			stock = {
 				stock: saleEv.stock || stock.stock,
@@ -1329,17 +1369,13 @@
 				image: saleProduct.image
 			},
 			viewing: {
-				tpl:
-					fieldValue(
-						'#mwst-viewing-template',
-						'{count} {people} are viewing {product}'
-					),
+				tpl: viewingTpl,
 				map: {
 					'{count}': String(viewCount),
 					'{people}': viewPeople,
 					'{product}': viewProduct.html
 				},
-				meta: i18n.now || 'now',
+				meta: viewNow,
 				cta: '',
 				showMedia: true,
 				image: viewProduct.image
@@ -4118,6 +4154,9 @@
 				pane.hidden = !on;
 				pane.classList.toggle('is-active', on);
 			});
+			if (typeof syncSample === 'function') {
+				syncSample();
+			}
 		}
 
 		bar.addEventListener('click', function (e) {
