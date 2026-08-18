@@ -63,16 +63,18 @@ class MW_Sales_Toast_Language {
 	}
 
 	/**
-	 * Whether WPML core is available.
+	 * Whether WPML core is loaded and setup.
 	 *
 	 * @return bool
 	 */
 	private static function wpml_is_active() {
-		return defined( 'ICL_SITEPRESS_VERSION' )
-			|| class_exists( 'SitePress', false )
-			|| function_exists( 'icl_get_languages' )
-			|| has_filter( 'wpml_active_languages' )
-			|| has_filter( 'wpml_current_language' );
+		if ( ! defined( 'ICL_SITEPRESS_VERSION' ) ) {
+			return false;
+		}
+		if ( has_filter( 'wpml_setting' ) && ! apply_filters( 'wpml_setting', false, 'setup_complete' ) ) {
+			return false;
+		}
+		return true;
 	}
 
 	/**
