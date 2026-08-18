@@ -10,8 +10,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-18 02:50+0000\n"
-"PO-Revision-Date: 2026-08-18 02:50+0000\n"
+"POT-Creation-Date: 2026-08-18 03:56+0000\n"
+"PO-Revision-Date: 2026-08-18 03:56+0000\n"
 "X-Generator: Antigravity\n"
 "X-Domain: mw-sales-toast\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2);\n"
@@ -596,11 +596,11 @@ msgstr "Could not send the webhook test. Please try again."
 
 #: includes/class-settings.php:3448
 msgid "Count"
-msgstr "Număr"
+msgstr "Count"
 
 #: includes/class-settings.php:3439
 msgid "Count mode"
-msgstr "Mod numărare"
+msgstr "Count mode"
 
 #: includes/class-settings.php:4693
 msgid "Counts only: impressions, auto-hides, dismissals, mutes, skips, clicks, toast type, source, page kind, trigger, click target, dwell averages, soft-attributed carts/orders, and order totals as revenue."
@@ -612,7 +612,7 @@ msgstr "Cod cupon"
 
 #: includes/class-analytics.php:820
 msgid "Coupon copy"
-msgstr "Copiere cupon"
+msgstr "Coupon copy"
 
 #: includes/class-settings.php:4124 includes/class-settings.php:5170
 msgid "Cron interval"
@@ -700,11 +700,11 @@ msgstr "Doar demo"
 
 #: includes/class-settings.php:3388
 msgid "Demo people"
-msgstr "Persoane simulate"
+msgstr "Demo people"
 
 #: includes/class-settings.php:3400
 msgid "Demo times"
-msgstr "Timpi simulați"
+msgstr "Demo times"
 
 #: includes/class-settings.php:5269
 msgid "Describe what you expected, what happened, and any steps to reproduce…"
@@ -716,7 +716,7 @@ msgstr "Design & aspect"
 
 #: includes/class-settings.php:3657
 msgid "Design theme"
-msgstr "Temă design"
+msgstr "Design theme"
 
 #: includes/class-settings.php:5423
 msgid "Digest"
@@ -732,7 +732,7 @@ msgstr "Dezactivat"
 
 #: includes/class-settings.php:1978 includes/class-settings.php:2911 includes/class-settings.php:2951
 msgid "Dismiss"
-msgstr "Închide"
+msgstr "Dismiss"
 
 #: includes/class-settings.php:2010 includes/class-settings.php:4307 includes/class-settings.php:4434 includes/class-settings.php:4471
 msgid "Dismissed"
@@ -768,7 +768,7 @@ msgstr "Umbră sub notificare. Alegeți Fără pentru un aspect plat."
 
 #: includes/class-settings.php:3464
 msgid "Each product gets a stable count in this range."
-msgstr "Fiecare produs primește un număr stabil în acest interval."
+msgstr "Each product gets a stable count in this range."
 
 #: includes/class-settings.php:3085
 msgid "Edge distance"
@@ -788,7 +788,7 @@ msgstr "Elementor"
 
 #: includes/class-settings.php:3710
 msgid "Elementor is active, but no Site Kit colors/fonts were found yet. Open Elementor → Site Settings → Global Colors / Global Fonts, then reload this page."
-msgstr "Elementor este activ, dar nu s-au găsit încă culori/fonturi din Site Kit. Deschideți Elementor → Setări site → Culori globale / Fonturi globale, apoi reîncărcați această pagină."
+msgstr "Elementor is active, but no Site Kit colors/fonts were found yet. Open Elementor → Site Settings → Global Colors / Global Fonts, then reload this page."
 
 #: includes/class-settings.php:5259 includes/class-settings.php:5311
 msgid "Email"
@@ -812,7 +812,7 @@ msgstr "Activat"
 
 #: includes/class-slack.php:367 includes/class-slack.php:68
 msgid "Enter a valid HTTPS webhook URL."
-msgstr "Introduceți un URL de webhook HTTPS valid."
+msgstr "Enter a valid HTTPS webhook URL."
 
 #: includes/class-settings.php:3111
 msgid "Entire site"
@@ -836,7 +836,7 @@ msgstr "Evenimentele sunt tipărite în pagină ca JSON (mwSalesToast.events). R
 
 #: mw-sales-toast.php:56
 msgid "Every %d minutes (Merchant Whisper)"
-msgstr "La fiecare %d minute (Merchant Whisper)"
+msgstr "Every %d minutes (Merchant Whisper)"
 
 #: includes/class-settings.php:5362
 msgid "Every 2 weeks"
@@ -860,11 +860,11 @@ msgstr "Exact — acum 2 minute, acum 3 zile…"
 
 #: includes/class-settings.php:1983 includes/class-types.php:579
 msgid "Exactly what I needed."
-msgstr "Exact ce aveam nevoie."
+msgstr "Exactly what I needed."
 
 #: includes/class-settings.php:3531
 msgid "Excerpt"
-msgstr "Fragment / Citat"
+msgstr "Excerpt"
 
 #: includes/class-settings.php:3184
 msgid "Exclude URLs"
@@ -888,7 +888,7 @@ msgstr "Intenție de părăsire"
 
 #: includes/class-cache.php:70 includes/class-settings.php:2509
 msgid "Expires in %s"
-msgstr "Expiră în %s"
+msgstr "Expires in %s"
 
 #: includes/class-transfer.php:393
 msgid "Export settings"
@@ -912,7 +912,7 @@ msgstr "Ritm mai rapid — folosiți cu moderație"
 
 #: includes/class-settings.php:3511
 msgid "Filters"
-msgstr "Filtre"
+msgstr "Filters"
 
 #: includes/class-settings.php:4050 includes/class-settings.php:5162
 msgid "First delay"
@@ -956,7 +956,7 @@ msgstr "Valoare implicită bună pentru majoritatea magazinelor"
 
 #: includes/class-types.php:580
 msgid "Great quality — will order again."
-msgstr "Calitate excelentă — voi comanda din nou."
+msgstr "Great quality — will order again."
 
 #: includes/class-settings.php:5415
 msgid "HTTPS only. Example: create a Slack app, enable Incoming Webhooks, add it to a channel, then paste that URL. Make, n8n, and similar tools that accept JSON work the same way. Local and private addresses are blocked. %s"
@@ -964,7 +964,7 @@ msgstr "Doar HTTPS. Exemplu: creați o aplicație Slack, activați Incoming Webh
 
 #: includes/class-types.php:582
 msgid "Happy with this purchase."
-msgstr "Foarte mulțumit de această achiziție."
+msgstr "Happy with this purchase."
 
 #: includes/class-settings.php:3239
 msgid "Hide for roles"
@@ -996,7 +996,7 @@ msgstr "Ascunde când ecranul este mai îngust decât această lățime (folosit
 
 #: includes/class-analytics.php:809
 msgid "Home"
-msgstr "Acasă"
+msgstr "Home"
 
 #: includes/class-settings.php:3120
 msgid "Homepage"
@@ -1116,7 +1116,7 @@ msgstr "Importul se aplică imediat. Sincronizarea Elementor Site Kit este inclu
 
 #: includes/class-settings.php:2927 includes/class-settings.php:2937
 msgid "Import failed"
-msgstr "Importul a eșuat"
+msgstr "Import failed"
 
 #: includes/class-transfer.php:396
 msgid "Import settings"
@@ -1128,7 +1128,7 @@ msgstr "Importă temă"
 
 #: includes/class-settings.php:2015
 msgid "Importing…"
-msgstr "Se importă…"
+msgstr "Importing…"
 
 #: includes/class-settings.php:2007 includes/class-settings.php:2727 includes/class-settings.php:4262 includes/class-settings.php:4304 includes/class-settings.php:4327 includes/class-settings.php:4618
 msgid "Impressions"
@@ -1188,7 +1188,7 @@ msgstr "Inline — inserare JSON în pagină (fără REST)"
 
 #: includes/class-settings.php:3333
 msgid "Insert placeholder"
-msgstr "Introduceți substituent"
+msgstr "Insert placeholder"
 
 #: includes/class-settings.php:3719
 msgid "Install and activate Elementor to match toast colors and font to your Site Kit."
@@ -1196,11 +1196,11 @@ msgstr "Instalați și activați Elementor pentru a potrivi culorile și fontul 
 
 #: includes/class-analytics.php:326
 msgid "Invalid or expired analytics nonce."
-msgstr "Nonce de analiză invalid sau expirat."
+msgstr "Invalid or expired analytics nonce."
 
 #: includes/class-rest.php:104
 msgid "Invalid or expired notifications nonce."
-msgstr "Nonce de notificări invalid sau expirat."
+msgstr "Invalid or expired notifications nonce."
 
 #: includes/class-settings.php:4830
 msgid "Is this GDPR / privacy friendly?"
@@ -1228,7 +1228,7 @@ msgstr "Metrici cheie"
 
 #: includes/class-settings.php:2152
 msgid "Language"
-msgstr "Limbă"
+msgstr "Language"
 
 #: includes/class-settings.php:2112 includes/class-settings.php:2871
 msgid "Languages"
@@ -1236,15 +1236,15 @@ msgstr "Limbi"
 
 #: includes/class-settings.php:3866
 msgid "Layout & state"
-msgstr "Aspect & stare"
+msgstr "Layout & state"
 
 #: includes/class-settings.php:3480
 msgid "Leave empty for random catalog products."
-msgstr "Lăsați gol pentru produse aleatorii din catalog."
+msgstr "Leave empty for random catalog products."
 
 #: includes/class-settings.php:3578
 msgid "Leave empty to copy the coupon when the button is clicked."
-msgstr "Lăsați gol pentru a copia cuponul la apăsarea butonului."
+msgstr "Leave empty to copy the coupon when the button is clicked."
 
 #: includes/class-settings.php:5464
 msgid "Leave the targeting boxes unchecked unless this is the same store (or a clone). Product and category IDs from another catalog will not match. Colors-only: Design → Theme JSON."
@@ -1256,11 +1256,11 @@ msgstr "Luminos"
 
 #: includes/class-settings.php:3460
 msgid "Live window"
-msgstr "Fereastră în timp real"
+msgstr "Live window"
 
 #: includes/class-settings.php:3443
 msgid "Live — unique visitors on this product (last N minutes)"
-msgstr "Live — vizitatori unici pe acest produs (ultimele N minute)"
+msgstr "Live — unique visitors on this product (last N minutes)"
 
 #: includes/class-settings.php:3259
 msgid "Logged-in users with any selected role will not see toasts. Useful for admins and shop managers."
@@ -1272,7 +1272,7 @@ msgstr "Căutare înapoi"
 
 #: includes/class-settings.php:3527
 msgid "Lookback is days. Hide names still applies. Stars appear under the line when you omit {stars}."
-msgstr "Căutarea înapoi este în zile. Ascunderea numelor se aplică în continuare. Stelele apar sub linie când omiteți {stars}."
+msgstr "Lookback is days. Hide names still applies. Stars appear under the line when you omit {stars}."
 
 #: includes/class-settings.php:4147
 msgid "Lookback window"
@@ -1280,7 +1280,7 @@ msgstr "Fereastră de căutare înapoi"
 
 #: includes/class-settings.php:3709
 msgid "Maps Site Kit Text → message, Accent → product link, Secondary → background/meta/close, and Text font → toast typeface. Opacity and radius still apply."
-msgstr "Mapează Site Kit Text → mesaj, Accent → link produs, Secundar → fundal/meta/închidere și Font text → font notificare. Opacitatea și raza se aplică în continuare."
+msgstr "Maps Site Kit Text → message, Accent → product link, Secondary → background/meta/close, and Text font → toast typeface. Opacity and radius still apply."
 
 #: includes/class-settings.php:2996
 msgid "Master switch for front-end toasts."
@@ -1288,7 +1288,7 @@ msgstr "Comutator principal pentru notificările de pe site."
 
 #: includes/class-settings.php:3456
 msgid "Max"
-msgstr "Maxim"
+msgstr "Max"
 
 #: includes/class-settings.php:4140 includes/class-settings.php:5171
 msgid "Max cached orders"
@@ -1296,7 +1296,7 @@ msgstr "Număr maxim de comenzi în cache"
 
 #: includes/class-settings.php:3519
 msgid "Max shown"
-msgstr "Maxim afișate"
+msgstr "Max shown"
 
 #: includes/class-settings.php:3782
 msgid "Max width"
@@ -1324,11 +1324,11 @@ msgstr "Mesaj & confidențialitate"
 
 #: includes/class-support.php:84
 msgid "Message is too long."
-msgstr "Mesajul este prea lung."
+msgstr "Message is too long."
 
 #: includes/class-support.php:149
 msgid "Message sent. We’ll get back to you as soon as we can."
-msgstr "Mesaj trimis. Vă vom răspunde în cel mai scurt timp posibil."
+msgstr "Message sent. We’ll get back to you as soon as we can."
 
 #: includes/class-settings.php:5138
 msgid "Message, types & privacy"
@@ -1344,11 +1344,11 @@ msgstr "Midnight"
 
 #: includes/class-settings.php:3452
 msgid "Min"
-msgstr "Minim"
+msgstr "Min"
 
 #: includes/class-settings.php:3515
 msgid "Min stars"
-msgstr "Stele minime"
+msgstr "Min stars"
 
 #: includes/class-settings.php:1023
 msgid "Minimal black with crisp edges"
@@ -1356,11 +1356,11 @@ msgstr "Negru minimal cu margini clare"
 
 #: includes/class-analytics.php:319
 msgid "Missing analytics nonce."
-msgstr "Lipsesc datele de autentificare (nonce analytics)."
+msgstr "Missing analytics nonce."
 
 #: includes/class-rest.php:96
 msgid "Missing notifications nonce."
-msgstr "Lipsesc datele de autentificare (nonce notificări)."
+msgstr "Missing notifications nonce."
 
 #: includes/class-settings.php:3290
 msgid "Mix purchase social proof with viewing counts, reviews, and a promo toast. Types rotate in the same loop."
@@ -1440,7 +1440,7 @@ msgstr "Următoarea rulare în %s"
 
 #: includes/class-slack.php:90
 msgid "No HTTP response (%s)."
-msgstr "Niciun răspuns HTTP (%s)."
+msgstr "No HTTP response (%s)."
 
 #: includes/class-settings.php:4695
 msgid "No cross-site tracking pixels; daily totals stay in a table on your WordPress site (90 days)."
@@ -1448,11 +1448,11 @@ msgstr "Fără pixeli de urmărire cross-site; totalurile zilnice rămân într-
 
 #: includes/class-settings.php:2736
 msgid "No data yet."
-msgstr "Nu există încă date."
+msgstr "No data yet."
 
 #: includes/class-settings.php:2932
 msgid "No file selected"
-msgstr "Niciun fișier selectat"
+msgstr "No file selected"
 
 #: includes/class-settings.php:3981
 msgid "No pointer, keyboard, or scroll activity for this long."
@@ -1464,7 +1464,7 @@ msgstr "Nu există încă date despre produse."
 
 #: includes/class-settings.php:2960
 msgid "No toast events cached"
-msgstr "Niciun eveniment de notificare în cache"
+msgstr "No toast events cached"
 
 #: includes/class-settings.php:5212
 msgid "No toasts: Enable on, cached events above 0 under Timing & cache → Order cache, not muted — start in %s."
@@ -1508,7 +1508,7 @@ msgstr "Pe paginile de produs, afișează doar notificări pentru acel produs"
 
 #: includes/class-settings.php:3582
 msgid "Once per visit"
-msgstr "O dată per sesiune"
+msgstr "Once per visit"
 
 #: includes/class-settings.php:3187
 msgid "One path per line. Matching pages never show toasts."
@@ -1520,11 +1520,11 @@ msgstr "O cale pe linie. Folosiți * ca caracter joker. Lăsați gol pentru a pe
 
 #: includes/class-settings.php:3408
 msgid "One per line, shown as-is (e.g. “just now”). No automatic “ago” is added."
-msgstr "O linie per timp, afișat ca atare (de ex. „chiar acum”). Nu se adaugă automat „acum”."
+msgstr "One per line, shown as-is (e.g. “just now”). No automatic “ago” is added."
 
 #: includes/class-settings.php:3396
 msgid "One per line: Name, City"
-msgstr "O linie per persoană: Nume, Oraș"
+msgstr "One per line: Name, City"
 
 #: includes/class-settings.php:5146
 msgid "Only first name and city are shown — never email or full address."
@@ -1560,7 +1560,7 @@ msgstr "Deschideți Mesaj & confidențialitate →"
 
 #: includes/class-slack.php:308
 msgid "Open Statistics"
-msgstr "Deschide Statisticile"
+msgstr "Open Statistics"
 
 #: includes/class-settings.php:5178
 msgid "Open Timing & cache →"
@@ -1600,7 +1600,7 @@ msgstr "Comenzi în aceeași fereastră"
 
 #: includes/class-analytics.php:810
 msgid "Other"
-msgstr "Altele"
+msgstr "Other"
 
 #: includes/class-settings.php:4256
 msgid "Overview"
@@ -1648,18 +1648,18 @@ msgstr "Redă mostra"
 
 #: includes/class-support.php:81
 msgid "Please fill in name, email, subject, and message."
-msgstr "Vă rugăm să completați numele, e-mailul, subiectul și mesajul."
+msgstr "Please fill in name, email, subject, and message."
 
 #: includes/class-slack.php:353
 msgid "Please wait %d second before sending another test."
 msgid_plural "Please wait %d seconds before sending another test."
-msgstr[0] "Vă rugăm să așteptați %d secundă înainte de a trimite un alt test."
-msgstr[1] "Vă rugăm să așteptați %d secundă înainte de a trimite un alt test."
-msgstr[2] "Vă rugăm să așteptați %d secundă înainte de a trimite un alt test."
+msgstr[0] "Please wait %d second before sending another test."
+msgstr[1] "Please wait %d second before sending another test."
+msgstr[2] "Please wait %d second before sending another test."
 
 #: includes/class-support.php:71
 msgid "Please wait a few minutes before sending another message."
-msgstr "Vă rugăm să așteptați câteva minute înainte de a trimite un alt mesaj."
+msgstr "Please wait a few minutes before sending another message."
 
 #: includes/class-settings.php:3273
 msgid "Pop sound"
@@ -1687,7 +1687,7 @@ msgstr "Previzualizare"
 
 #: includes/class-settings.php:1977
 msgid "Preview %s toast"
-msgstr "Previzualizează notificarea %s"
+msgstr "Preview %s toast"
 
 #: includes/class-settings.php:5276
 msgid "Preview system info"
@@ -1715,7 +1715,7 @@ msgstr "Doar ID-uri de produse — niciodată nume de clienți, adrese de e-mail
 
 #: includes/class-settings.php:2313
 msgid "Product IDs, comma-separated"
-msgstr "ID-uri de produse, separate prin virgulă"
+msgstr "Product IDs, comma-separated"
 
 #: includes/class-settings.php:3737
 msgid "Product accent"
@@ -1727,7 +1727,7 @@ msgstr "Imagine produs"
 
 #: includes/class-analytics.php:819
 msgid "Product link"
-msgstr "Link produs"
+msgstr "Product link"
 
 #: includes/class-settings.php:4404
 msgid "Product links versus coupon copy. Both start the attribution window."
@@ -1751,7 +1751,7 @@ msgstr "Actualizări de produse și note de lansare. În curând — nimic nu es
 
 #: includes/class-settings.php:3469
 msgid "Products"
-msgstr "Produse"
+msgstr "Products"
 
 #: includes/class-settings.php:4600
 msgid "Products with toast activity in the selected range (all types combined). Click a column to sort."
@@ -1815,7 +1815,7 @@ msgstr "Comenzi reale + completare demo"
 
 #: includes/class-analytics.php:802
 msgid "Real orders"
-msgstr "Comenzi reale"
+msgstr "Real orders"
 
 #: includes/class-settings.php:2964
 msgid "Real orders are enabled, but nothing is cached yet. Check Lookback window under Timing & cache, and Message & privacy → Checkout consent (customers who declined are hidden; admin/legacy orders without a choice still count)."
@@ -1859,7 +1859,7 @@ msgstr "Reconstruiește cache-ul"
 
 #: includes/class-settings.php:2034
 msgid "Rebuilding cache…"
-msgstr "Se reconstruiește cache-ul…"
+msgstr "Rebuilding cache…"
 
 #: includes/class-settings.php:4799
 msgid "Recent eligible WooCommerce sales."
@@ -1879,7 +1879,7 @@ msgstr "Înregistrează evenimentele"
 
 #: includes/class-settings.php:4642
 msgid "Record events and attribution save immediately. Reset clears stored totals. Other plugin settings still use Save settings below."
-msgstr "Înregistrarea evenimentelor și atribuirea se salvează imediat. Resetarea golește totalurile stocate. Celelalte setări ale modulului folosesc Salvează setările de mai jos."
+msgstr "Record events and attribution save immediately. Reset clears stored totals. Other plugin settings still use Save settings below."
 
 #: includes/class-settings.php:3617
 msgid "Reduce fatigue so toasts stay helpful, not noisy."
@@ -1899,7 +1899,7 @@ msgstr "Înlocuiți mesajele, timpii și celelalte setări? Țintirea produselor
 
 #: includes/class-transfer.php:400
 msgid "Replace settings including product, category, and URL targeting from the file? Those IDs only match the store they were exported from."
-msgstr "Înlocuiți setările inclusiv țintirea de produse, categorii și URL-uri din fișier? Acele ID-uri se potrivesc doar cu magazinul din care au fost exportate."
+msgstr "Replace settings including product, category, and URL targeting from the file? Those IDs only match the store they were exported from."
 
 #: includes/class-transfer.php:398
 msgid "Replace the current toast design with this theme file?"
@@ -1915,7 +1915,7 @@ msgstr "Resetează designul la valorile implicite"
 
 #: includes/class-settings.php:2017 includes/class-settings.php:3928
 msgid "Reset design to defaults?"
-msgstr "Resetați designul la valorile implicite?"
+msgstr "Reset design to defaults?"
 
 #: includes/class-settings.php:2005 includes/class-settings.php:4680 includes/class-settings.php:4709
 msgid "Reset statistics"
@@ -1927,7 +1927,7 @@ msgstr "Resetați statisticile?"
 
 #: includes/class-settings.php:2018 includes/class-settings.php:3929
 msgid "Restore colors, layout, and shape to the Midnight preset? Unsaved design changes on this tab will be lost until you save settings."
-msgstr "Restaurați culorile, aspectul și forma la presetul Midnight? Modificările nesalvate ale designului din acest tab se vor pierde dacă nu salvați."
+msgstr "Restore colors, layout, and shape to the Midnight preset? Unsaved design changes on this tab will be lost until you save settings."
 
 #: includes/class-settings.php:3908
 msgid "Reuse colors, layout, and custom CSS across stores. Does not change targeting, privacy, or demo data."
@@ -2023,7 +2023,7 @@ msgstr "Limite sesiune"
 
 #: includes/class-settings.php:774
 msgid "Set delay, visible time, and gap yourself"
-msgstr "Reglați singur întârzierea, timpul vizibil și pauza"
+msgstr "Set delay, visible time, and gap yourself"
 
 #: includes/class-settings.php:5081
 msgid "Set position, edge distance, and which pages may show toasts (%s)."
@@ -2078,8 +2078,8 @@ msgid "Shop, categories & products"
 msgstr "Magazin, categorii & produse"
 
 #: includes/class-settings.php:2113
-msgid "Show a different toast on each language of your shop."
-msgstr "Afișează o notificare diferită pentru fiecare limbă a magazinului tău."
+msgid "Choose whether toast copy is edited here or translated in your language plugin."
+msgstr "Alegeți dacă textul notificărilor se editează aici sau se traduce în pluginul de limbi."
 
 #: includes/class-settings.php:3533
 msgid "Show a short quote under the review"
@@ -2239,7 +2239,7 @@ msgstr "Nicio soluție găsită — cum pot primi ajutor?"
 
 #: includes/class-settings.php:5232
 msgid "Still stuck? Skim the FAQ above, or use %s and include system info."
-msgstr "Still stuck? Skim the FAQ above, or use %s and include system info."
+msgstr "Tot nicio soluție? Parcurgeți Întrebările frecvente de mai sus sau folosiți %s și includeți informațiile despre sistem."
 
 #: includes/class-settings.php:3356
 msgid "Stock display"
@@ -2462,8 +2462,12 @@ msgid "Turn on Record events in %1$s → %2$s to send webhook digests."
 msgstr "Activați Înregistrează evenimentele în %1$s → %2$s pentru a trimite rapoarte webhook."
 
 #: includes/class-settings.php:2129
-msgid "Turn this on, pick a language, then edit the text in the cards above. Turn it off to use the same text everywhere."
-msgstr "Activați această opțiune, alegeți o limbă, apoi editați textul din cardurile de mai sus. Dezactivați-o pentru a folosi același text peste tot."
+msgid "On: pick a language, then edit the toast text in the cards above."
+msgstr "Activat: alegeți o limbă, apoi editați textul notificării din cardurile de mai sus."
+
+#: includes/class-settings.php:2277
+msgid "Off: keep the default text here and translate it in your language plugin."
+msgstr "Dezactivat: păstrați textul implicit aici și traduceți-l în pluginul de limbi."
 
 #: includes/class-settings.php:4326
 msgid "Type"
@@ -2499,7 +2503,7 @@ msgstr "Folosit când Sursă date este Doar demo sau Comenzi reale + completare 
 
 #: includes/class-settings.php:3352
 msgid "Used when a name is missing, or when “Hide names” is on."
-msgstr "Folosit când numele lipsește sau când opțiunea „Hide names” este activată."
+msgstr "Folosit când numele lipsește sau când opțiunea „Ascunde numele” este activată."
 
 #: includes/class-settings.php:3465
 msgid "Uses real unique pings, then clamps to max. Window is minutes. Product targeting follows Include / Exclude on the General tab."
@@ -2666,8 +2670,8 @@ msgid "WordPress account details used for support communication."
 msgstr "Detaliile contului WordPress folosite pentru comunicarea de suport."
 
 #: includes/class-settings.php:2108
-msgid "Write a different message for each language"
-msgstr "Scrie un mesaj diferit pentru fiecare limbă"
+msgid "Override %s with manual copy here"
+msgstr "Suprascrie %s cu text scris manual aici"
 
 #: includes/class-settings.php:4822
 msgid "Yes. Under %s → Toast types, enable Viewing now, Reviews, and/or CTA / coupon alongside (or instead of) Purchases. They rotate in the same loop. Viewing can be simulated or live unique visitors on the product page — live mode stores no IPs, only a short-lived session token. Simulated can pin specific products; live follows Include / Exclude products on the General tab. Reviews use approved WooCommerce product reviews (min stars). The coupon chip copies the code; the button can copy or open a URL."
@@ -2678,12 +2682,12 @@ msgid "Yes. Under %s → Triggers, choose Page load, Scroll, Exit intent, Add to
 msgstr "Da. În %s → Declanșatoare, alegeți Încărcare pagină, Derulare, Intenție de părăsire, Adăugare în coș, Inactivitate și/sau Click. Prima potrivire pornește bucla de notificări; durata și pauza se aplică în continuare după aceea. Deselectați Încărcare pagină dacă doriți doar un declanșator comportamental."
 
 #: includes/class-settings.php:2134
-msgid "You can also find them in Languages → Translations, group “%s”."
-msgstr "Le puteți găsi și în Limbi → Traduceri, grupul „%s”."
+msgid "When this is off, edit those translations in Languages → Translations, group “%s”."
+msgstr "Când este dezactivat, editați acele traduceri în Limbi → Traduceri, grupul „%s”."
 
 #: includes/class-settings.php:2141
-msgid "You can also find them in WPML → String Translation, context “%s”."
-msgstr "Le puteți găsi și în WPML → Traduceri de șiruri, contextul „%s”."
+msgid "When this is off, edit those translations in WPML → String Translation, context “%s”."
+msgstr "Când este dezactivat, editați acele traduceri în WPML → Traduceri de șiruri, contextul „%s”."
 
 #: includes/class-settings.php:4697
 msgid "You can turn collection off or reset totals from this tab. Export is a CSV of aggregates only."

@@ -2027,6 +2027,8 @@ class MW_Sales_Toast_Settings {
 					'statsResetting'   => __( 'Clearing…', 'mw-sales-toast' ),
 					'statsReset'       => __( 'Reset statistics', 'mw-sales-toast' ),
 					'statsResetError'  => __( 'Could not reset statistics. Please try again.', 'mw-sales-toast' ),
+					/* translators: %d: minutes */
+					'statsAttrSaved'   => __( 'Attribution window set to %d minutes.', 'mw-sales-toast' ),
 					'statsImpressions' => __( 'Impressions', 'mw-sales-toast' ),
 					'statsClicks'      => __( 'Clicks', 'mw-sales-toast' ),
 					'statsAutoHide'    => __( 'Auto-hid', 'mw-sales-toast' ),
@@ -2249,12 +2251,18 @@ class MW_Sales_Toast_Settings {
 		$plugin    = $available ? MW_Sales_Toast_Language::provider_label() : '';
 		$langs     = $available ? MW_Sales_Toast_Language::languages() : array();
 		$default   = $available ? MW_Sales_Toast_Language::default_lang() : '';
-		$toggle    = __( 'Write a different message for each language', 'mw-sales-toast' );
+		$toggle    = $plugin
+			? sprintf(
+				/* translators: %s: language plugin name, e.g. Polylang */
+				__( 'Override %s with manual copy here', 'mw-sales-toast' ),
+				$plugin
+			)
+			: __( 'Override language plugin with manual copy here', 'mw-sales-toast' );
 		?>
 		<details class="mwst-card mwst-fold mwst-fold--card" id="mwst-card-languages">
 			<summary class="mwst-card__head">
 				<h2><?php echo self::dashicon_html( 'dashicons-translation' ); ?><?php esc_html_e( 'Languages', 'mw-sales-toast' ); ?></h2>
-				<p><?php esc_html_e( 'Show a different toast on each language of your shop.', 'mw-sales-toast' ); ?></p>
+				<p><?php esc_html_e( 'Choose whether toast copy is edited here or translated in your language plugin.', 'mw-sales-toast' ); ?></p>
 			</summary>
 			<div class="mwst-card__body">
 				<div class="mwst-field" id="mwst-i18n-field"<?php echo $available ? '' : ' data-disabled="1"'; ?>>
@@ -2270,19 +2278,21 @@ class MW_Sales_Toast_Settings {
 									esc_html( $plugin )
 								);
 								echo ' ';
-								esc_html_e( 'Turn this on, pick a language, then edit the text in the cards above. Turn it off to use the same text everywhere.', 'mw-sales-toast' );
+								esc_html_e( 'On: pick a language, then edit the toast text in the cards above.', 'mw-sales-toast' );
+								echo ' ';
+								esc_html_e( 'Off: keep the default text here and translate it in your language plugin.', 'mw-sales-toast' );
 								if ( 'polylang' === MW_Sales_Toast_Language::provider() ) {
 									echo ' ';
 									printf(
 										/* translators: %s: Polylang string group name */
-										esc_html__( 'You can also find them in Languages → Translations, group “%s”.', 'mw-sales-toast' ),
+										esc_html__( 'When this is off, edit those translations in Languages → Translations, group “%s”.', 'mw-sales-toast' ),
 										esc_html( MW_Sales_Toast_Language::string_group() )
 									);
 								} elseif ( 'wpml' === MW_Sales_Toast_Language::provider() ) {
 									echo ' ';
 									printf(
 										/* translators: %s: WPML string context name */
-										esc_html__( 'You can also find them in WPML → String Translation, context “%s”.', 'mw-sales-toast' ),
+										esc_html__( 'When this is off, edit those translations in WPML → String Translation, context “%s”.', 'mw-sales-toast' ),
 										esc_html( MW_Sales_Toast_Language::string_group() )
 									);
 								}
@@ -4990,7 +5000,7 @@ class MW_Sales_Toast_Settings {
 													<?php
 													printf(
 														/* translators: 1: Message & privacy tab link, 2: language plugin translations screen label, 3: string group name */
-														esc_html__( 'Under %1$s, turn on “Write a different message for each language” if you want to manage per-language toast copy inside this plugin. If you leave it off, Merchant Whisper uses your language plugin string translations instead, so the main/default field becomes the source string. After editing that source text, update its translations in %2$s under the “%3$s” group/context.', 'mw-sales-toast' ),
+														esc_html__( 'Under %1$s, turn the toggle on to type a different toast message for each shop language inside this plugin. Leave it off to keep one source text here and translate it in your language plugin (%2$s, group/context “%3$s”). Changing the source text means those string translations may need updating.', 'mw-sales-toast' ),
 														self::tab_link( 'message', __( 'Message & privacy', 'mw-sales-toast' ) ),
 														'polylang' === MW_Sales_Toast_Language::provider()
 															? __( 'Languages → Translations', 'mw-sales-toast' )

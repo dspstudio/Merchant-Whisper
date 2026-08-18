@@ -477,16 +477,19 @@
   "Could not send the webhook test. Please try again.": [
     "includes/class-settings.php"
   ],
-  "Write a different message for each language": [
+  "Override %s with manual copy here": [
+    "includes/class-settings.php"
+  ],
+  "Override language plugin with manual copy here": [
     "includes/class-settings.php"
   ],
   "Using %s.": [
     "includes/class-settings.php"
   ],
-  "You can also find them in Languages → Translations, group “%s”.": [
+  "When this is off, edit those translations in Languages → Translations, group “%s”.": [
     "includes/class-settings.php"
   ],
-  "You can also find them in WPML → String Translation, context “%s”.": [
+  "When this is off, edit those translations in WPML → String Translation, context “%s”.": [
     "includes/class-settings.php"
   ],
   "Same as default": [
@@ -905,7 +908,7 @@
     "includes/class-settings.php",
     "includes/class-settings.php"
   ],
-  "Show a different toast on each language of your shop.": [
+  "Choose whether toast copy is edited here or translated in your language plugin.": [
     "includes/class-settings.php",
     "includes/class-settings.php"
   ],
@@ -913,7 +916,11 @@
     "includes/class-settings.php",
     "includes/class-settings.php"
   ],
-  "Turn this on, pick a language, then edit the text in the cards above. Turn it off to use the same text everywhere.": [
+  "On: pick a language, then edit the toast text in the cards above.": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Off: keep the default text here and translate it in your language plugin.": [
     "includes/class-settings.php",
     "includes/class-settings.php"
   ],
@@ -2252,6 +2259,13 @@
   ],
   "Can I wait for scroll, exit intent, or add to cart instead of page load?": [
     "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "How do multilingual message translations work?": [
+    "includes/class-settings.php",
+    "includes/class-settings.php"
+  ],
+  "Under %1$s, turn the toggle on to type a different toast message for each shop language inside this plugin. Leave it off to keep one source text here and translate it in your language plugin (%2$s, group/context “%3$s”). Changing the source text means those string translations may need updating.": [
     "includes/class-settings.php"
   ],
   "How do I preview before going live?": [

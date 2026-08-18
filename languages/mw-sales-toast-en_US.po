@@ -10,8 +10,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-18 02:50+0000\n"
-"PO-Revision-Date: 2026-08-18 02:50+0000\n"
+"POT-Creation-Date: 2026-08-18 03:56+0000\n"
+"PO-Revision-Date: 2026-08-18 03:56+0000\n"
 "X-Generator: Antigravity\n"
 "X-Domain: mw-sales-toast\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -2076,8 +2076,8 @@ msgid "Shop, categories & products"
 msgstr "Shop, categories & products"
 
 #: includes/class-settings.php:2113
-msgid "Show a different toast on each language of your shop."
-msgstr "Show a different toast on each language of your shop."
+msgid "Choose whether toast copy is edited here or translated in your language plugin."
+msgstr "Choose whether toast copy is edited here or translated in your language plugin."
 
 #: includes/class-settings.php:3533
 msgid "Show a short quote under the review"
@@ -2460,8 +2460,12 @@ msgid "Turn on Record events in %1$s → %2$s to send webhook digests."
 msgstr "Turn on Record events in %1$s → %2$s to send webhook digests."
 
 #: includes/class-settings.php:2129
-msgid "Turn this on, pick a language, then edit the text in the cards above. Turn it off to use the same text everywhere."
-msgstr "Turn this on, pick a language, then edit the text in the cards above. Turn it off to use the same text everywhere."
+msgid "On: pick a language, then edit the toast text in the cards above."
+msgstr "On: pick a language, then edit the toast text in the cards above."
+
+#: includes/class-settings.php:2277
+msgid "Off: keep the default text here and translate it in your language plugin."
+msgstr "Off: keep the default text here and translate it in your language plugin."
 
 #: includes/class-settings.php:4326
 msgid "Type"
@@ -2664,8 +2668,8 @@ msgid "WordPress account details used for support communication."
 msgstr "WordPress account details used for support communication."
 
 #: includes/class-settings.php:2108
-msgid "Write a different message for each language"
-msgstr "Write a different message for each language"
+msgid "Override %s with manual copy here"
+msgstr "Override %s with manual copy here"
 
 #: includes/class-settings.php:4822
 msgid "Yes. Under %s → Toast types, enable Viewing now, Reviews, and/or CTA / coupon alongside (or instead of) Purchases. They rotate in the same loop. Viewing can be simulated or live unique visitors on the product page — live mode stores no IPs, only a short-lived session token. Simulated can pin specific products; live follows Include / Exclude products on the General tab. Reviews use approved WooCommerce product reviews (min stars). The coupon chip copies the code; the button can copy or open a URL."
@@ -2676,12 +2680,12 @@ msgid "Yes. Under %s → Triggers, choose Page load, Scroll, Exit intent, Add to
 msgstr "Yes. Under %s → Triggers, choose Page load, Scroll, Exit intent, Add to cart, Inactivity, and/or Click. The first match starts the toast loop; duration and gap still apply after that. Uncheck Page load if you only want a behavioral trigger."
 
 #: includes/class-settings.php:2134
-msgid "You can also find them in Languages → Translations, group “%s”."
-msgstr "You can also find them in Languages → Translations, group “%s”."
+msgid "When this is off, edit those translations in Languages → Translations, group “%s”."
+msgstr "When this is off, edit those translations in Languages → Translations, group “%s”."
 
 #: includes/class-settings.php:2141
-msgid "You can also find them in WPML → String Translation, context “%s”."
-msgstr "You can also find them in WPML → String Translation, context “%s”."
+msgid "When this is off, edit those translations in WPML → String Translation, context “%s”."
+msgstr "When this is off, edit those translations in WPML → String Translation, context “%s”."
 
 #: includes/class-settings.php:4697
 msgid "You can turn collection off or reset totals from this tab. Export is a CSV of aggregates only."

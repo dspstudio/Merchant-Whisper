@@ -3959,7 +3959,12 @@
 							});
 						}
 						applyStats(currentStatsSummary());
-						setCollectionStatus(inner.message || '', true);
+					setCollectionStatus(
+						fillI18n(i18n.statsAttrSaved || 'Attribution window set to %d minutes.', [
+							saved
+						]),
+						true
+					);
 						userTouchedForm = false;
 						captureSaveSnapshot(true);
 					} else {
