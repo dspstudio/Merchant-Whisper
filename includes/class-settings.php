@@ -2295,6 +2295,9 @@ class MW_Sales_Toast_Settings {
 										esc_html__( 'When this is off, edit those translations in WPML → String Translation, context “%s”.', 'mw-sales-toast' ),
 										esc_html( MW_Sales_Toast_Language::string_group() )
 									);
+								} elseif ( 'translatepress' === MW_Sales_Toast_Language::provider() ) {
+									echo ' ';
+									esc_html_e( 'When this is off, open TranslatePress → Translate Site on any page, then translate “Merchant Whisper toast copy” in the string list.', 'mw-sales-toast' );
 								}
 								?>
 							</p>
@@ -2337,7 +2340,20 @@ class MW_Sales_Toast_Settings {
 								<span class="mwst-toggle__track" aria-hidden="true"></span>
 								<span class="mwst-toggle__text"><?php echo esc_html( $toggle ); ?></span>
 							</label>
-							<p class="description"><?php esc_html_e( 'Add a language plugin first (Polylang, WPML, or TranslatePress).', 'mw-sales-toast' ); ?></p>
+							<p class="description">
+								<?php
+								$detected = class_exists( 'MW_Sales_Toast_Language' ) ? MW_Sales_Toast_Language::provider_label() : '';
+								if ( $detected ) {
+									printf(
+										/* translators: %s: plugin name, e.g. WPML */
+										esc_html__( '%s is active, but at least two shop languages are needed. Add another language there, then reload this page.', 'mw-sales-toast' ),
+										esc_html( $detected )
+									);
+								} else {
+									esc_html_e( 'Add a language plugin first (Polylang, WPML, or TranslatePress).', 'mw-sales-toast' );
+								}
+								?>
+							</p>
 						<?php endif; ?>
 					</div>
 				</div>
@@ -5004,8 +5020,12 @@ class MW_Sales_Toast_Settings {
 														self::tab_link( 'message', __( 'Message & privacy', 'mw-sales-toast' ) ),
 														'polylang' === MW_Sales_Toast_Language::provider()
 															? __( 'Languages → Translations', 'mw-sales-toast' )
-															: __( 'WPML → String Translation', 'mw-sales-toast' ),
-														MW_Sales_Toast_Language::string_group()
+															: ( 'translatepress' === MW_Sales_Toast_Language::provider()
+																? __( 'TranslatePress → Translate Site', 'mw-sales-toast' )
+																: __( 'WPML → String Translation', 'mw-sales-toast' ) ),
+														'translatepress' === MW_Sales_Toast_Language::provider()
+															? __( 'Merchant Whisper toast copy', 'mw-sales-toast' )
+															: MW_Sales_Toast_Language::string_group()
 													);
 													?>
 												</p>

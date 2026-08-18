@@ -2687,6 +2687,22 @@ msgstr "When this is off, edit those translations in Languages → Translations,
 msgid "When this is off, edit those translations in WPML → String Translation, context “%s”."
 msgstr "When this is off, edit those translations in WPML → String Translation, context “%s”."
 
+#: includes/class-settings.php:2300
+msgid "When this is off, open TranslatePress → Translate Site on any page, then translate “Merchant Whisper toast copy” in the string list."
+msgstr "When this is off, open TranslatePress → Translate Site on any page, then translate “Merchant Whisper toast copy” in the string list."
+
+#: includes/class-settings.php:5027 includes/class-language.php:701
+msgid "Merchant Whisper toast copy"
+msgstr "Merchant Whisper toast copy"
+
+#: includes/class-settings.php:5024
+msgid "TranslatePress → Translate Site"
+msgstr "TranslatePress → Translate Site"
+
+#: includes/class-rest.php:75
+msgid "Shop language slug from the storefront page."
+msgstr "Shop language slug from the storefront page."
+
 #: includes/class-settings.php:4697
 msgid "You can turn collection off or reset totals from this tab. Export is a CSV of aggregates only."
 msgstr "You can turn collection off or reset totals from this tab. Export is a CSV of aggregates only."

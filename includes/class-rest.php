@@ -71,6 +71,11 @@ class MW_Sales_Toast_REST {
 						'type'        => 'integer',
 						'required'    => false,
 					),
+					'lang'        => array(
+						'description' => __( 'Shop language slug from the storefront page.', 'mw-sales-toast' ),
+						'type'        => 'string',
+						'required'    => false,
+					),
 				),
 			)
 		);
@@ -176,7 +181,11 @@ class MW_Sales_Toast_REST {
 			return rest_ensure_response( array() );
 		}
 
-		$settings = MW_Sales_Toast_Settings::get_for_lang();
+		$lang = '';
+		if ( class_exists( 'MW_Sales_Toast_Language' ) ) {
+			$lang = MW_Sales_Toast_Language::known_lang( (string) $request->get_param( 'lang' ) );
+		}
+		$settings = MW_Sales_Toast_Settings::get_for_lang( '' !== $lang ? $lang : null );
 
 		$limit  = max( 1, min( 40, (int) $base_settings['max_events'] ) );
 		if ( class_exists( 'MW_Sales_Toast_Types' ) && MW_Sales_Toast_Types::any_enabled( $base_settings ) ) {

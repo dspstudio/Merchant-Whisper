@@ -2689,6 +2689,22 @@ msgstr "Când este dezactivat, editați acele traduceri în Limbi → Traduceri,
 msgid "When this is off, edit those translations in WPML → String Translation, context “%s”."
 msgstr "Când este dezactivat, editați acele traduceri în WPML → Traduceri de șiruri, contextul „%s”."
 
+#: includes/class-settings.php:2300
+msgid "When this is off, open TranslatePress → Translate Site on any page, then translate “Merchant Whisper toast copy” in the string list."
+msgstr "Când este dezactivat, deschideți TranslatePress → Translate Site pe orice pagină, apoi traduceți „Merchant Whisper toast copy” din lista de șiruri."
+
+#: includes/class-settings.php:5027 includes/class-language.php:701
+msgid "Merchant Whisper toast copy"
+msgstr "Text notificări Merchant Whisper"
+
+#: includes/class-settings.php:5024
+msgid "TranslatePress → Translate Site"
+msgstr "TranslatePress → Translate Site"
+
+#: includes/class-rest.php:75
+msgid "Shop language slug from the storefront page."
+msgstr "Slug-ul limbii magazinului de pe pagina vitrinei."
+
 #: includes/class-settings.php:4697
 msgid "You can turn collection off or reset totals from this tab. Export is a CSV of aggregates only."
 msgstr "Puteți dezactiva colectarea sau reseta totalurile din acest tab. Exportul este un fișier CSV doar cu date agregate."

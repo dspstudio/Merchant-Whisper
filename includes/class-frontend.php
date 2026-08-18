@@ -597,6 +597,9 @@ class MW_Sales_Toast_Frontend {
 			'whenStyle'            => ( 'exact' === ( $base_settings['when_style'] ?? '' ) ) ? 'exact' : 'natural',
 			'matchProductPage'     => ! empty( $base_settings['match_product_page'] ),
 			'currentProductId'     => $current_product_id,
+			'lang'                 => class_exists( 'MW_Sales_Toast_Language' )
+				? MW_Sales_Toast_Language::current_lang()
+				: '',
 			'triggers'             => MW_Sales_Toast_Settings::triggers_config( $base_settings ),
 			'analytics'            => false,
 			'refetchMs'            => 0,

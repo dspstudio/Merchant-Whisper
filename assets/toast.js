@@ -944,6 +944,9 @@
     if (pid > 0) {
       url += (url.indexOf('?') === -1 ? '?' : '&') + 'product=' + pid;
     }
+    if (cfg.lang) {
+      url += (url.indexOf('?') === -1 ? '?' : '&') + 'lang=' + encodeURIComponent(String(cfg.lang));
+    }
 
     return fetch(url, {
       credentials: 'same-origin',

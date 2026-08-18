@@ -492,6 +492,19 @@
   "When this is off, edit those translations in WPML → String Translation, context “%s”.": [
     "includes/class-settings.php"
   ],
+  "When this is off, open TranslatePress → Translate Site on any page, then translate “Merchant Whisper toast copy” in the string list.": [
+    "includes/class-settings.php"
+  ],
+  "Merchant Whisper toast copy": [
+    "includes/class-settings.php",
+    "includes/class-language.php"
+  ],
+  "TranslatePress → Translate Site": [
+    "includes/class-settings.php"
+  ],
+  "Shop language slug from the storefront page.": [
+    "includes/class-rest.php"
+  ],
   "Same as default": [
     "includes/class-settings.php",
     "includes/class-settings.php"

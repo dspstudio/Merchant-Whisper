@@ -18,6 +18,7 @@ function mw_sales_toast_uninstall_site() {
 	delete_option( 'mw_st_stats_schema' );
 	delete_option( 'mw_st_cache_schema' );
 	delete_option( 'mw_st_slack_last' );
+	delete_option( 'mw_st_trp_strings_hash' );
 
 	delete_transient( 'mw_st_sales_cache' );
 	delete_transient( 'mw_st_rebuild_lock' );
