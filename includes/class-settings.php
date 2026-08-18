@@ -87,6 +87,8 @@ class MW_Sales_Toast_Settings {
 			'hide_thankyou'          => 1,
 			'hide_account'           => 0,
 			'guests_only'            => 0,
+			'cart_empty_only'        => 0,
+			'first_visit_only'       => 0,
 			'respect_reduced_motion' => 1,
 			'require_consent'        => 1,
 			'hide_names'             => 0,
@@ -1306,6 +1308,8 @@ class MW_Sales_Toast_Settings {
 			'hide_thankyou',
 			'hide_account',
 			'guests_only',
+			'cart_empty_only',
+			'first_visit_only',
 			'respect_reduced_motion',
 			'require_consent',
 			'hide_names',
@@ -3327,6 +3331,18 @@ class MW_Sales_Toast_Settings {
 										<div class="mwst-field__label"><?php esc_html_e( 'Visitors', 'mw-sales-toast' ); ?></div>
 										<div class="mwst-field__control">
 											<?php self::toggle( $opt, 'guests_only', $s, 'mwst-guests-only', __( 'Show only to logged-out visitors (hide for logged-in users)', 'mw-sales-toast' ) ); ?>
+										</div>
+									</div>
+									<div class="mwst-field">
+										<div class="mwst-field__label"><?php esc_html_e( 'Cart state', 'mw-sales-toast' ); ?></div>
+										<div class="mwst-field__control">
+											<?php self::toggle( $opt, 'cart_empty_only', $s, 'mwst-cart-empty-only', __( 'Show only when cart is empty (hide if cart has items)', 'mw-sales-toast' ) ); ?>
+										</div>
+									</div>
+									<div class="mwst-field">
+										<div class="mwst-field__label"><?php esc_html_e( 'First visit', 'mw-sales-toast' ); ?></div>
+										<div class="mwst-field__control">
+											<?php self::toggle( $opt, 'first_visit_only', $s, 'mwst-first-visit-only', __( 'Show only on first visit (hide for returning visitors)', 'mw-sales-toast' ) ); ?>
 										</div>
 									</div>
 									<div class="mwst-field">
@@ -5533,18 +5549,18 @@ class MW_Sales_Toast_Settings {
 							<div class="mwst-card" id="mwst-account-newsletter">
 								<div class="mwst-card__head">
 									<h2><?php esc_html_e( 'Newsletter', 'mw-sales-toast' ); ?></h2>
-									<p><?php esc_html_e( 'Product updates and release notes. Coming soon — nothing is emailed yet.', 'mw-sales-toast' ); ?></p>
+									<p><?php esc_html_e( 'Product updates and release notes.', 'mw-sales-toast' ); ?></p>
 								</div>
 								<div class="mwst-card__body">
 									<div class="mwst-field">
 										<div class="mwst-field__label"><?php esc_html_e( 'Email updates', 'mw-sales-toast' ); ?></div>
 										<div class="mwst-field__control">
-											<?php self::toggle( $opt, 'newsletter', $s, 'mwst-newsletter', __( 'I want Merchant Whisper news when this ships', 'mw-sales-toast' ) ); ?>
+											<?php self::toggle( $opt, 'newsletter', $s, 'mwst-newsletter', __( 'Subscribe to Merchant Whisper newsletter', 'mw-sales-toast' ) ); ?>
 											<p class="description">
 												<?php
 												printf(
 													/* translators: %s: admin email address */
-													esc_html__( 'Your choice is stored on this site only. When newsletters go live, we will use %s from your WordPress profile. No message is sent today.', 'mw-sales-toast' ),
+													esc_html__( 'Your choice is stored on this site only. We will use %s from your WordPress profile.', 'mw-sales-toast' ),
 													'<strong>' . esc_html( $current_user->user_email ) . '</strong>'
 												);
 												?>

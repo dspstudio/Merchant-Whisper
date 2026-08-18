@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Merchant Whisper
  * Description: Social proof for WooCommerce — recent purchases, viewing counts, reviews, and promo notices. Cached real orders, privacy controls, optional demo fill.
- * Version: 0.9.1
+ * Version: 1.0.0
  * Author: MWV3
  * Requires at least: 5.8
  * Requires PHP: 7.2
@@ -13,7 +13,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'MW_SALES_TOAST_VERSION', '0.9.1' );
+define( 'MW_SALES_TOAST_VERSION', '1.0.0' );
 define( 'MW_SALES_TOAST_NAME', 'Merchant Whisper' );
 define( 'MW_SALES_TOAST_FILE', __FILE__ );
 define( 'MW_SALES_TOAST_URL', plugin_dir_url( __FILE__ ) );

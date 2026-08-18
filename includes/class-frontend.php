@@ -48,6 +48,10 @@ class MW_Sales_Toast_Frontend {
 			return false;
 		}
 
+		if ( ! empty( $settings['cart_empty_only'] ) && class_exists( 'WooCommerce' ) && function_exists( 'WC' ) && WC()->cart && ! WC()->cart->is_empty() ) {
+			return false;
+		}
+
 		$show_on = isset( $settings['show_on'] ) ? (string) $settings['show_on'] : 'all';
 
 		if ( 'home' === $show_on ) {
@@ -582,6 +586,8 @@ class MW_Sales_Toast_Frontend {
 			'jitter'               => max( 0, min( 50, (int) ( $base_settings['jitter'] ?? 0 ) ) ),
 			'respectReducedMotion' => ! empty( $base_settings['respect_reduced_motion'] ),
 			'disableMobile'        => ! empty( $base_settings['disable_mobile'] ),
+			'cartEmptyOnly'        => ! empty( $base_settings['cart_empty_only'] ),
+			'firstVisitOnly'       => ! empty( $base_settings['first_visit_only'] ),
 			'mobileBreakpoint'     => $breakpoint,
 			'soundEnabled'         => ! empty( $base_settings['sound_enabled'] ),
 			'pauseOnHover'         => ! empty( $base_settings['pause_on_hover'] ),

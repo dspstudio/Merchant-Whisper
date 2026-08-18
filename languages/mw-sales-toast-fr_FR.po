@@ -1,0 +1,2920 @@
+# Copyright (C) 2026 MWV3
+# This file is distributed under the GPLv2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Merchant Whisper 0.9.1\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/mw-sales-toast\n"
+"Last-Translator: \n"
+"Language-Team: French\n"
+"Language: fr_FR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-08-18 03:56+0000\n"
+"PO-Revision-Date: 2026-08-18 03:56+0000\n"
+"X-Generator: Antigravity\n"
+"X-Domain: mw-sales-toast\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: includes/class-settings.php:2026 includes/class-settings.php:2389
+msgctxt "duration hours minutes"
+msgid "%1$dh %2$dm"
+msgstr "%1$dh %2$dm"
+
+#: includes/class-settings.php:2030 includes/class-settings.php:2403
+msgctxt "duration minutes seconds"
+msgid "%1$dm %2$ds"
+msgstr "%1$dm %2$ds"
+
+#: includes/class-settings.php:4031
+msgid "%1$ds delay · %2$ds visible · %3$ds gap"
+msgstr "%1$ds délai · %2$ds visible · %3$ds intervalle"
+
+#: includes/class-slack.php:189
+msgid "%1$s is connected for %2$s."
+msgstr "%1$s is connected for %2$s."
+
+#: includes/class-settings.php:2891
+msgid "%1$s of %2$s cached events"
+msgstr "%1$s of %2$s cached events"
+
+#: includes/class-slack.php:315
+msgid "%1$s — %2$s on %3$s: %4$s impressions, %5$s clicks (%6$s%% CTR), %7$s carts, %8$s orders, %9$s revenue."
+msgstr "%1$s — %2$s on %3$s: %4$s impressions, %5$s clicks (%6$s%% CTR), %7$s paniers, %8$s commandes, %9$s revenue."
+
+#: includes/class-settings.php:4668
+msgid "%d minutes"
+msgstr "%d minutes"
+
+#: includes/class-analytics.php:937
+msgid "%d ms"
+msgstr "%d ms"
+
+#: includes/class-settings.php:2024 includes/class-settings.php:2395
+msgctxt "duration hours"
+msgid "%dh"
+msgstr "%dh"
+
+#: includes/class-settings.php:2028 includes/class-settings.php:2409
+msgctxt "duration minutes"
+msgid "%dm"
+msgstr "%dm"
+
+#: includes/class-settings.php:2032 includes/class-settings.php:2416
+msgctxt "duration seconds"
+msgid "%ds"
+msgstr "%ds"
+
+#: includes/class-cache.php:439 includes/class-cache.php:578 includes/class-frontend.php:605 includes/class-settings.php:1976
+msgid "%s ago"
+msgstr "%s ago"
+
+#: includes/class-analytics.php:943
+msgid "%s s"
+msgstr "%s s"
+
+#: includes/class-settings.php:1799
+msgid "%s — Merchant Whisper"
+msgstr "%s — Merchant Whisper"
+
+#: includes/class-settings.php:5030
+msgid "%s — colors, radius, width, custom CSS, and theme JSON for the toast chrome."
+msgstr "%s — couleurs, rayon, largeur, CSS personnalisé et JSON de thème pour l'habillage des notifications."
+
+#: includes/class-settings.php:5012
+msgid "%s — enable toasts, data source, event delivery (REST or inline), position, where they appear, targeting, sound, and mobile."
+msgstr "%s — activation des notifications, source de données, livraison (REST ou en ligne), position, ciblage et mobile."
+
+#: includes/class-settings.php:5057
+msgid "%s — profile, newsletter preference, optional digest webhook, and settings import/export."
+msgstr "%s — profil, préférences de newsletter, webhook d'envoi et import/export des réglages."
+
+#: includes/class-settings.php:5048
+msgid "%s — toast impressions, clicks, CTR, funnel, skip reasons, CSV export, and per-product performance."
+msgstr "%s — impressions de notifications, clics, CTR, entonnoir, motifs d'omission, export CSV et statistiques par produit."
+
+#: includes/class-settings.php:5021
+msgid "%s — toast types (purchases, viewing now, reviews, CTA/coupon), purchase templates, simulated names & times, fallback name, stock display, hide names, checkout consent, mute, and session limits."
+msgstr "%s — types de notifications (achats, consultation, avis, CTA/coupon), modèles d'achat, noms & heures simulés, masquage des noms et limites par session."
+
+#: includes/class-settings.php:5039
+msgid "%s — triggers, delay, visible time, gap, jitter, estimated loop duration, toasts per visit, cache lifetime, cron (default 15 min each), rebuild, and lookback days."
+msgstr "%s — déclencheurs, délai, temps visible, intervalle, variation, durée estimée de la boucle, durée de vie du cache et jours d'historique."
+
+#: includes/class-analytics.php:1171 includes/class-analytics.php:1193
+msgid "%s%% vs prior"
+msgstr "%s%% vs prior"
+
+#: includes/class-slack.php:268
+msgid "*%1$s* — %2$s on `%3$s`"
+msgstr "*%1$s* — %2$s on `%3$s`"
+
+#: includes/class-slack.php:183
+msgid "*%1\\$s* is connected for `%2\\$s`.\n"
+msgstr "*%1\\$s* is connected for `%2\\$s`.\n"
+"Scheduled digests will use this webhook when enabled."
+msgstr "*%1\\$s* is connected for `%2\\$s`.\n"
+"Scheduled digests will use this webhook when enabled."
+
+#: includes/class-settings.php:3993
+msgid ".add-to-wishlist, #cta-button"
+msgstr ".add-to-wishlist, #cta-button"
+
+#: includes/class-settings.php:3186
+msgid "/blog/*\n"
+msgstr "/blog/*\n"
+"/about"
+msgstr "/blog/*\n"
+"/about"
+
+#: includes/class-settings.php:3176
+msgid "/sale/*\n"
+msgstr "/sale/*\n"
+"/collections/summer"
+msgstr "/sale/*\n"
+"/collections/summer"
+
+#: includes/class-settings.php:3625
+msgid "0 = only hide the current toast; dismiss does not mute future ones."
+msgstr "0 = only hide the current notification; dismiss does not mute future ones."
+
+#: includes/class-settings.php:1979
+msgid "2 minutes"
+msgstr "2 minutes"
+
+#: includes/class-settings.php:4223
+msgid "30 days"
+msgstr "30 jours"
+
+#: includes/class-settings.php:4222
+msgid "7 days"
+msgstr "7 jours"
+
+#: includes/class-settings.php:4224
+msgid "90 days"
+msgstr "90 jours"
+
+#: includes/class-settings.php:3542
+msgid "A promo toast with an optional coupon chip (click to copy) and button."
+msgstr "A promo notification with an optional coupon chip (click to copy) and button."
+
+#: includes/class-settings.php:1651 includes/class-settings.php:2987 includes/class-settings.php:4966 includes/class-settings.php:5058
+msgid "Account"
+msgstr "Compte"
+
+#: includes/class-settings.php:2535
+msgid "Active"
+msgstr "Active"
+
+#: includes/class-settings.php:3189
+msgid "Add /blog/*"
+msgstr "Ajouter /blog/*"
+
+#: includes/class-settings.php:3179
+msgid "Add /sale/*"
+msgstr "Ajouter /promotion/*"
+
+#: includes/class-settings.php:2176
+msgid "Add a language plugin first (Polylang, WPML, or TranslatePress)."
+msgstr "Ajoutez d'abord une extension de langue."
+
+#: includes/class-settings.php:807
+msgid "Add to cart"
+msgstr "Ajouter au panier"
+
+#: includes/class-settings.php:4585
+msgid "Add-to-cart after toast click"
+msgstr "Ajout au panier après un clic sur la notification"
+
+#: includes/class-settings.php:2836
+msgid "Admin appearance"
+msgstr "Apparence d'administration"
+
+#: includes/class-settings.php:3608
+msgid "Admin-created or older orders without a consent choice can still appear. Customers who unchecked the box never appear."
+msgstr "Les commandes créées par l'administrateur ou plus anciennes sans choix de consentement peuvent toujours apparaître. Les clients ayant décoché la case n'apparaissent jamais."
+
+#: includes/class-settings.php:3835
+msgid "Advanced overrides. Loaded after the base toast styles."
+msgstr "Surcharges avancées. Chargées après les styles de base des notifications."
+
+#: includes/class-settings.php:3168
+msgid "Advanced targeting"
+msgstr "Ciblage avancé"
+
+#: includes/class-settings.php:790
+msgid "After First delay below"
+msgstr "Après le premier délai ci-dessous"
+
+#: includes/class-settings.php:808
+msgid "After a WooCommerce add-to-cart"
+msgstr "Après un ajout au panier WooCommerce"
+
+#: includes/class-settings.php:814
+msgid "After no mouse, keyboard, or scroll"
+msgstr "Après aucune activité de souris, clavier ou défilement"
+
+#: includes/class-settings.php:796
+msgid "After the visitor scrolls down the page"
+msgstr "Après le défilement vers le bas du visiteur"
+
+#: includes/class-settings.php:4217
+msgid "Aggregate engagement only — no names, emails, or IPs."
+msgstr "Engagement global uniquement — aucun nom, e-mail ou IP."
+
+#: includes/class-privacy.php:44 includes/class-privacy.php:97
+msgid "Allow my first name and city to appear in live purchase notifications on this site"
+msgstr "Autoriser l'affichage de mon prénom et de ma ville dans les notifications d'achat en direct sur ce site"
+
+#: includes/class-settings.php:3601
+msgid "Always use the fallback name instead of the customer first name"
+msgstr "Toujours utiliser le nom par défaut au lieu du prénom du client"
+
+#: includes/class-analytics.php:341
+msgid "Analytics unavailable."
+msgstr "Analytique indisponible."
+
+#: includes/class-settings.php:3489
+msgid "Approved WooCommerce product reviews. Demo source (or Real + demo fill) can add simulated reviews when volume is low."
+msgstr "Avis produits WooCommerce approuvés. La source démo (ou Commandes réelles + démo) peut ajouter des avis simulés lorsque le volume est faible."
+
+#: includes/class-settings.php:899
+msgid "Approved product reviews"
+msgstr "Avis produits approuvés"
+
+#: includes/class-types.php:581
+msgid "Arrived quickly and looks even better in person."
+msgstr "Arrivé rapidement et encore plus beau en vrai."
+
+#: includes/class-settings.php:4277 includes/class-settings.php:4455 includes/class-settings.php:4583
+msgid "Attributed carts"
+msgstr "Paniers attribués"
+
+#: includes/class-settings.php:4282 includes/class-settings.php:4462 includes/class-settings.php:4588
+msgid "Attributed purchases"
+msgstr "Achats attribués"
+
+#: includes/class-settings.php:4292
+msgid "Attributed revenue"
+msgstr "Chiffre d'affaires attribué"
+
+#: includes/class-settings.php:4653
+msgid "Attribution window"
+msgstr "Fenêtre d'attribution"
+
+#: includes/class-analytics.php:283
+msgid "Attribution window set to %d minutes."
+msgstr "Fenêtre d'attribution définie sur %d minutes."
+
+#: includes/class-settings.php:2009 includes/class-settings.php:4306 includes/class-settings.php:4427 includes/class-settings.php:4470
+msgid "Auto-hid"
+msgstr "Masqué automatiquement"
+
+#: includes/class-settings.php:4478
+msgid "Average until close."
+msgstr "Moyenne jusqu'à la fermeture."
+
+#: includes/class-settings.php:4483
+msgid "Average until the duration ended."
+msgstr "Moyenne jusqu'à la fin de la durée."
+
+#: includes/class-settings.php:3743
+msgid "Background"
+msgstr "Arrière-plan"
+
+#: includes/class-settings.php:757
+msgid "Balanced"
+msgstr "Équilibré"
+
+#: includes/class-settings.php:3752
+msgid "Border"
+msgstr "Bordure"
+
+#: includes/class-settings.php:4951
+msgid "Both default to 15 minutes and should usually match. Cache lifetime is how long the rebuilt event list is reused. Cron interval is how often WP-Cron rebuilds that list in the background (WP-Cron only runs when someone visits the site). They are not synced to the same second. If lifetime is shorter than cron, the list can expire and the next visitor may trigger a rebuild. New orders also rebuild. Set them under %s → Order cache, or click Rebuild cache to refresh now. Toasts per visit (Timing) is how many unique toasts a session shows — the list does not repeat."
+msgstr "Les deux sont réglés par défaut sur 15 minutes et doivent correspondre. La durée de vie du cache indique combien de temps la liste est réutilisée. L'intervalle cron indique la fréquence à laquelle WP-Cron reconstruit cette liste en arrière-plan. Si la durée de vie est plus courte que le cron, la liste peut expirer et le visiteur suivant peut déclencher une reconstruction. Réglez-les sous %s → Cache des commandes."
+
+#: includes/class-settings.php:3064
+msgid "Bottom left"
+msgstr "Bas gauche"
+
+#: includes/class-settings.php:3065
+msgid "Bottom right"
+msgstr "Bas droite"
+
+#: includes/class-settings.php:4531
+msgid "Browser still in mute-after-dismiss. Lower mute hours in %s."
+msgstr "Navigateur toujours en mode silencieux après fermeture."
+
+#: includes/class-settings.php:3575
+msgid "Button URL"
+msgstr "URL du bouton"
+
+#: includes/class-settings.php:3564
+msgid "Button label"
+msgstr "Libellé du bouton"
+
+#: includes/class-settings.php:4383
+msgid "By page"
+msgstr "Par page"
+
+#: includes/class-settings.php:4373
+msgid "By source"
+msgstr "Par source"
+
+#: includes/class-settings.php:4318
+msgid "By toast type"
+msgstr "Par type de notification"
+
+#: includes/class-settings.php:4393
+msgid "By trigger"
+msgstr "Par déclencheur"
+
+#: includes/class-settings.php:3839
+msgid "CSS"
+msgstr "CSS"
+
+#: includes/class-settings.php:3995
+msgid "CSS selector. A click on a matching element starts the toast loop."
+msgstr "Sélecteur CSS. Un clic sur un élément correspondant démarre la boucle de notification."
+
+#: includes/class-settings.php:3877
+msgid "CSS variables"
+msgstr "Variables CSS"
+
+#: includes/class-settings.php:3541 includes/class-settings.php:904
+msgid "CTA / coupon"
+msgstr "CTA / coupon"
+
+#: includes/class-settings.php:5144
+msgid "CTA / coupon: promo line, optional code (click to copy), and button URL."
+msgstr "CTA / coupon : ligne promo, code optionnel (cliquez pour copier) et URL du bouton."
+
+#: includes/class-settings.php:4272 includes/class-settings.php:4329 includes/class-settings.php:4377 includes/class-settings.php:4387 includes/class-settings.php:4397 includes/class-settings.php:4620
+msgid "CTR"
+msgstr "CTR"
+
+#: includes/class-settings.php:4108 includes/class-settings.php:5169
+msgid "Cache lifetime"
+msgstr "Durée de vie du cache"
+
+#: includes/class-cache.php:78
+msgid "Cache rebuilt: %d event."
+msgid_plural "Cache rebuilt: %d events."
+msgstr[0] "Cache reconstruit : %d événement."
+msgstr[1] "Cache reconstruit : %d événements."
+
+#: includes/class-cache.php:82
+msgid "Cache rebuilt: no events found."
+msgstr "Cache reconstruit : aucun événement trouvé."
+
+#: includes/class-cache.php:64 includes/class-settings.php:2513 includes/class-settings.php:2883
+msgid "Cached"
+msgstr "En cache"
+
+#: includes/class-settings.php:4783
+msgid "Cached counts toast events, not catalog products. The header shows %1$s of a %2$s-order query ceiling (Max cached orders). Only processing/completed orders in the last %3$s days are considered, one line item per order. Checkout consent can skip customers who declined. Sale events are then limited to Toasts per visit (%4$s); other toast types mix in and the stored list is capped at %5$s. Change those values under %6$s, then Save or Rebuild cache. Real + demo fill only adds demo events when there are fewer than 3 real sales — it does not pad the list to %2$s."
+msgstr "Le cache compte les événements de notification, pas les produits du catalogue. L'en-tête affiche %1$s du plafond de requête de %2$s commandes. Seules les commandes terminées des %3$s derniers jours sont prises en compte."
+
+#: includes/class-settings.php:4816
+msgid "Can I show “X viewing now”, reviews, or a coupon on the toast?"
+msgstr "Puis-je afficher « X consultent actuellement », des avis ou un coupon sur la notification ?"
+
+#: includes/class-settings.php:4886
+msgid "Can I wait for scroll, exit intent, or add to cart instead of page load?"
+msgstr "Puis-je attendre le défilement, l'intention de sortie ou l'ajout au panier au lieu du chargement de page ?"
+
+#: includes/class-settings.php:2003 includes/class-settings.php:3931 includes/class-settings.php:4708
+msgid "Cancel"
+msgstr "Annuler"
+
+#: includes/class-settings.php:1991 includes/class-settings.php:5498
+msgid "Cancel changes"
+msgstr "Annuler les modifications"
+
+#: includes/class-settings.php:3126
+msgid "Cart & checkout"
+msgstr "Panier & commande"
+
+#: includes/class-settings.php:2011 includes/class-settings.php:4308 includes/class-settings.php:4330 includes/class-settings.php:4621
+msgid "Carts"
+msgstr "Paniers"
+
+#: includes/class-settings.php:4474
+msgid "Carts / purchases"
+msgstr "Paniers / achats"
+
+#: includes/class-settings.php:4367
+msgid "Carts, orders, and revenue use the last toast click (product link or coupon copy) in the attribution window. Coupon / CTA toasts count any order in that window by toast type. Older attributed totals stay in Overview only."
+msgstr "Les paniers, commandes et revenus utilisent le dernier clic sur une notification dans la fenêtre d'attribution."
+
+#: includes/class-analytics.php:808
+msgid "Category / tag"
+msgstr "Catégorie / tag"
+
+#: includes/class-settings.php:2368
+msgid "Category IDs, comma-separated"
+msgstr "Catégorie IDs, comma-separated"
+
+#: includes/class-settings.php:5495
+msgid "Changes apply after save. The front-end cache rebuilds automatically."
+msgstr "Les modifications s'appliquent après enregistrement."
+
+#: includes/class-settings.php:4303
+msgid "Chart series"
+msgstr "Série du graphique"
+
+#: includes/class-settings.php:3605
+msgid "Checkout consent"
+msgstr "Consentement à la commande"
+
+#: includes/class-settings.php:5147
+msgid "Checkout consent hides customers who declined; legacy/admin orders without a choice can still appear."
+msgstr "Le consentement à la commande masque les clients ayant refusé ; les commandes plus anciennes sans choix peuvent toujours apparaître."
+
+#: includes/class-settings.php:2933
+msgid "Choose a .json export before importing."
+msgstr "Choisissez un fichier d'exportation .json avant d'importer."
+
+#: includes/class-settings.php:2014
+msgid "Choose a JSON file first."
+msgstr "Choisissez d'abord un fichier JSON."
+
+#: includes/class-settings.php:4807
+msgid "Choose the source in %1$s. Edit demo people and times under %2$s → Purchases → Simulated names & times (even if Real orders only is selected — they simply won’t show until you switch source)."
+msgstr "Choisissez la source dans %1$s. Modifiez les personnes et heures démo sous %2$s → Achats → Noms & heures simulés."
+
+#: includes/class-settings.php:995
+msgid "Clean white card with blue accent"
+msgstr "Carte blanche épurée avec accent bleu"
+
+#: includes/class-settings.php:2004
+msgid "Clearing…"
+msgstr "Effacement en cours…"
+
+#: includes/class-settings.php:5173
+msgid "Clears and rebuilds the list immediately from saved settings."
+msgstr "Efface et reconstruit la liste immédiatement à partir des réglages enregistrés."
+
+#: includes/class-settings.php:4169
+msgid "Clears and rebuilds the sales event cache now, using saved settings. Save first if you changed lookback, source, or filters."
+msgstr "Efface et reconstruit le cache des événements de vente maintenant, en utilisant les réglages enregistrés. Enregistrez d'abord si vous avez modifié l'historique, la source ou les filtres."
+
+#: includes/class-settings.php:819
+msgid "Click"
+msgstr "Clic"
+
+#: includes/class-settings.php:5097
+msgid "Click a toast in the sidebar preview, then Save settings (Enter works in most fields)."
+msgstr "Cliquez sur une notification dans l'aperçu latéral, puis sur Enregistrer les réglages."
+
+#: includes/class-settings.php:4906
+msgid "Click a toast in the sidebar preview. Tune colors in %1$s and cadence in %2$s, then Save. For a quiet store, use Demo only or Real + demo fill and edit people/times in %3$s → Purchases."
+msgstr "Cliquez sur une notification dans l'aperçu latéral. Ajustez les couleurs dans %1$s et la cadence dans %2$s puis enregistrez."
+
+#: includes/class-settings.php:5476
+msgid "Click a toast to preview it on this page using the form values above (save to apply on the storefront)."
+msgstr "Cliquez sur une notification pour la prévisualiser sur cette page."
+
+#: includes/class-settings.php:3985
+msgid "Click selector"
+msgstr "Sélecteur de clic"
+
+#: includes/class-settings.php:4403
+msgid "Click target"
+msgstr "Cible de clic"
+
+#: includes/class-settings.php:4580
+msgid "Click → add to cart or purchase"
+msgstr "Click → add to panier or achat"
+
+#: includes/class-settings.php:4287
+msgid "Click → order"
+msgstr "Click → commande"
+
+#: includes/class-settings.php:4448 includes/class-settings.php:4473
+msgid "Clicked"
+msgstr "Cliqué"
+
+#: includes/class-settings.php:2008 includes/class-settings.php:2729 includes/class-settings.php:4267 includes/class-settings.php:4305 includes/class-settings.php:4328 includes/class-settings.php:4619
+msgid "Clicks"
+msgstr "Clics"
+
+#: includes/class-settings.php:3926 includes/class-settings.php:4703
+msgid "Close"
+msgstr "Fermer"
+
+#: includes/class-settings.php:5174
+msgid "Closing with × can mute future toasts for N hours (0 = current toast only)."
+msgstr "Fermer avec × peut masquer les futures notifications pendant N heures (0 = notification actuelle uniquement)."
+
+#: includes/class-settings.php:4648
+msgid "Collect toast impressions, clicks, and skip reasons"
+msgstr "Enregistrer les impressions de notifications, les clics et les motifs d'omission"
+
+#: includes/class-settings.php:4239 includes/class-settings.php:4641 includes/class-settings.php:5384
+msgid "Collection"
+msgstr "Collecte"
+
+#: includes/class-settings.php:4233 includes/class-settings.php:5377
+msgid "Collection is off"
+msgstr "La collecte est désactivée"
+
+#: includes/class-settings.php:3724
+msgid "Colors"
+msgstr "Couleurs"
+
+#: includes/class-settings.php:3642
+msgid "Colors & shape"
+msgstr "Couleurs & forme"
+
+#: includes/class-settings.php:4730
+msgid "Common questions about setup, privacy, and troubleshooting."
+msgstr "Questions fréquentes sur la configuration et la confidentialité."
+
+#: includes/class-settings.php:4413
+msgid "Completion funnel"
+msgstr "Entonnoir de conversion"
+
+#: includes/class-settings.php:4741
+msgid "Confirm Enable is on under %1$s, then check cached events under %2$s → Order cache (must be above 0; use Rebuild cache if empty). Try a private window — dismissing a toast can mute future ones. Also check Show on, Hide on cart & checkout, and Disable on mobile in %1$s, plus Mute after dismiss in %3$s."
+msgstr "Vérifiez qu'Activer est sur ON sous %1$s, puis vérifiez les événements en cache sous %2$s → Cache des commandes. Essayez dans une fenêtre privée — fermer une notification peut masquer les suivantes."
+
+#: includes/class-settings.php:5149
+msgid "Consent meta key on the order: _mw_st_allow_public."
+msgstr "Clé méta de consentement sur la commande : _mw_st_allow_public."
+
+#: includes/class-settings.php:4724 includes/class-settings.php:4980 includes/class-settings.php:5233 includes/class-settings.php:5245
+msgid "Contact"
+msgstr "Contact"
+
+#: includes/class-settings.php:3048
+msgid "Control placement and which pages can show notifications."
+msgstr "Contrôler l'emplacement et les pages pouvant afficher les notifications."
+
+#: includes/class-settings.php:1009
+msgid "Cool charcoal with sky accent"
+msgstr "Charbon froid avec accent ciel"
+
+#: includes/class-frontend.php:623
+msgid "Copied"
+msgstr "Copié"
+
+#: includes/class-settings.php:1987 includes/class-types.php:639
+msgid "Copy code"
+msgstr "Copier le code"
+
+#: includes/class-frontend.php:624
+msgid "Copy failed"
+msgstr "Échec de la copie"
+
+#: includes/class-settings.php:5456
+msgid "Copy messages, timing, and design to another site. Newsletter and webhook URL stay here."
+msgstr "Copier les messages, la temporisation et le design vers un autre site."
+
+#: includes/class-settings.php:3774
+msgid "Corner radius"
+msgstr "Rayon des angles"
+
+#: includes/class-transfer.php:145
+msgid "Could not build the export file."
+msgstr "Impossible de générer le fichier d'exportation."
+
+#: includes/class-support.php:121
+msgid "Could not reach the support form service. Please try again later."
+msgstr "Impossible de contacter le service de support."
+
+#: includes/class-settings.php:2035
+msgid "Could not rebuild the cache. Please try again."
+msgstr "Impossible de reconstruire le cache. Veuillez réessayer."
+
+#: includes/class-settings.php:2006
+msgid "Could not reset statistics. Please try again."
+msgstr "Impossible de réinitialiser les statistiques."
+
+#: includes/class-settings.php:2038
+msgid "Could not send the webhook test. Please try again."
+msgstr "Impossible d'envoyer le test de webhook."
+
+#: includes/class-settings.php:3448
+msgid "Count"
+msgstr "Nombre"
+
+#: includes/class-settings.php:3439
+msgid "Count mode"
+msgstr "Mode de comptage"
+
+#: includes/class-settings.php:4693
+msgid "Counts only: impressions, auto-hides, dismissals, mutes, skips, clicks, toast type, source, page kind, trigger, click target, dwell averages, soft-attributed carts/orders, and order totals as revenue."
+msgstr "Comptes uniquement : impressions, masquages automatiques, fermetures, clics, type de notification, source, type de page, déclencheur et totaux."
+
+#: includes/class-settings.php:3558
+msgid "Coupon code"
+msgstr "Code coupon"
+
+#: includes/class-analytics.php:820
+msgid "Coupon copy"
+msgstr "Copie du coupon"
+
+#: includes/class-settings.php:4124 includes/class-settings.php:5170
+msgid "Cron interval"
+msgstr "Intervalle Cron"
+
+#: includes/class-settings.php:4931
+msgid "Cron isn’t updating the sales cache. What should I do?"
+msgstr "Le Cron ne met pas à jour le cache des ventes. Que faire ?"
+
+#: includes/class-settings.php:5227
+msgid "Cron not scheduled: open this settings page once or re-activate the plugin. Use Rebuild cache for an immediate refresh."
+msgstr "Cron not scheduled: open this réglages page once or re-activate the plugin. Use Rebuild cache for an immediate refresh."
+
+#: includes/class-rest.php:70
+msgid "Current product ID (viewing toasts)."
+msgstr "Current produit ID (viewing notifications)."
+
+#: includes/class-settings.php:4162
+msgid "Currently cached: %1$s. %2$s"
+msgstr "Actuellement en cache : %1$s. %2$s"
+
+#: includes/class-settings.php:1050 includes/class-settings.php:773
+msgid "Custom"
+msgstr "Personnalisé"
+
+#: includes/class-settings.php:3834
+msgid "Custom CSS"
+msgstr "CSS personnalisé"
+
+#: includes/class-settings.php:4046
+msgid "Custom timing"
+msgstr "Temporisation personnalisée"
+
+#: includes/class-settings.php:5359
+msgid "Daily"
+msgstr "Quotidien"
+
+#: includes/class-settings.php:4301
+msgid "Daily toast metrics"
+msgstr "Métriques quotidiennes des notifications"
+
+#: includes/class-settings.php:2845 includes/class-settings.php:2846
+msgid "Dark"
+msgstr "Sombre"
+
+#: includes/class-settings.php:981
+msgid "Dark glass with warm gold accent"
+msgstr "Verre sombre avec accent or chaud"
+
+#: includes/class-settings.php:3006
+msgid "Data source"
+msgstr "Source de données"
+
+#: includes/class-settings.php:5122
+msgid "Data sources"
+msgstr "Sources de données"
+
+#: includes/class-settings.php:4221
+msgid "Date range"
+msgstr "Plage de dates"
+
+#: includes/class-settings.php:1037
+msgid "Deep green with mint accent"
+msgstr "Vert profond avec accent menthe"
+
+#: includes/class-settings.php:2001 includes/class-settings.php:4706
+msgid "Delete all stored toast statistics? This cannot be undone."
+msgstr "Delete all stored notification statistics? This cannot be undone."
+
+#: includes/class-analytics.php:803
+msgid "Demo"
+msgstr "Démo"
+
+#: includes/class-settings.php:3009
+msgid "Demo / simulated only"
+msgstr "Démo / simulation uniquement"
+
+#: includes/class-settings.php:3018
+msgid "Demo mode can fill gaps when order volume is low. Real orders require WooCommerce. Edit simulated names and times under %s → Purchases."
+msgstr "Le mode démo permet de compléter les périodes creuses lorsque le volume de commandes est faible. Les commandes réelles nécessitent WooCommerce. Modifiez les noms et heures simulés sous %s → Achats."
+
+#: includes/class-settings.php:2775 includes/class-settings.php:4800 includes/class-settings.php:5125
+msgid "Demo only"
+msgstr "Démo uniquement"
+
+#: includes/class-settings.php:3388
+msgid "Demo people"
+msgstr "Personnes démo"
+
+#: includes/class-settings.php:3400
+msgid "Demo times"
+msgstr "Temps démo"
+
+#: includes/class-settings.php:5269
+msgid "Describe what you expected, what happened, and any steps to reproduce…"
+msgstr "Décrivez ce à quoi vous vous attendiez et ce qui s'est passé…"
+
+#: includes/class-settings.php:1647 includes/class-settings.php:2982 includes/class-settings.php:4907 includes/class-settings.php:5031 includes/class-settings.php:5092
+msgid "Design"
+msgstr "Design"
+
+#: includes/class-settings.php:3657
+msgid "Design theme"
+msgstr "Thème de design"
+
+#: includes/class-settings.php:5423
+msgid "Digest"
+msgstr "Rapport résumé"
+
+#: includes/class-settings.php:3631
+msgid "Disable toasts when the visitor prefers reduced motion"
+msgstr "Désactiver les notifications si le visiteur préfère une animation réduite"
+
+#: includes/class-settings.php:2858
+msgid "Disabled"
+msgstr "Désactivé"
+
+#: includes/class-settings.php:1978 includes/class-settings.php:2911 includes/class-settings.php:2951
+msgid "Dismiss"
+msgstr "Fermer"
+
+#: includes/class-settings.php:2010 includes/class-settings.php:4307 includes/class-settings.php:4434 includes/class-settings.php:4471
+msgid "Dismissed"
+msgstr "Fermé"
+
+#: includes/class-settings.php:3140
+msgid "Do not show on WooCommerce My Account pages"
+msgstr "Ne pas afficher sur les pages Mon compte WooCommerce"
+
+#: includes/class-settings.php:3128
+msgid "Do not show on cart or checkout"
+msgstr "Ne pas afficher sur le panier ou la commande"
+
+#: includes/class-settings.php:3122
+msgid "Do not show on the homepage"
+msgstr "Ne pas afficher sur la page d'accueil"
+
+#: includes/class-settings.php:3134
+msgid "Do not show on the order received (thank-you) page"
+msgstr "Ne pas afficher sur la page de confirmation de commande (merci)"
+
+#: includes/class-settings.php:4723 includes/class-settings.php:4992
+msgid "Documentation"
+msgstr "Documentation"
+
+#: includes/class-settings.php:1997 includes/class-settings.php:4226
+msgid "Download CSV"
+msgstr "Télécharger le CSV"
+
+#: includes/class-settings.php:3799
+msgid "Drop shadow under the toast. Choose None for a flat look."
+msgstr "Drop shadow under the notification. Choose None for a flat look."
+
+#: includes/class-settings.php:3464
+msgid "Each product gets a stable count in this range."
+msgstr "Chaque produit obtient un nombre stable dans cette plage."
+
+#: includes/class-settings.php:3085
+msgid "Edge distance"
+msgstr "Distance des bords"
+
+#: includes/class-settings.php:5132
+msgid "Edit simulated names →"
+msgstr "Modifier les noms simulés →"
+
+#: includes/class-settings.php:5090
+msgid "Edit the message and privacy options in %1$s, look in %2$s, and cadence in %3$s."
+msgstr "Modifiez les options de message et de confidentialité dans %1$s."
+
+#: includes/class-settings.php:3702
+msgid "Elementor"
+msgstr "Elementor"
+
+#: includes/class-settings.php:3710
+msgid "Elementor is active, but no Site Kit colors/fonts were found yet. Open Elementor → Site Settings → Global Colors / Global Fonts, then reload this page."
+msgstr "Elementor is active, but no Site Kit colors/fonts were found yet. Open Elementor → Site Réglages → Global Colors / Global Fonts, then reload this page."
+
+#: includes/class-settings.php:5259 includes/class-settings.php:5311
+msgid "Email"
+msgstr "E-mail"
+
+#: includes/class-settings.php:5335
+msgid "Email updates"
+msgstr "Mises à jour par e-mail"
+
+#: includes/class-settings.php:2502
+msgid "Empty"
+msgstr "Vide"
+
+#: includes/class-settings.php:3000
+msgid "Enable"
+msgstr "Activer"
+
+#: includes/class-settings.php:2858
+msgid "Enabled"
+msgstr "Activé"
+
+#: includes/class-slack.php:367 includes/class-slack.php:68
+msgid "Enter a valid HTTPS webhook URL."
+msgstr "Saisissez une URL de webhook HTTPS valide."
+
+#: includes/class-settings.php:3111
+msgid "Entire site"
+msgstr "Ensemble du site"
+
+#: includes/class-settings.php:2022 includes/class-settings.php:2443
+msgid "Estimated messages duration %1$s–%2$s (first delay + visible + gaps)."
+msgstr "Durée estimée des messages %1$s–%2$s."
+
+#: includes/class-settings.php:2020 includes/class-settings.php:2451
+msgid "Estimated messages duration %s (first delay + visible + gaps)."
+msgstr "Durée estimée des messages %s."
+
+#: includes/class-settings.php:3033 includes/class-settings.php:5184
+msgid "Event delivery"
+msgstr "Livraison des événements"
+
+#: includes/class-settings.php:5197
+msgid "Events are printed into the page as JSON (mwSalesToast.events). The REST route is not registered. Choose this under %s → Event delivery. No refetch until the next full page load — beware full-page caches serving stale events."
+msgstr "Les événements sont intégrés dans la page au format JSON. La route REST n'est pas enregistrée. Choisissez ceci sous %s → Livraison des événements."
+
+#: mw-sales-toast.php:56
+msgid "Every %d minutes (Merchant Whisper)"
+msgstr "Toutes les %d minutes (Merchant Whisper)"
+
+#: includes/class-settings.php:5362
+msgid "Every 2 weeks"
+msgstr "Toutes les 2 semaines"
+
+#: includes/class-settings.php:5360
+msgid "Every 3 days"
+msgstr "Tous les 3 jours"
+
+#: includes/class-settings.php:5361
+msgid "Every 7 days"
+msgstr "Tous les 7 jours"
+
+#: includes/class-settings.php:3361
+msgid "Exact when low — “only 3 left”"
+msgstr "Exact en stock bas — « plus que 3 restants »"
+
+#: includes/class-settings.php:4085
+msgid "Exact — 2 minutes ago, 3 days ago…"
+msgstr "Exact — il y a 2 minutes, il y a 3 jours…"
+
+#: includes/class-settings.php:1983 includes/class-types.php:579
+msgid "Exactly what I needed."
+msgstr "Exactement ce dont j'avais besoin."
+
+#: includes/class-settings.php:3531
+msgid "Excerpt"
+msgstr "Extrait"
+
+#: includes/class-settings.php:3184
+msgid "Exclude URLs"
+msgstr "Exclure les URL"
+
+#: includes/class-settings.php:3223
+msgid "Exclude categories"
+msgstr "Exclude catégories"
+
+#: includes/class-settings.php:3209
+msgid "Exclude products"
+msgstr "Exclude produits"
+
+#: includes/class-settings.php:4238
+msgid "Existing totals stay on this tab. New storefront events are not recorded until you turn collection back on in %s."
+msgstr "Les totaux existants restent sur cet onglet."
+
+#: includes/class-settings.php:801
+msgid "Exit intent"
+msgstr "Intention de sortie"
+
+#: includes/class-cache.php:70 includes/class-settings.php:2509
+msgid "Expires in %s"
+msgstr "Expire dans %s"
+
+#: includes/class-transfer.php:393
+msgid "Export settings"
+msgstr "Exporter les réglages"
+
+#: includes/class-transfer.php:392
+msgid "Export theme JSON"
+msgstr "Exporter le JSON du thème"
+
+#: includes/class-settings.php:4722 includes/class-settings.php:4729
+msgid "FAQ"
+msgstr "FAQ"
+
+#: includes/class-settings.php:3344
+msgid "Fallback name"
+msgstr "Nom par défaut"
+
+#: includes/class-settings.php:766
+msgid "Faster cadence — use sparingly"
+msgstr "Cadence plus rapide — à utiliser avec modération"
+
+#: includes/class-settings.php:3511
+msgid "Filters"
+msgstr "Filtres"
+
+#: includes/class-settings.php:4050 includes/class-settings.php:5162
+msgid "First delay"
+msgstr "Premier délai"
+
+#: includes/class-settings.php:1036
+msgid "Forest"
+msgstr "Forêt"
+
+#: includes/class-settings.php:765
+msgid "Frequent"
+msgstr "Fréquent"
+
+#: includes/class-settings.php:5188
+msgid "Front end fetches events from"
+msgstr "Le site récupère les événements depuis"
+
+#: includes/class-settings.php:3814
+msgid "Full height"
+msgstr "Hauteur complète"
+
+#: includes/class-settings.php:4058 includes/class-settings.php:5164
+msgid "Gap after hide"
+msgstr "Intervalle après masquage"
+
+#: includes/class-settings.php:3102
+msgid "Gap from the screen edges (0–80px)."
+msgstr "Distance par rapport aux bords de l'écran (0–80px)."
+
+#: includes/class-settings.php:1645 includes/class-settings.php:2980 includes/class-settings.php:4552 includes/class-settings.php:4562 includes/class-settings.php:4742 includes/class-settings.php:4758 includes/class-settings.php:4808 includes/class-settings.php:5013 includes/class-settings.php:5073 includes/class-settings.php:5082 includes/class-settings.php:5198 includes/class-settings.php:5213
+msgid "General"
+msgstr "Général"
+
+#: includes/class-settings.php:5066
+msgid "Getting started"
+msgstr "Prise en main"
+
+#: includes/class-settings.php:758
+msgid "Good default for most stores"
+msgstr "Bon réglage par défaut pour la plupart des boutiques"
+
+#: includes/class-types.php:580
+msgid "Great quality — will order again."
+msgstr "Great quality — will commande again."
+
+#: includes/class-settings.php:5415
+msgid "HTTPS only. Example: create a Slack app, enable Incoming Webhooks, add it to a channel, then paste that URL. Make, n8n, and similar tools that accept JSON work the same way. Local and private addresses are blocked. %s"
+msgstr "HTTPS uniquement. Exemple : créez une application Slack."
+
+#: includes/class-types.php:582
+msgid "Happy with this purchase."
+msgstr "Happy with this achat."
+
+#: includes/class-settings.php:3239
+msgid "Hide for roles"
+msgstr "Masquer pour les rôles"
+
+#: includes/class-settings.php:3599
+msgid "Hide names"
+msgstr "Masquer les noms"
+
+#: includes/class-settings.php:5148
+msgid "Hide names always uses the fallback name (e.g. “Someone”)."
+msgstr "Masquer les noms utilise toujours le nom par défaut."
+
+#: includes/class-settings.php:3607
+msgid "Hide orders where the customer declined the checkout consent checkbox (recommended)"
+msgstr "Masquer les commandes où le client a refusé la case de consentement lors de la commande (recommandé)"
+
+#: includes/class-settings.php:3380
+msgid "Hide stock above this quantity so high inventory does not look odd."
+msgstr "Masquer le stock au-dessus de cette quantité afin qu'un stock élevé ne paraisse pas curieux."
+
+#: includes/class-settings.php:3152
+msgid "Hide toasts on small viewports"
+msgstr "Hide notifications on small viewports"
+
+#: includes/class-settings.php:3160
+msgid "Hide when the viewport is narrower than this width (used when Mobile is on). Default 768."
+msgstr "Masquer lorsque l'écran est plus étroit que cette largeur."
+
+#: includes/class-analytics.php:809
+msgid "Home"
+msgstr "Accueil"
+
+#: includes/class-settings.php:3120
+msgid "Homepage"
+msgstr "Page d'accueil"
+
+#: includes/class-settings.php:3114
+msgid "Homepage only"
+msgstr "Page d'accueil uniquement"
+
+#: includes/class-settings.php:3088
+msgid "Horizontal"
+msgstr "Horizontal"
+
+#: includes/class-settings.php:4900
+msgid "How do I preview before going live?"
+msgstr "Comment prévisualiser avant la mise en ligne ?"
+
+#: includes/class-settings.php:4844
+msgid "How does stock display work?"
+msgstr "Comment fonctionne l'affichage du stock ?"
+
+#: includes/class-settings.php:4959
+msgid "How does the webhook digest work?"
+msgstr "Comment fonctionne le rapport par webhook ?"
+
+#: includes/class-settings.php:5172
+msgid "How far back orders are considered."
+msgstr "How far back commandes are considered."
+
+#: includes/class-settings.php:5102
+msgid "How it works"
+msgstr "Comment ça marche"
+
+#: includes/class-settings.php:4676
+msgid "How long a toast click (product link or coupon copy) can count toward a cart or order. Saved immediately."
+msgstr "Durée pendant laquelle un clic sur une notification peut compter pour un panier ou une commande. Enregistré immédiatement."
+
+#: includes/class-settings.php:5163
+msgid "How long each toast stays on screen."
+msgstr "Durée d'affichage de chaque notification à l'écran."
+
+#: includes/class-settings.php:4116
+msgid "How long the rebuilt event list is kept before it expires. Remaining: %s"
+msgstr "Durée de conservation de la liste reconstituée. Reste : %s"
+
+#: includes/class-settings.php:5169
+msgid "How long the rebuilt list is kept (default 15 minutes). Remaining time is shown next to the field."
+msgstr "Durée de conservation de la liste."
+
+#: includes/class-settings.php:5171
+msgid "How many recent WooCommerce orders are queried during a rebuild. Keep this ≥ Toasts per visit."
+msgstr "How many recent WooCommerce commandes are queried during a rebuild. Keep this ≥ Notifications per visit."
+
+#: includes/class-settings.php:4143
+msgid "How many recent orders to query when rebuilding. Keep this at least as high as Toasts per visit. Visitors still only see that visit cap."
+msgstr "Nombre de commandes récentes à interroger lors de la reconstruction. Conservez cette valeur au moins égale au nombre de notifications par visite."
+
+#: includes/class-settings.php:4094
+msgid "How many toasts a visitor sees in one browser session. The list does not repeat. Resets when they open a new tab or window."
+msgstr "Nombre de notifications qu'un visiteur voit par session de navigation. La liste ne se répète pas."
+
+#: includes/class-settings.php:5168
+msgid "How many unique toasts a visitor sees in one session (newest first). The list does not repeat. The estimate under this field is delay + visible + gaps for that count."
+msgstr "Nombre de notifications uniques qu'un visiteur voit par session. La liste ne se répète pas."
+
+#: includes/class-settings.php:5170
+msgid "How often WP-Cron rebuilds the list (default 15 minutes). Keep this equal to cache lifetime."
+msgstr "Fréquence de reconstruction par WP-Cron."
+
+#: includes/class-settings.php:4132
+msgid "How often WP-Cron rebuilds the sales cache in the background. %s"
+msgstr "Fréquence de reconstruction du cache des ventes en arrière-plan."
+
+#: includes/class-settings.php:5437
+msgid "How often to send the digest."
+msgstr "Fréquence d'envoi du rapport."
+
+#: includes/class-settings.php:4087
+msgid "How real-order timestamps appear under the toast. Demo times are always shown exactly as written."
+msgstr "Affichage de l'horodatage des commandes réelles sous la notification. Les heures démo sont toujours affichées exactement comme écrites."
+
+#: includes/class-settings.php:4872
+msgid "I closed a toast and they stopped appearing. Why?"
+msgstr "J'ai fermé une notification et elles n'apparaissent plus. Pourquoi ?"
+
+#: includes/class-settings.php:5337
+msgid "I want Merchant Whisper news when this ships"
+msgstr "S'abonner à la newsletter Merchant Whisper"
+
+#: includes/class-settings.php:3977
+msgid "Idle time"
+msgstr "Temps d'inactivité"
+
+#: includes/class-settings.php:3965
+msgid "If none are selected, Page load is used. Exit intent is desktop-only. Add to cart needs WooCommerce."
+msgstr "Si aucune option n'est sélectionnée, Chargement de page est utilisé. L'intention de sortie est réservée aux ordinateurs. L'ajout au panier nécessite WooCommerce."
+
+#: includes/class-settings.php:3312
+msgid "If none are selected, Purchases is used. Uncheck Purchases to show only extra types."
+msgstr "Si aucune option n'est sélectionnée, Achats est utilisé. Décochez Achats pour afficher uniquement les types supplémentaires."
+
+#: includes/class-settings.php:2168
+msgid "If you leave a language blank, it uses your default text."
+msgstr "Si vous laissez une langue vide, le texte par défaut sera utilisé."
+
+#: includes/class-settings.php:3340
+msgid "If you omit stock tokens, a stock phrase still appears next to the time when stock display is on (real orders only)."
+msgstr "Si vous omettez les variables de stock, une phrase de stock apparaît quand même à côté de l'heure lorsque l'affichage du stock est activé (commandes réelles uniquement)."
+
+#: includes/class-settings.php:5455
+msgid "Import / export"
+msgstr "Importation / exportation"
+
+#: includes/class-settings.php:3919
+msgid "Import applies immediately. Elementor Site Kit sync is included when that toggle is on."
+msgstr "L'importation s'applique immédiatement."
+
+#: includes/class-settings.php:2927 includes/class-settings.php:2937
+msgid "Import failed"
+msgstr "Échec de l'importation"
+
+#: includes/class-transfer.php:396
+msgid "Import settings"
+msgstr "Importer les réglages"
+
+#: includes/class-transfer.php:395
+msgid "Import theme"
+msgstr "Importer le thème"
+
+#: includes/class-settings.php:2015
+msgid "Importing…"
+msgstr "Importation en cours…"
+
+#: includes/class-settings.php:2007 includes/class-settings.php:2727 includes/class-settings.php:4262 includes/class-settings.php:4304 includes/class-settings.php:4327 includes/class-settings.php:4618
+msgid "Impressions"
+msgstr "Impressions"
+
+#: includes/class-settings.php:4319
+msgid "Impressions, clicks, and last-click attributed carts, orders, and revenue per type."
+msgstr "Impressions, clicks, and last-click attributed paniers, commandes, and revenue per type."
+
+#: includes/class-settings.php:4922
+msgid "In %1$s, use Natural time labels and raise Jitter so delays feel less mechanical. Keep Demo times in %2$s → Purchases to a short recent band (just now, a few minutes ago…) and put freshest phrases first."
+msgstr "In %1$s, use Natural time labels and raise Jitter so delays feel less mechanical. Keep Demo times in %2$s → Achats to a short recent band (just now, a few minutes ago…) and put freshest phrases first."
+
+#: includes/class-settings.php:813
+msgid "Inactivity"
+msgstr "Inactivité"
+
+#: includes/class-settings.php:3294
+msgid "Include"
+msgstr "Inclure"
+
+#: includes/class-settings.php:3174
+msgid "Include URLs"
+msgstr "Inclure les URL"
+
+#: includes/class-settings.php:3216
+msgid "Include categories"
+msgstr "Inclure les catégories"
+
+#: includes/class-transfer.php:406
+msgid "Include product, category, and URL targeting in the export"
+msgstr "Inclure le ciblage par produit, catégorie et URL dans l'exportation"
+
+#: includes/class-settings.php:3202
+msgid "Include products"
+msgstr "Inclure les produits"
+
+#: includes/class-settings.php:5273
+msgid "Include system info (WordPress, PHP, WooCommerce, theme)"
+msgstr "Inclure les informations système (WordPress, PHP, WooCommerce, thème)"
+
+#: includes/class-settings.php:1022
+msgid "Ink"
+msgstr "Encre"
+
+#: includes/class-settings.php:5193
+msgid "Inline"
+msgstr "En ligne"
+
+#: includes/class-settings.php:3039
+msgid "Inline disables the notifications REST route and prints events into the page script. Good for removing a public API; events refresh only when the HTML does (watch full-page caches)."
+msgstr "En ligne désactive la route REST et intègre les événements dans le script de page. Utile pour supprimer l'API publique ; les événements ne se rafraîchissent que lors du rechargement de la page."
+
+#: includes/class-settings.php:3037
+msgid "Inline — embed JSON in the page (no REST)"
+msgstr "En ligne — intégrer le JSON dans la page (sans REST)"
+
+#: includes/class-settings.php:3333
+msgid "Insert placeholder"
+msgstr "Insérer une variable"
+
+#: includes/class-settings.php:3719
+msgid "Install and activate Elementor to match toast colors and font to your Site Kit."
+msgstr "Installez et activez Elementor pour adapter les couleurs et la police de la notification à votre Kit de site."
+
+#: includes/class-analytics.php:326
+msgid "Invalid or expired analytics nonce."
+msgstr "Nonce d'analyse invalide ou expiré."
+
+#: includes/class-rest.php:104
+msgid "Invalid or expired notifications nonce."
+msgstr "Nonce de notification invalide ou expiré."
+
+#: includes/class-settings.php:4830
+msgid "Is this GDPR / privacy friendly?"
+msgstr "Est-ce conforme au RGPD / respectueux de la vie privée ?"
+
+#: includes/class-settings.php:4066 includes/class-settings.php:5165
+msgid "Jitter"
+msgstr "Variation aléatoire (Jitter)"
+
+#: includes/class-settings.php:4979
+msgid "Jump to %s, describe what you expected vs what happened, and leave Include system info checked so we can see WordPress, PHP, WooCommerce, and theme versions."
+msgstr "Allez dans %s et décrivez le problème."
+
+#: includes/class-settings.php:5486
+msgid "Keep checkout consent on for GDPR-friendly social proof."
+msgstr "Keep commande consent on for GDPR-friendly social proof."
+
+#: includes/class-settings.php:3595
+msgid "Keep customer data minimal and consent-aware."
+msgstr "Conserver les données clients minimales et avec consentement."
+
+#: includes/class-settings.php:4260
+msgid "Key metrics"
+msgstr "Indicateurs clés"
+
+#: includes/class-settings.php:2152
+msgid "Language"
+msgstr "Langue"
+
+#: includes/class-settings.php:2112 includes/class-settings.php:2871
+msgid "Languages"
+msgstr "Langues"
+
+#: includes/class-settings.php:3866
+msgid "Layout & state"
+msgstr "Disposition & état"
+
+#: includes/class-settings.php:3480
+msgid "Leave empty for random catalog products."
+msgstr "Laisser vide pour des produits aléatoires du catalogue."
+
+#: includes/class-settings.php:3578
+msgid "Leave empty to copy the coupon when the button is clicked."
+msgstr "Laisser vide pour copier le coupon lors du clic."
+
+#: includes/class-settings.php:5464
+msgid "Leave the targeting boxes unchecked unless this is the same store (or a clone). Product and category IDs from another catalog will not match. Colors-only: Design → Theme JSON."
+msgstr "Laissez les cases de ciblage décochées sauf s'il s'agit de la même boutique (ou d'un clone). Les identifiants de produits et catégories d'un autre catalogue ne correspondront pas. Couleurs uniquement : Design → JSON du thème."
+
+#: includes/class-settings.php:2841 includes/class-settings.php:2842
+msgid "Light"
+msgstr "Clair"
+
+#: includes/class-settings.php:3460
+msgid "Live window"
+msgstr "Fenêtre en direct"
+
+#: includes/class-settings.php:3443
+msgid "Live — unique visitors on this product (last N minutes)"
+msgstr "En direct — visiteurs uniques sur ce produit (N dernières minutes)"
+
+#: includes/class-settings.php:3259
+msgid "Logged-in users with any selected role will not see toasts. Useful for admins and shop managers."
+msgstr "Les utilisateurs connectés ayant un rôle sélectionné ne verront pas les notifications. Utile pour les administrateurs et gestionnaires de boutique."
+
+#: includes/class-settings.php:3523 includes/class-settings.php:5172
+msgid "Lookback"
+msgstr "Historique (Lookback)"
+
+#: includes/class-settings.php:3527
+msgid "Lookback is days. Hide names still applies. Stars appear under the line when you omit {stars}."
+msgstr "L'historique est en jours."
+
+#: includes/class-settings.php:4147
+msgid "Lookback window"
+msgstr "Fenêtre d'historique"
+
+#: includes/class-settings.php:3709
+msgid "Maps Site Kit Text → message, Accent → product link, Secondary → background/meta/close, and Text font → toast typeface. Opacity and radius still apply."
+msgstr "Maps Site Kit Text → message, Accent → produit link, Secondary → background/meta/close, and Text font → notification typeface. Opacity and radius still apply."
+
+#: includes/class-settings.php:2996
+msgid "Master switch for front-end toasts."
+msgstr "Interrupteur principal pour les notifications côté public."
+
+#: includes/class-settings.php:3456
+msgid "Max"
+msgstr "Max"
+
+#: includes/class-settings.php:4140 includes/class-settings.php:5171
+msgid "Max cached orders"
+msgstr "Max cached commandes"
+
+#: includes/class-settings.php:3519
+msgid "Max shown"
+msgstr "Max affiché"
+
+#: includes/class-settings.php:3782
+msgid "Max width"
+msgstr "Largeur max"
+
+#: includes/class-settings.php:3796
+msgid "Medium (default)"
+msgstr "Moyen (par défaut)"
+
+#: includes/class-settings.php:1785 includes/class-settings.php:1786 includes/class-settings.php:1812 includes/class-settings.php:1813 includes/class-settings.php:2827
+msgid "Merchant Whisper"
+msgstr "Merchant Whisper"
+
+#: includes/class-settings.php:4997
+msgid "Merchant Whisper %s — setup guide, features, and how the cache works."
+msgstr "Merchant Whisper %s — guide de configuration et fonctionnement."
+
+#: includes/class-settings.php:3546 includes/class-settings.php:3729 includes/class-settings.php:5268
+msgid "Message"
+msgstr "Message"
+
+#: includes/class-settings.php:1646 includes/class-settings.php:2981 includes/class-settings.php:3019 includes/class-settings.php:3025 includes/class-settings.php:4532 includes/class-settings.php:4744 includes/class-settings.php:4759 includes/class-settings.php:4809 includes/class-settings.php:4823 includes/class-settings.php:4837 includes/class-settings.php:4851 includes/class-settings.php:4879 includes/class-settings.php:4909 includes/class-settings.php:4924 includes/class-settings.php:5022 includes/class-settings.php:5091 includes/class-settings.php:5222
+msgid "Message & privacy"
+msgstr "Message & confidentialité"
+
+#: includes/class-support.php:84
+msgid "Message is too long."
+msgstr "Le message est trop long."
+
+#: includes/class-support.php:149
+msgid "Message sent. We’ll get back to you as soon as we can."
+msgstr "Message envoyé. Nous vous répondrons dès que possible."
+
+#: includes/class-settings.php:5138
+msgid "Message, types & privacy"
+msgstr "Message, types & confidentialité"
+
+#: includes/class-settings.php:3733
+msgid "Meta / time / close"
+msgstr "Méta / heure / fermeture"
+
+#: includes/class-settings.php:980
+msgid "Midnight"
+msgstr "Minuit"
+
+#: includes/class-settings.php:3452
+msgid "Min"
+msgstr "Min"
+
+#: includes/class-settings.php:3515
+msgid "Min stars"
+msgstr "Étoiles min"
+
+#: includes/class-settings.php:1023
+msgid "Minimal black with crisp edges"
+msgstr "Noir minimaliste avec bords nets"
+
+#: includes/class-analytics.php:319
+msgid "Missing analytics nonce."
+msgstr "Nonce d'analyse manquant."
+
+#: includes/class-rest.php:96
+msgid "Missing notifications nonce."
+msgstr "Nonce de notification manquant."
+
+#: includes/class-settings.php:3290
+msgid "Mix purchase social proof with viewing counts, reviews, and a promo toast. Types rotate in the same loop."
+msgstr "Mix achat social proof with viewing counts, avis, and a promo notification. Types rotate in the same loop."
+
+#: includes/class-settings.php:3150
+msgid "Mobile"
+msgstr "Mobile"
+
+#: includes/class-settings.php:3156
+msgid "Mobile breakpoint"
+msgstr "Point de rupture mobile"
+
+#: includes/class-settings.php:4519 includes/class-settings.php:4557
+msgid "Mobile gate"
+msgstr "Barrière mobile"
+
+#: includes/class-settings.php:5363
+msgid "Monthly (30 days)"
+msgstr "Mensuel (30 jours)"
+
+#: includes/class-settings.php:3621 includes/class-settings.php:5174
+msgid "Mute after dismiss"
+msgstr "Mode silencieux après fermeture"
+
+#: includes/class-settings.php:4878
+msgid "Mute after dismiss (in %s) can hide toasts for a set number of hours in that browser. Set mute hours to 0 to only dismiss the current toast, or test in a private window."
+msgstr "Le mode silencieux après fermeture (dans %s) peut masquer les notifications pendant un nombre d'heures défini dans ce navigateur."
+
+#: includes/class-settings.php:4472
+msgid "Mute-after-dismiss applied in that browser."
+msgstr "Mode silencieux appliqué dans ce navigateur."
+
+#: includes/class-settings.php:4472
+msgid "Muted"
+msgstr "En mode silencieux"
+
+#: includes/class-settings.php:4441
+msgid "Muted (after dismiss)"
+msgstr "Silencieux (après fermeture)"
+
+#: includes/class-settings.php:4498 includes/class-settings.php:4527
+msgid "Muted already"
+msgstr "Déjà silencieux"
+
+#: includes/class-settings.php:3138
+msgid "My Account"
+msgstr "Mon compte"
+
+#: includes/class-settings.php:5255 includes/class-settings.php:5307
+msgid "Name"
+msgstr "Nom"
+
+#: includes/class-settings.php:5167
+msgid "Natural (just now…) or Exact (2 minutes ago) for real orders; demo lines are shown as written."
+msgstr "Natural (just now…) or Exact (2 minutes ago) for real commandes; demo lines are shown as written."
+
+#: includes/class-settings.php:4084
+msgid "Natural — just now, a few minutes ago…"
+msgstr "Naturel — à l'instant, il y a quelques minutes…"
+
+#: includes/class-settings.php:3226
+msgid "Never toast products in these categories, and hide toasts on those category/product pages."
+msgstr "Never notification produits in these catégories, and hide notifications on those catégorie/produit pages."
+
+#: includes/class-settings.php:3212
+msgid "Never toast these products, and hide toasts on their product pages."
+msgstr "Never notification these produits, and hide notifications on their produit pages."
+
+#: includes/class-settings.php:5330
+msgid "Newsletter"
+msgstr "Lettre d'information"
+
+#: includes/class-settings.php:2521
+msgid "Next run in %s"
+msgstr "Prochaine exécution dans %s"
+
+#: includes/class-slack.php:90
+msgid "No HTTP response (%s)."
+msgstr "Pas de réponse HTTP (%s)."
+
+#: includes/class-settings.php:4695
+msgid "No cross-site tracking pixels; daily totals stay in a table on your WordPress site (90 days)."
+msgstr "Aucun tracker tiers ; les totaux restent sur votre site."
+
+#: includes/class-settings.php:2736
+msgid "No data yet."
+msgstr "Aucune donnée pour l'instant."
+
+#: includes/class-settings.php:2932
+msgid "No file selected"
+msgstr "Aucun fichier sélectionné"
+
+#: includes/class-settings.php:3981
+msgid "No pointer, keyboard, or scroll activity for this long."
+msgstr "Aucune activité pendant cette durée."
+
+#: includes/class-settings.php:1995 includes/class-settings.php:4627
+msgid "No product data yet."
+msgstr "No produit data yet."
+
+#: includes/class-settings.php:2960
+msgid "No toast events cached"
+msgstr "Aucun événement de notification en cache"
+
+#: includes/class-settings.php:5212
+msgid "No toasts: Enable on, cached events above 0 under Timing & cache → Order cache, not muted — start in %s."
+msgstr "Aucune notification : activez dans %s, événements en cache supérieurs à 0 sous Rythme & cache."
+
+#: includes/class-settings.php:3794
+msgid "None"
+msgstr "Aucun"
+
+#: includes/class-settings.php:2535 includes/class-settings.php:2537
+msgid "Not detected"
+msgstr "Non détecté"
+
+#: includes/class-settings.php:2524
+msgid "Not scheduled"
+msgstr "Non planifié"
+
+#: includes/class-settings.php:4250
+msgid "Numbers appear after visitors see toasts on the storefront. Keep toasts enabled and browse the shop in a private window to generate the first events."
+msgstr "Les chiffres apparaissent une fois que les visiteurs voient les notifications sur le site. Conservez les notifications activées et naviguez sur la boutique dans une fenêtre privée pour générer les premiers événements."
+
+#: includes/class-settings.php:3359 includes/class-settings.php:5358
+msgid "Off"
+msgstr "Désactivé"
+
+#: includes/class-settings.php:4649
+msgid "Off stops new beacons. Historical numbers remain until you reset."
+msgstr "Désactivé arrête les nouveaux relevés."
+
+#: includes/class-settings.php:4965
+msgid "On %s you can paste any HTTPS webhook URL (Slack Incoming Webhooks are the example) and pick a cadence: daily, every 3 days, 7 days, 2 weeks, or monthly (30 days). Each POST covers that same window of impressions, clicks, CTR, attributed carts/orders, and revenue — aggregates only. The first digest can go out on the next cron after you save; then it waits the chosen interval (UTC). Statistics collection must be on. Local and private addresses are blocked."
+msgstr "Dans %s, vous pouvez coller une URL de webhook HTTPS (comme Slack Incoming Webhooks) et choisir une fréquence : quotidienne, tous les 3 jours, 7 jours, 2 semaines ou mensuelle (30 jours). Chaque envoi couvre cette même période (impressions, clics, CTR, paniers/commandes attribués et chiffre d'affaires). Le premier rapport sera envoyé lors du prochain cron. La collecte des statistiques doit être activée."
+
+#: includes/class-transfer.php:417
+msgid "On import, apply that targeting from the file"
+msgstr "Lors de l'importation, appliquer ce ciblage"
+
+#: includes/class-settings.php:3233
+msgid "On product pages, only show toasts for that product"
+msgstr "On produit pages, only show notifications for that produit"
+
+#: includes/class-settings.php:3582
+msgid "Once per visit"
+msgstr "Une fois par visite"
+
+#: includes/class-settings.php:3187
+msgid "One path per line. Matching pages never show toasts."
+msgstr "One path per line. Matching pages never show notifications."
+
+#: includes/class-settings.php:3177
+msgid "One path per line. Use * as a wildcard. Leave empty to allow all (after other rules)."
+msgstr "Un chemin par ligne. Utilisez * comme joker."
+
+#: includes/class-settings.php:3408
+msgid "One per line, shown as-is (e.g. “just now”). No automatic “ago” is added."
+msgstr "Un par ligne, affiché tel quel."
+
+#: includes/class-settings.php:3396
+msgid "One per line: Name, City"
+msgstr "Un par ligne : Nom, Ville"
+
+#: includes/class-settings.php:5146
+msgid "Only first name and city are shown — never email or full address."
+msgstr "Seuls le prénom et la ville sont affichés."
+
+#: includes/class-settings.php:4836
+msgid "Only first name and city are shown — never email or full address. In %s you can require checkout consent for real orders, or hide names and use a fallback like “Someone”. No external tracking calls are made for toast delivery."
+msgstr "Seuls le prénom et la ville sont affichés — jamais l'e-mail ou l'adresse complète. Dans %s, vous pouvez exiger le consentement à la commande pour les commandes réelles ou masquer les noms et utiliser un nom par défaut comme « Quelqu'un ». Aucun appel de suivi externe n'est effectué pour la livraison des notifications."
+
+#: includes/class-settings.php:4757
+msgid "Only processing and completed orders are used. Set Data source under %1$s to Real orders (or Real + demo fill). Checkout consent in %2$s hides customers who declined; admin/legacy orders without a choice can still appear. Check Lookback window in %3$s, then Save or use Rebuild cache so the list refreshes."
+msgstr "Seules les commandes en cours de traitement et terminées sont utilisées. Définissez la source de données sous %1$s sur Commandes réelles (ou Commandes réelles + démo). Le consentement à la commande dans %2$s masque les clients qui ont refusé. Vérifiez la fenêtre d'historique dans %3$s puis enregistrez ou reconstruisez le cache."
+
+#: includes/class-settings.php:3219
+msgid "Only sales of products in these categories (including child categories). Combined with Include products as a union."
+msgstr "Only sales of produits in these catégories (including child catégories). Combined with Include produits as a union."
+
+#: includes/class-settings.php:3205
+msgid "Only sales of these products appear in toasts. Combined with Include categories as a union (product listed or in a listed category)."
+msgstr "Only sales of these produits appear in notifications. Combined with Include catégories as a union (produit listed or in a listed catégorie)."
+
+#: includes/class-settings.php:3746 includes/class-settings.php:3755
+msgid "Opacity"
+msgstr "Opacité"
+
+#: includes/class-settings.php:5130
+msgid "Open General to change source →"
+msgstr "Ouvrir Général pour changer la source →"
+
+#: includes/class-settings.php:5153
+msgid "Open Message & privacy →"
+msgstr "Ouvrir Message & confidentialité →"
+
+#: includes/class-slack.php:308
+msgid "Open Statistics"
+msgstr "Ouvrir les statistiques"
+
+#: includes/class-settings.php:5178
+msgid "Open Timing & cache →"
+msgstr "Ouvrir Rythme & cache →"
+
+#: includes/class-settings.php:4937
+msgid "Open this settings page once, or deactivate and re-activate the plugin so the cache cron is scheduled. New orders also trigger a debounced rebuild. Use Rebuild cache under %s → Order cache for an immediate refresh. Cache lifetime and cron interval default to 15 minutes — keep those two values the same."
+msgstr "Ouvrez cette page de réglages une fois, ou désactivez puis réactivez l'extension pour planifier le cron de cache. Les nouvelles commandes déclenchent également une reconstruction. Utilisez Reconstruire le cache sous %s → Cache des commandes pour un rafraîchissement immédiat. La durée de vie du cache et l'intervalle cron sont par défaut de 15 minutes — conservez ces deux valeurs identiques."
+
+#: includes/class-settings.php:4696
+msgid "Optional HTTPS webhook (Account tab) may send aggregate digests when you save a URL — never customer names, cities, or the webhook URL in support system info. Slack Incoming Webhooks are the usual example."
+msgstr "Le webhook HTTPS optionnel peut envoyer des rapports résumés."
+
+#: includes/class-settings.php:3269
+msgid "Optional audio cue when a toast appears."
+msgstr "Signal sonore optionnel lors de l'apparition d'une notification."
+
+#: includes/class-settings.php:5371
+msgid "Optional stats digest to any HTTPS JSON webhook. Off by default. Slack Incoming Webhooks are the usual example."
+msgstr "Rapport statistique optionnel vers un webhook JSON."
+
+#: includes/class-settings.php:4103
+msgid "Order cache"
+msgstr "Commande cache"
+
+#: includes/class-settings.php:4864
+msgid "Order queries run on WP-Cron and order hooks, not on every page view. Cache lifetime and cron interval (default 15 minutes each — keep them the same) are under %s → Order cache. Visitors fetch a small REST payload; an empty response means no toast loop runs."
+msgstr "Les requêtes de commandes s'exécutent sur WP-Cron et sur les crochets de commande, pas à chaque vue de page. La durée de vie du cache et l'intervalle cron (15 minutes par défaut chacun) se trouvent sous %s → Cache des commandes. Les visiteurs récupèrent une petite charge REST ; une réponse vide signifie qu'aucune boucle de notification ne s'exécute."
+
+#: includes/class-settings.php:2012 includes/class-settings.php:4309 includes/class-settings.php:4331 includes/class-settings.php:4622
+msgid "Orders"
+msgstr "Commandes"
+
+#: includes/class-settings.php:4590
+msgid "Orders in the same window"
+msgstr "Commandes in the same window"
+
+#: includes/class-analytics.php:810
+msgid "Other"
+msgstr "Autre"
+
+#: includes/class-settings.php:4256
+msgid "Overview"
+msgstr "Vue d'ensemble"
+
+#: includes/class-settings.php:3778
+msgid "Padding"
+msgstr "Espacement interne"
+
+#: includes/class-settings.php:4387
+msgid "Page"
+msgstr "Page"
+
+#: includes/class-settings.php:789
+msgid "Page load"
+msgstr "Chargement de page"
+
+#: includes/class-settings.php:5161
+msgid "Page load, scroll depth, exit intent, add to cart, inactivity, or a CSS click selector. The first match starts the loop."
+msgstr "Chargement de page, profondeur de défilement, intention de sortie, ajout au panier, inactivité ou sélecteur de clic CSS."
+
+#: includes/class-settings.php:4074 includes/class-settings.php:5166
+msgid "Pause on hover"
+msgstr "Mettre en pause au survol"
+
+#: includes/class-settings.php:4076
+msgid "Pause the visible timer while the visitor hovers the toast"
+msgstr "Mettre en pause le chronomètre d'affichage lorsque le visiteur survole la notification"
+
+#: includes/class-settings.php:4599
+msgid "Per-product performance"
+msgstr "Performance par produit"
+
+#: includes/class-settings.php:3698
+msgid "Pick a coherent palette, then fine-tune below. Editing colors switches to Custom."
+msgstr "Choisissez une palette cohérente, puis ajustez ci-dessous. Modifier les couleurs bascule en Personnalisé."
+
+#: includes/class-settings.php:3275
+msgid "Play a short sine-wave pop when a toast appears"
+msgstr "Jouer un court son pop lors de l'apparition d'une notification"
+
+#: includes/class-settings.php:3277
+msgid "Play sample"
+msgstr "Écouter l'échantillon"
+
+#: includes/class-support.php:81
+msgid "Please fill in name, email, subject, and message."
+msgstr "Veuillez remplir le nom, l'e-mail, le sujet et le message."
+
+#: includes/class-slack.php:353
+msgid "Please wait %d second before sending another test."
+msgid_plural "Please wait %d seconds before sending another test."
+msgstr[0] "Veuillez attendre %d seconde avant d'envoyer un autre test."
+msgstr[1] "Veuillez attendre %d secondes avant d'envoyer un autre test."
+
+#: includes/class-support.php:71
+msgid "Please wait a few minutes before sending another message."
+msgstr "Veuillez attendre quelques minutes avant d'envoyer un autre message."
+
+#: includes/class-settings.php:3273
+msgid "Pop sound"
+msgstr "Son d'éclatement (pop)"
+
+#: includes/class-settings.php:3053
+msgid "Position"
+msgstr "Position"
+
+#: includes/class-settings.php:4801 includes/class-settings.php:5126
+msgid "Prefer real sales; fill with demo when volume is low."
+msgstr "Préférer les ventes réelles ; compléter avec de la démo lorsque le volume est faible."
+
+#: includes/class-settings.php:5485
+msgid "Prefer “Real + demo fill” until you have steady order volume."
+msgstr "Préférer « Commandes réelles + démo » jusqu'à ce que vous ayez un volume de commandes régulier."
+
+#: includes/class-settings.php:4008
+msgid "Preset"
+msgstr "Préréglage"
+
+#: includes/class-settings.php:5472
+msgid "Preview"
+msgstr "Pavis"
+
+#: includes/class-settings.php:1977
+msgid "Preview %s toast"
+msgstr "Prévisualiser la notification %s"
+
+#: includes/class-settings.php:5276
+msgid "Preview system info"
+msgstr "Pavis system info"
+
+#: includes/class-settings.php:3594 includes/class-settings.php:4688
+msgid "Privacy"
+msgstr "Confidentialité"
+
+#: includes/class-settings.php:5124
+msgid "Processing/completed orders inside the lookback window, respecting consent and privacy."
+msgstr "Processing/completed commandes inside the lookback window, respecting consent and privacy."
+
+#: includes/class-analytics.php:806 includes/class-settings.php:4617
+msgid "Product"
+msgstr "Produit"
+
+#: includes/class-settings.php:4473
+msgid "Product (or toast) link opened."
+msgstr "Produit (or notification) link opened."
+
+#: includes/class-settings.php:4694
+msgid "Product IDs only — never customer names, emails, IPs, or page URLs."
+msgstr "Produit IDs only — never customer names, emails, IPs, or page URLs."
+
+#: includes/class-settings.php:2313
+msgid "Product IDs, comma-separated"
+msgstr "ID de produits, séparés par des virgules"
+
+#: includes/class-settings.php:3737
+msgid "Product accent"
+msgstr "Produit accent"
+
+#: includes/class-settings.php:3803
+msgid "Product image"
+msgstr "Produit image"
+
+#: includes/class-analytics.php:819
+msgid "Product link"
+msgstr "Produit link"
+
+#: includes/class-settings.php:4404
+msgid "Product links versus coupon copy. Both start the attribution window."
+msgstr "Produit links versus coupon copy. Both start the attribution window."
+
+#: includes/class-settings.php:4635
+msgid "Product names link to the WooCommerce edit screen when available. The table shows 20 rows at a time."
+msgstr "Les noms de produits mènent à l'écran de modification WooCommerce lorsque disponible. Le tableau affiche 20 lignes à la fois."
+
+#: includes/class-settings.php:3231
+msgid "Product page match"
+msgstr "Correspondance de page produit"
+
+#: includes/class-settings.php:3113
+msgid "Product pages only"
+msgstr "Pages produits uniquement"
+
+#: includes/class-settings.php:5331
+msgid "Product updates and release notes. Coming soon — nothing is emailed yet."
+msgstr "Mises à jour du produit et notes de version."
+
+#: includes/class-settings.php:3469
+msgid "Products"
+msgstr "Produits"
+
+#: includes/class-settings.php:4600
+msgid "Products with toast activity in the selected range (all types combined). Click a column to sort."
+msgstr "Produits avec activité de notification dans la période sélectionnée (tous types confondus). Cliquez sur une colonne pour trier."
+
+#: includes/class-settings.php:5291
+msgid "Profile"
+msgstr "Profil"
+
+#: includes/class-settings.php:905
+msgid "Promo line with optional code"
+msgstr "Ligne promo avec code optionnel"
+
+#: includes/class-settings.php:5319
+msgid "Pulled from your WordPress user. Change your name or email in %s."
+msgstr "Extrait de votre compte utilisateur WordPress. Modifiez votre nom ou e-mail dans %s."
+
+#: includes/class-settings.php:5140
+msgid "Purchase tokens: {name}, {city}, {product}, {stock}, {stock_label}."
+msgstr "Achat tokens: {name}, {city}, {produit}, {stock}, {stock_label}."
+
+#: includes/class-settings.php:3320 includes/class-settings.php:886
+msgid "Purchases"
+msgstr "Achats"
+
+#: includes/class-settings.php:5247
+msgid "Questions, bugs, or setup help for Merchant Whisper. We usually reply within 1–2 business days."
+msgstr "Questions, bogues ou aide à la configuration de Merchant Whisper. Nous répondons sous 1 à 2 jours ouvrés."
+
+#: includes/class-settings.php:3643
+msgid "Quick controls map to CSS variables. Preview updates live — save to apply on the storefront."
+msgstr "Quick controls map to CSS variables. Pavis updates live — save to apply on the storefront."
+
+#: includes/class-settings.php:5164
+msgid "Quiet time after a toast hides before the next one."
+msgstr "Temps de calme après le masquage d'une notification avant l'apparition de la suivante."
+
+#: includes/class-settings.php:5187
+msgid "REST API"
+msgstr "API REST"
+
+#: includes/class-settings.php:3036
+msgid "REST API — fetch with nonce (default)"
+msgstr "API REST — récupération avec nonce (par défaut)"
+
+#: includes/class-settings.php:3786
+msgid "Radius 0–40px. Padding 4–32px. Max width 220–560px."
+msgstr "Rayon 0–40px. Espacement 4–32px. Largeur max 220–560px."
+
+#: includes/class-settings.php:5165
+msgid "Randomizes delay and gap (±%) so the rhythm feels less robotic. Visible time is never jittered. Does not shuffle which events appear."
+msgstr "Rend le délai et l'intervalle aléatoires (±%) pour un rythme moins robotique. La durée d'affichage n'est jamais modifiée. Ne mélange pas les événements."
+
+#: includes/class-settings.php:4070
+msgid "Randomizes page-load delay and gap by up to this percent so the rhythm feels less robotic. 0 = exact timing. Visible duration is never jittered."
+msgstr "Rend le délai et l'intervalle au chargement aléatoires pour un rythme moins robotique."
+
+#: includes/class-settings.php:2776 includes/class-settings.php:4801 includes/class-settings.php:5126
+msgid "Real + demo fill"
+msgstr "Commandes réelles + démo"
+
+#: includes/class-analytics.php:802
+msgid "Real orders"
+msgstr "Commandes réelles"
+
+#: includes/class-settings.php:2964
+msgid "Real orders are enabled, but nothing is cached yet. Check Lookback window under Timing & cache, and Message & privacy → Checkout consent (customers who declined are hidden; admin/legacy orders without a choice still count)."
+msgstr "Les commandes réelles sont activées, mais rien n'est encore en cache. Vérifiez la fenêtre d'historique sous Rythme & cache, et Message & confidentialité → Consentement à la commande (les clients ayant refusé sont masqués)."
+
+#: includes/class-settings.php:2966
+msgid "Real orders are enabled, but nothing is cached yet. Confirm you have processing/completed orders inside the Lookback window (Timing & cache), then reload this page."
+msgstr "Commandes réelles are enabled, but nothing is cached yet. Confirm you have processing/completed commandes inside the Lookback window (Timing & cache), then reload this page."
+
+#: includes/class-settings.php:4104
+msgid "Real orders are rebuilt on a schedule — not on every page view."
+msgstr "Commandes réelles are rebuilt on a schedule — not on every page view."
+
+#: includes/class-settings.php:5221
+msgid "Real orders missing: %1$s (consent) and %2$s (lookback), plus processing/completed status."
+msgstr "Commandes réelles missing: %1$s (consent) and %2$s (lookback), plus processing/completed status."
+
+#: includes/class-settings.php:2774 includes/class-settings.php:3010 includes/class-settings.php:4799 includes/class-settings.php:5124
+msgid "Real orders only"
+msgstr "Commandes réelles uniquement"
+
+#: includes/class-settings.php:3363
+msgid "Real orders only. Demo toasts never show stock. Requires WooCommerce stock management on the product."
+msgstr "Commandes réelles uniquement. Demo notifications never show stock. Requires WooCommerce stock management on the produit."
+
+#: includes/class-settings.php:3011
+msgid "Real orders, fill with demo if needed"
+msgstr "Commandes réelles, compléter avec la démo si besoin"
+
+#: includes/class-settings.php:4374
+msgid "Real-order toasts versus demo fill in the selected range."
+msgstr "Notifications de commandes réelles vs complétion démo dans la période sélectionnée."
+
+#: includes/class-settings.php:4154
+msgid "Rebuild"
+msgstr "Reconstruire"
+
+#: includes/class-settings.php:2033 includes/class-settings.php:4157 includes/class-settings.php:5173
+msgid "Rebuild cache"
+msgstr "Reconstruire le cache"
+
+#: includes/class-settings.php:2034
+msgid "Rebuilding cache…"
+msgstr "Reconstruction du cache…"
+
+#: includes/class-settings.php:4799
+msgid "Recent eligible WooCommerce sales."
+msgstr "Ventes WooCommerce éligibles récentes."
+
+#: includes/class-settings.php:887
+msgid "Recent orders"
+msgstr "Recent commandes"
+
+#: includes/class-settings.php:5107
+msgid "Recent orders are queried in the background (WP-Cron, default every 15 minutes) and on new orders — not on every page view. The result is stored for the cache lifetime (also 15 minutes by default). Keep lifetime and cron the same. Both live under %s → Order cache, with a Rebuild cache button. Visitors load a small REST payload and see one toast at a time after your trigger, then delay / visible time / gap (jitter randomizes waits, not which sales)."
+msgstr "Les commandes récentes sont interrogées en arrière-plan (WP-Cron, par défaut toutes les 15 minutes) et lors des nouvelles commandes — pas à chaque affichage de page. Le résultat est conservé pour la durée de vie du cache (15 minutes par défaut). Conservez la durée de vie et le cron identiques. Les deux se trouvent sous %s → Cache des commandes. Les visiteurs chargent une charge REST et voient une notification à la fois."
+
+#: includes/class-settings.php:4646
+msgid "Record events"
+msgstr "Enregistrer les événements"
+
+#: includes/class-settings.php:4642
+msgid "Record events and attribution save immediately. Reset clears stored totals. Other plugin settings still use Save settings below."
+msgstr "L'enregistrement des événements et l'attribution s'enregistrent immédiatement. La réinitialisation efface les totaux enregistrés. Les autres réglages de l'extension utilisent Enregistrer les réglages ci-dessous."
+
+#: includes/class-settings.php:3617
+msgid "Reduce fatigue so toasts stay helpful, not noisy."
+msgstr "Réduisez la fatigue visuelle pour que les notifications restent utiles et non intrusives."
+
+#: includes/class-settings.php:3629 includes/class-settings.php:4512 includes/class-settings.php:4547
+msgid "Reduced motion"
+msgstr "Animation réduite"
+
+#: includes/class-settings.php:749
+msgid "Relaxed"
+msgstr "Détendu"
+
+#: includes/class-transfer.php:399
+msgid "Replace messages, timing, and other settings? This store’s product, category, and URL targeting will be kept."
+msgstr "Replace messages, timing, and other réglages? This store’s produit, catégorie, and URL targeting will be kept."
+
+#: includes/class-transfer.php:400
+msgid "Replace settings including product, category, and URL targeting from the file? Those IDs only match the store they were exported from."
+msgstr "Remplacer les réglages y compris le ciblage par produit, catégorie et URL depuis le fichier ? Ces identifiants correspondent uniquement à la boutique d'où ils ont été exportés."
+
+#: includes/class-transfer.php:398
+msgid "Replace the current toast design with this theme file?"
+msgstr "Replace the current notification design with this theme file?"
+
+#: includes/class-settings.php:3824
+msgid "Reset"
+msgstr "Réinitialiser"
+
+#: includes/class-settings.php:2016 includes/class-settings.php:3826 includes/class-settings.php:3932
+msgid "Reset design to defaults"
+msgstr "Réinitialiser le design par défaut"
+
+#: includes/class-settings.php:2017 includes/class-settings.php:3928
+msgid "Reset design to defaults?"
+msgstr "Réinitialiser le design par défaut ?"
+
+#: includes/class-settings.php:2005 includes/class-settings.php:4680 includes/class-settings.php:4709
+msgid "Reset statistics"
+msgstr "Réinitialiser les statistiques"
+
+#: includes/class-settings.php:2002 includes/class-settings.php:4705
+msgid "Reset statistics?"
+msgstr "Réinitialiser les statistiques ?"
+
+#: includes/class-settings.php:2018 includes/class-settings.php:3929
+msgid "Restore colors, layout, and shape to the Midnight preset? Unsaved design changes on this tab will be lost until you save settings."
+msgstr "Restaurer les couleurs, la disposition et la forme sur le préréglage Minuit ? Les modifications de design non enregistrées sur cet onglet seront perdues si vous n'enregistrez pas."
+
+#: includes/class-settings.php:3908
+msgid "Reuse colors, layout, and custom CSS across stores. Does not change targeting, privacy, or demo data."
+msgstr "Réutiliser les couleurs et le style sur d'autres boutiques."
+
+#: includes/class-settings.php:2013 includes/class-settings.php:4310 includes/class-settings.php:4332
+msgid "Revenue"
+msgstr "Chiffre d'affaires"
+
+#: includes/class-settings.php:3488 includes/class-settings.php:898
+msgid "Reviews"
+msgstr "Avis"
+
+#: includes/class-settings.php:5143
+msgid "Reviews: {name}, {rating}, {stars}, {product}, {excerpt} from approved WooCommerce reviews."
+msgstr "Avis: {name}, {rating}, {stars}, {produit}, {excerpt} from approved WooCommerce avis."
+
+#: includes/class-settings.php:3246
+msgid "Roles to hide toasts from"
+msgstr "Rôles pour lesquels masquer les notifications"
+
+#: includes/class-settings.php:3560
+msgid "SAVE10"
+msgstr "PROMO10"
+
+#: includes/class-settings.php:2233 includes/class-settings.php:2243
+msgid "Same as default"
+msgstr "Identique au choix par défaut"
+
+#: includes/class-settings.php:3818
+msgid "Same padding as text"
+msgstr "Même espacement que le texte"
+
+#: includes/class-settings.php:5502 includes/class-settings.php:5503
+msgid "Save settings"
+msgstr "Enregistrer les réglages"
+
+#: includes/class-settings.php:5487
+msgid "Saving settings clears the sales cache so the next rebuild uses your new options."
+msgstr "Enregistrer les réglages efface le cache des ventes afin que la prochaine reconstruction utilise vos nouvelles options."
+
+#: includes/class-settings.php:1989
+msgid "Saving your settings and rebuilding the sales cache…"
+msgstr "Enregistrement de vos réglages et reconstruction du cache des ventes…"
+
+#: includes/class-settings.php:1988
+msgid "Saving…"
+msgstr "Enregistrement en cours…"
+
+#: includes/class-settings.php:795
+msgid "Scroll"
+msgstr "Défilement"
+
+#: includes/class-settings.php:3969
+msgid "Scroll depth"
+msgstr "Profondeur de défilement"
+
+#: includes/class-settings.php:1998 includes/class-settings.php:4604 includes/class-settings.php:4609
+msgid "Search products"
+msgstr "Rechercher des produits"
+
+#: includes/class-settings.php:2282
+msgid "Search products…"
+msgstr "Rechercher des produits…"
+
+#: includes/class-settings.php:4062
+msgid "Seconds. First delay applies when Page load is a trigger. Gap is the quiet time after a toast hides before the next one appears."
+msgstr "Secondes. Le premier délai s'applique lorsque le chargement de page est un déclencheur. L'intervalle est le temps de calme après le masquage d'une notification."
+
+#: includes/class-settings.php:2348
+msgid "Select categories…"
+msgstr "Sélectionner des catégories…"
+
+#: includes/class-settings.php:1993 includes/class-settings.php:5280
+msgid "Send message"
+msgstr "Envoyer le message"
+
+#: includes/class-settings.php:2036 includes/class-settings.php:5444
+msgid "Send test"
+msgstr "Envoyer un test"
+
+#: includes/class-settings.php:1992 includes/class-settings.php:2037
+msgid "Sending…"
+msgstr "Envoi en cours…"
+
+#: includes/class-settings.php:4505 includes/class-settings.php:4537
+msgid "Session cap"
+msgstr "Limite par session"
+
+#: includes/class-settings.php:3616
+msgid "Session limits"
+msgstr "Limites de session"
+
+#: includes/class-settings.php:774
+msgid "Set delay, visible time, and gap yourself"
+msgstr "Définir vous-même le délai, la durée visible et l'intervalle"
+
+#: includes/class-settings.php:5081
+msgid "Set position, edge distance, and which pages may show toasts (%s)."
+msgstr "Définir la position, la distance des bords et les pages autorisées à afficher les notifications (%s)."
+
+#: includes/class-settings.php:1766
+msgid "Settings"
+msgstr "Réglages"
+
+#: includes/class-settings.php:2917
+msgid "Settings imported"
+msgstr "Réglages importés"
+
+#: includes/class-settings.php:5006
+msgid "Settings map"
+msgstr "Carte des réglages"
+
+#: includes/class-settings.php:2908
+msgid "Settings saved"
+msgstr "Réglages enregistrés"
+
+#: includes/class-settings.php:2979
+msgid "Settings sections"
+msgstr "Sections de réglages"
+
+#: includes/class-settings.php:3790
+msgid "Shadow"
+msgstr "Ombre"
+
+#: includes/class-settings.php:3770
+msgid "Shape"
+msgstr "Forme"
+
+#: includes/class-settings.php:4407
+msgid "Share"
+msgstr "Partager"
+
+#: includes/class-analytics.php:807
+msgid "Shop"
+msgstr "Boutique"
+
+#: includes/class-types.php:640
+msgid "Shop now"
+msgstr "Acheter maintenant"
+
+#: includes/class-settings.php:3116
+msgid "Shop options need WooCommerce. Homepage uses your site’s front page setting."
+msgstr "Les options de boutique nécessitent WooCommerce. La page d'accueil utilise le réglage de page d'accueil de votre site."
+
+#: includes/class-settings.php:3112
+msgid "Shop, categories & products"
+msgstr "Boutique, catégories & produits"
+
+#: includes/class-settings.php:2113
+msgid "Choose whether toast copy is edited here or translated in your language plugin."
+msgstr "Choisissez si le texte est modifié ici ou traduit via votre extension de langue."
+
+#: includes/class-settings.php:3533
+msgid "Show a short quote under the review"
+msgstr "Afficher une courte citation sous l'avis"
+
+#: includes/class-settings.php:4004
+msgid "Show a toast, then wait a quiet gap before the next one. Pick a preset or fine-tune custom values."
+msgstr "Afficher une notification, puis attendre un intervalle de calme avant la suivante. Choisissez un préréglage ou ajustez les valeurs."
+
+#: includes/class-settings.php:2000
+msgid "Show fewer"
+msgstr "Afficher moins"
+
+#: includes/class-settings.php:3419
+msgid "Show how many people are looking at a product. Simulated picks a stable count in your range; Live counts unique visitors on product pages (no IPs stored)."
+msgstr "Afficher combien de personnes consultent un produit. Le mode simulé choisit un nombre stable ; Le mode en direct compte les visiteurs uniques."
+
+#: includes/class-settings.php:1999 includes/class-settings.php:4633
+msgid "Show more"
+msgstr "Afficher plus"
+
+#: includes/class-settings.php:3108
+msgid "Show on"
+msgstr "Afficher sur"
+
+#: includes/class-settings.php:3146
+msgid "Show only to logged-out visitors (hide for logged-in users)"
+msgstr "Afficher uniquement aux visiteurs non connectés (masquer pour les utilisateurs connectés)"
+
+#: includes/class-settings.php:3805
+msgid "Show product thumbnail"
+msgstr "Afficher la vignette du produit"
+
+#: includes/class-settings.php:2831
+msgid "Show recent purchases as discreet toasts — cached for performance, privacy-aware by default."
+msgstr "Afficher les achats récents sous forme de notifications discrètes — mises en cache pour la performance et respectueuses de la vie privée."
+
+#: includes/class-settings.php:3367
+msgid "Show stock when ≤"
+msgstr "Afficher le stock si ≤"
+
+#: includes/class-settings.php:3584
+msgid "Show the promo toast at most once per browser session"
+msgstr "Afficher la notification promo au maximum une fois par session de navigation"
+
+#: includes/class-settings.php:3002
+msgid "Show toasts on the front end"
+msgstr "Afficher les notifications sur le site"
+
+#: includes/class-settings.php:4420 includes/class-settings.php:4469
+msgid "Shown"
+msgstr "Affiché"
+
+#: includes/class-settings.php:3554
+msgid "Shown as the toast line. Use {coupon} to insert the code in the text."
+msgstr "Affiché comme ligne de notification. Utilisez {coupon} pour insérer le code dans le texte."
+
+#: includes/class-settings.php:3384
+msgid "Simulated names & times"
+msgstr "Noms & temps simulés"
+
+#: includes/class-settings.php:5141
+msgid "Simulated names & times: under Purchases; used for Demo only and Real + demo fill."
+msgstr "Noms & temps simulés : sous Achats ; utilisé pour Démo uniquement et Commandes réelles + démo."
+
+#: includes/class-settings.php:4800
+msgid "Simulated people/times using your catalog products."
+msgstr "Personnes/heures simulées utilisant les produits de votre catalogue."
+
+#: includes/class-settings.php:5125
+msgid "Simulated people/times; products from your published catalog when available."
+msgstr "Personnes/heures simulées ; produits de votre catalogue publié lorsque disponibles."
+
+#: includes/class-settings.php:3442
+msgid "Simulated — set a range (no tracking)"
+msgstr "Simulé — définir une plage (sans suivi)"
+
+#: includes/class-settings.php:5416
+msgid "Slack Incoming Webhooks"
+msgstr "Webhooks entrants Slack"
+
+#: includes/class-settings.php:1008
+msgid "Slate"
+msgstr "Ardoise"
+
+#: includes/class-settings.php:750
+msgid "Slower first toast, longer quiet time"
+msgstr "Première notification plus lente, temps de calme plus long"
+
+#: includes/class-settings.php:2823
+msgid "Social proof toasts"
+msgstr "Notifications de preuve sociale"
+
+#: includes/class-settings.php:3795
+msgid "Soft"
+msgstr "Doux"
+
+#: includes/class-settings.php:4572
+msgid "Soft attribution"
+msgstr "Attribution indirecte"
+
+#: includes/class-settings.php:4593
+msgid "Soft attribution is correlation, not proven causation. Stored counts never include customer PII."
+msgstr "L'attribution indirecte est une corrélation. Les comptages enregistrés ne contiennent aucune donnée personnelle client."
+
+#: includes/class-settings.php:994
+msgid "Soft light"
+msgstr "Lumière douce"
+
+#: includes/class-settings.php:3360
+msgid "Soft phrases — last one / only a few / low stock"
+msgstr "Phrases douces — dernier restant / quelques-uns / stock faible"
+
+#: includes/class-settings.php:4474
+msgid "Soft-attributed after a toast click in the attribution window."
+msgstr "Attribué indirectement après un clic sur une notification pendant la fenêtre d'attribution."
+
+#: includes/class-settings.php:1994 includes/class-support.php:140
+msgid "Something went wrong. Please try again."
+msgstr "Un problème est survenu. Veuillez réessayer."
+
+#: includes/class-settings.php:3268
+msgid "Sound"
+msgstr "Son"
+
+#: includes/class-settings.php:2879 includes/class-settings.php:4377
+msgid "Source"
+msgstr "Source"
+
+#: includes/class-settings.php:3973
+msgid "Start after this percent of the page has been scrolled. Short pages that cannot scroll count as 100%."
+msgstr "Démarrer après ce pourcentage de défilement de la page."
+
+#: includes/class-settings.php:3947
+msgid "Start when"
+msgstr "Démarrer lorsque"
+
+#: includes/class-settings.php:1649 includes/class-settings.php:2984 includes/class-settings.php:5049 includes/class-settings.php:5383
+msgid "Statistics"
+msgstr "Statistiques"
+
+#: includes/class-analytics.php:241
+msgid "Statistics cleared."
+msgstr "Statistiques effacées."
+
+#: includes/class-slack.php:252
+msgid "Statistics collection is off. Turn it on under Statistics → Collection."
+msgstr "La collecte des statistiques est désactivée. Activez-la sous Statistiques → Collecte."
+
+#: includes/class-settings.php:2995
+msgid "Status"
+msgstr "Statut"
+
+#: includes/class-settings.php:4973
+msgid "Still stuck — how do I get help?"
+msgstr "Toujours bloqué — comment obtenir de l'aide ?"
+
+#: includes/class-settings.php:5232
+msgid "Still stuck? Skim the FAQ above, or use %s and include system info."
+msgstr "Toujours bloqué ? Parcourez la FAQ ci-dessus ou utilisez %s."
+
+#: includes/class-settings.php:3356
+msgid "Stock display"
+msgstr "Affichage du stock"
+
+#: includes/class-settings.php:5145
+msgid "Stock: Off / Soft phrases / Exact when low — real orders only, qty at or below threshold; demo never shows stock."
+msgstr "Stock : Désactivé / Phrases douces / Exact en stock bas — commandes réelles uniquement."
+
+#: includes/class-settings.php:4492
+msgid "Storefront loads that skipped the toast loop. Bars are a share of shown + skipped in this range."
+msgstr "Chargements de page ayant ignoré les notifications."
+
+#: includes/class-rest.php:65
+msgid "Storefront nonce from the page load (do not use X-WP-Nonce)."
+msgstr "Nonce du site issu du chargement de page."
+
+#: includes/class-settings.php:3797
+msgid "Strong"
+msgstr "Fort"
+
+#: includes/class-settings.php:3234
+msgid "Stronger social proof on the product the visitor is viewing."
+msgstr "Preuve sociale renforcée sur le produit consulté par le visiteur."
+
+#: includes/class-settings.php:3851
+msgid "Structure"
+msgstr "Structure"
+
+#: includes/class-settings.php:5264
+msgid "Subject"
+msgstr "Sujet"
+
+#: includes/class-settings.php:1650 includes/class-settings.php:2985
+msgid "Support"
+msgstr "Support"
+
+#: includes/class-settings.php:4721
+msgid "Support sections"
+msgstr "Sections de support"
+
+#: includes/class-settings.php:2837 includes/class-settings.php:2838
+msgid "System"
+msgstr "Système"
+
+#: includes/class-settings.php:2850
+msgid "System status"
+msgstr "Statut du système"
+
+#: includes/class-settings.php:4407
+msgid "Target"
+msgstr "Cible"
+
+#: includes/class-settings.php:3325 includes/class-settings.php:3423 includes/class-settings.php:3493
+msgid "Template"
+msgstr "Modèle"
+
+#: includes/class-settings.php:3321
+msgid "Template, fallback name, stock, and simulated names for purchase toasts."
+msgstr "Modèle, nom par défaut, stock et noms simulés pour les notifications d'achat."
+
+#: includes/class-settings.php:5441
+msgid "Test"
+msgstr "Test"
+
+#: includes/class-slack.php:387
+msgid "Test message sent (HTTP %d). Check your webhook receiver (e.g. Slack)."
+msgstr "Message de test envoyé (HTTP %d). Vérifiez votre récepteur de webhook (ex. Slack)."
+
+#: includes/class-settings.php:3132
+msgid "Thank-you page"
+msgstr "Page de remerciement"
+
+#: includes/class-settings.php:2928
+msgid "That file is not an Merchant Whisper settings or theme export."
+msgstr "Ce fichier n'est pas un export de réglages ou de thème Merchant Whisper."
+
+#: includes/class-settings.php:2918
+msgid "The JSON pack was applied. Product and category filters may need a pass if this file came from another store."
+msgstr "Le pack JSON a été appliqué. Les filtres de produits et catégories devront peut-être être ajustés."
+
+#: includes/class-settings.php:2938
+msgid "The file could not be read. Try exporting again and keep it under 512 KB."
+msgstr "Le fichier n'a pas pu être lu. Réessayez d'exporter et gardez un fichier inférieur à 512 Ko."
+
+#: includes/class-slack.php:108
+msgid "The webhook did not accept the message (%s). Check the URL and try again."
+msgstr "Le webhook n'a pas accepté le message (%s). Vérifiez l'URL et réessayez."
+
+#: includes/class-settings.php:3655
+msgid "Theme"
+msgstr "Thème"
+
+#: includes/class-settings.php:3907
+msgid "Theme JSON"
+msgstr "JSON du thème"
+
+#: includes/class-settings.php:3912
+msgid "Theme file"
+msgstr "Fichier de thème"
+
+#: includes/class-settings.php:2922
+msgid "Theme imported"
+msgstr "Thème importé"
+
+#: includes/class-settings.php:3811
+msgid "Thumbnail layout"
+msgstr "Disposition de la vignette"
+
+#: includes/class-settings.php:4081 includes/class-settings.php:5167
+msgid "Time label"
+msgstr "Étiquette de temps"
+
+#: includes/class-settings.php:4916
+msgid "Time labels feel jumpy or robotic. What can I change?"
+msgstr "Les étiquettes de temps paraissent saccadées. Que puis-je modifier ?"
+
+#: includes/class-settings.php:4481
+msgid "Time visible (auto-hide)"
+msgstr "Temps visible (masquage automatique)"
+
+#: includes/class-settings.php:4476
+msgid "Time visible (dismiss)"
+msgstr "Temps visible (fermeture)"
+
+#: includes/class-settings.php:4003
+msgid "Timing"
+msgstr "Rythme & temporisation"
+
+#: includes/class-settings.php:1648 includes/class-settings.php:2983 includes/class-settings.php:4542 includes/class-settings.php:4743 includes/class-settings.php:4760 includes/class-settings.php:4789 includes/class-settings.php:4865 includes/class-settings.php:4893 includes/class-settings.php:4908 includes/class-settings.php:4923 includes/class-settings.php:4938 includes/class-settings.php:4952 includes/class-settings.php:5040 includes/class-settings.php:5093 includes/class-settings.php:5108 includes/class-settings.php:5159 includes/class-settings.php:5223
+msgid "Timing & cache"
+msgstr "Rythme & cache"
+
+#: includes/class-settings.php:4010
+msgid "Timing preset"
+msgstr "Préréglage de rythme"
+
+#: includes/class-settings.php:5482
+msgid "Tips"
+msgstr "Conseils"
+
+#: includes/class-settings.php:2923
+msgid "Toast colors, layout, and custom CSS were replaced from the theme file."
+msgstr "Les couleurs, la disposition et le CSS personnalisé ont été remplacés."
+
+#: includes/class-settings.php:4216
+msgid "Toast performance"
+msgstr "Performance des notifications"
+
+#: includes/class-settings.php:3059
+msgid "Toast position"
+msgstr "Position de la notification"
+
+#: includes/class-settings.php:4469
+msgid "Toast rendered on the storefront."
+msgstr "Notification affichée sur le site."
+
+#: includes/class-analytics.php:262
+msgid "Toast statistics collection is off."
+msgstr "La collecte des statistiques de notifications est désactivée."
+
+#: includes/class-analytics.php:261
+msgid "Toast statistics collection is on."
+msgstr "La collecte des statistiques de notifications est activée."
+
+#: includes/class-settings.php:3949
+msgid "Toast triggers"
+msgstr "Déclencheurs de notification"
+
+#: includes/class-settings.php:3289 includes/class-settings.php:3296
+msgid "Toast types"
+msgstr "Types de notifications"
+
+#: includes/class-settings.php:2852
+msgid "Toasts"
+msgstr "Notifications"
+
+#: includes/class-settings.php:4091 includes/class-settings.php:5168
+msgid "Toasts per visit"
+msgstr "Notifications par visite"
+
+#: includes/class-settings.php:4541
+msgid "Toasts per visit already reached. Raise the cap in %s."
+msgstr "Limite de notifications par visite atteinte."
+
+#: includes/class-settings.php:3062
+msgid "Top left"
+msgstr "Haut gauche"
+
+#: includes/class-settings.php:3063
+msgid "Top right"
+msgstr "Haut droite"
+
+#: includes/class-settings.php:2117
+msgid "Translations"
+msgstr "Traductions"
+
+#: includes/class-settings.php:4397
+msgid "Trigger"
+msgstr "Déclencheur"
+
+#: includes/class-settings.php:3942 includes/class-settings.php:5161
+msgid "Triggers"
+msgstr "Déclencheurs"
+
+#: includes/class-settings.php:5206
+msgid "Troubleshooting"
+msgstr "Dépannage"
+
+#: includes/class-settings.php:1051
+msgid "Tune colors and radius yourself"
+msgstr "Ajuster vous-même les couleurs et le rayon"
+
+#: includes/class-settings.php:5072
+msgid "Turn Enable on in %s and pick a data source."
+msgstr "Activez dans %s et choisissez une source de données."
+
+#: includes/class-settings.php:5382
+msgid "Turn on Record events in %1$s → %2$s to send webhook digests."
+msgstr "Activez Enregistrer les événements dans %1$s → %2$s pour envoyer des rapports."
+
+#: includes/class-settings.php:2129
+msgid "On: pick a language, then edit the toast text in the cards above."
+msgstr "Activé : choisissez une langue, puis modifiez le texte ci-dessus."
+
+#: includes/class-settings.php:2277
+msgid "Off: keep the default text here and translate it in your language plugin."
+msgstr "Désactivé : conservez le texte par défaut ici et traduisez-le."
+
+#: includes/class-settings.php:4326
+msgid "Type"
+msgstr "Type"
+
+#: includes/class-settings.php:3169
+msgid "URL rules, product/category filters, PDP matching, and role exclusions."
+msgstr "Règles d'URL, filtres de produits/catégories, correspondance PDP et exclusions de rôles."
+
+#: includes/class-settings.php:4850
+msgid "Under %s, Stock display can be Off, Soft phrases (last one / only a few / low stock), or Exact when low (“only 3 left”). Stock only appears for real orders with WooCommerce stock management, and only when quantity is at or below your threshold. Demo toasts never show stock. Use {stock} / {stock_label} in the template, or leave them out to show the phrase next to the time."
+msgstr "Sous %s, l'affichage du stock peut être désactivé, en phrases douces ou exact en stock bas."
+
+#: includes/class-analytics.php:362
+msgid "Unknown event."
+msgstr "Événement inconnu."
+
+#: includes/class-settings.php:1990
+msgid "Unsaved changes"
+msgstr "Modifications non enregistrées"
+
+#: includes/class-settings.php:3705 includes/class-settings.php:3717
+msgid "Use Elementor colors & font"
+msgstr "Utiliser les couleurs & la police Elementor"
+
+#: includes/class-types.php:635
+msgid "Use this code at checkout"
+msgstr "Utilisez ce code lors de la commande"
+
+#: includes/class-settings.php:3386
+msgid "Used when Data source is Demo only or Real + demo fill (General tab). Edit anytime — they stay saved even if Real orders only is selected."
+msgstr "Utilisé lorsque la source de données est Démo uniquement ou Commandes réelles + démo."
+
+#: includes/class-settings.php:3352
+msgid "Used when a name is missing, or when “Hide names” is on."
+msgstr "Utilisé lorsqu'un nom est manquant ou que « Masquer les noms » est activé."
+
+#: includes/class-settings.php:3465
+msgid "Uses real unique pings, then clamps to max. Window is minutes. Product targeting follows Include / Exclude on the General tab."
+msgstr "Utilise de véritables pings uniques, puis limite au maximum."
+
+#: includes/class-settings.php:5447
+msgid "Uses the URL in the field above (save to keep it). Limited to one successful test every 15 seconds."
+msgstr "Utilise l'URL du champ ci-dessus."
+
+#: includes/class-settings.php:2125
+msgid "Using %s."
+msgstr "Utilise %s."
+
+#: includes/class-settings.php:3095
+msgid "Vertical"
+msgstr "Vertical"
+
+#: includes/class-settings.php:3418 includes/class-settings.php:892
+msgid "Viewing now"
+msgstr "Consultent actuellement"
+
+#: includes/class-settings.php:5142
+msgid "Viewing now: {count}, {people}, {product}. Simulated range or live unique visitors on the product page (no IPs)."
+msgstr "Consultation actuelle : {count}, {people}, {product}."
+
+#: includes/class-settings.php:4561
+msgid "Viewport below 768px with Disable on mobile on in %s."
+msgstr "Écran inférieur à 768px avec Désactiver sur mobile dans %s."
+
+#: includes/class-settings.php:4257
+msgid "Visibility, clicks, and soft-attributed carts and orders in the selected range."
+msgstr "Visibilité, clics et paniers/commandes attribués indirectement."
+
+#: includes/class-settings.php:4470
+msgid "Visible duration ended without a dismiss."
+msgstr "La durée d'affichage s'est terminée sans fermeture."
+
+#: includes/class-settings.php:4054 includes/class-settings.php:5163
+msgid "Visible for"
+msgstr "Visible pendant"
+
+#: includes/class-settings.php:4471
+msgid "Visitor closed the toast."
+msgstr "Le visiteur a fermé la notification."
+
+#: includes/class-settings.php:4551
+msgid "Visitor prefers reduced motion and the setting is on in %s."
+msgstr "Le visiteur préfère une animation réduite."
+
+#: includes/class-settings.php:3144
+msgid "Visitors"
+msgstr "Visiteurs"
+
+#: includes/class-settings.php:5162
+msgid "Wait after page load before the first toast (when Page load is a trigger)."
+msgstr "Attendre après le chargement de page avant la première notification."
+
+#: includes/class-settings.php:4249
+msgid "Waiting for data"
+msgstr "En attente de données"
+
+#: includes/class-settings.php:5370
+msgid "Webhook"
+msgstr "Webhook"
+
+#: includes/class-settings.php:5391
+msgid "Webhook URL"
+msgstr "URL de webhook"
+
+#: includes/class-settings.php:4414
+msgid "What happened after a toast was shown, as a share of impressions. Click and auto-hide can both count for the same toast."
+msgstr "Ce qui s'est passé après l'affichage d'une notification."
+
+#: includes/class-settings.php:4689
+msgid "What this dashboard stores."
+msgstr "Ce que ce tableau de bord enregistre."
+
+#: includes/class-settings.php:4945
+msgid "What’s the difference between cache lifetime and cron interval?"
+msgstr "Quelle est la différence entre la durée de vie du cache et l'intervalle cron ?"
+
+#: includes/class-settings.php:4796
+msgid "What’s the difference between data sources?"
+msgstr "Quelle est la différence entre les sources de données ?"
+
+#: includes/class-settings.php:820
+msgid "When a matching element is clicked"
+msgstr "Lors du clic sur un élément correspondant"
+
+#: includes/class-settings.php:4077
+msgid "When off, the toast still hides after the visible duration even if the pointer is over it."
+msgstr "Lorsque désactivé, la notification se masque après la durée visible."
+
+#: includes/class-settings.php:5166
+msgid "When on, hovering a toast pauses the visible timer until the pointer leaves. When off, the toast still auto-hides on schedule."
+msgstr "Lorsque activé, le survol met en pause le chronomètre."
+
+#: includes/class-settings.php:802
+msgid "When the cursor leaves toward the top"
+msgstr "Lorsque le curseur sort vers le haut"
+
+#: includes/class-settings.php:3943
+msgid "When the first toast may appear. Select one or more — the first match starts the loop. Later toasts still follow duration and gap."
+msgstr "Quand la première notification peut apparaître. Sélectionnez-en un ou plusieurs — le premier résultat démarre la boucle. Les notifications suivantes respectent la durée et l'intervalle."
+
+#: includes/class-settings.php:4384
+msgid "Where the toast was shown. Page kinds only — never URLs."
+msgstr "Où la notification a été affichée."
+
+#: includes/class-settings.php:3047
+msgid "Where toasts appear"
+msgstr "Où apparaissent les notifications"
+
+#: includes/class-settings.php:4394
+msgid "Which storefront trigger started the toast loop."
+msgstr "Quel déclencheur du site a démarré la boucle."
+
+#: includes/class-settings.php:4735
+msgid "Why aren’t toasts showing on my site?"
+msgstr "Pourquoi les notifications ne s'affichent-elles pas ?"
+
+#: includes/class-settings.php:4751
+msgid "Why don’t my real orders appear?"
+msgstr "Pourquoi mes commandes réelles n'apparaissent-elles pas ?"
+
+#: includes/class-settings.php:4771
+msgid "Why is Cached %1$s/%2$s when I have more products?"
+msgstr "Pourquoi le cache indique-t-il %1$s/%2$s alors que j'ai plus de produits ?"
+
+#: includes/class-settings.php:4491
+msgid "Why toasts did not show"
+msgstr "Pourquoi les notifications ne se sont pas affichées"
+
+#: includes/class-settings.php:3760
+msgid "Width"
+msgstr "Largeur"
+
+#: includes/class-settings.php:4858
+msgid "Will this slow down my store?"
+msgstr "Cela va-t-il ralentir ma boutique ?"
+
+#: includes/class-settings.php:4578
+msgid "Window"
+msgstr "Fenêtre"
+
+#: includes/class-settings.php:4573
+msgid "Window after a toast click (product link or coupon copy). CTA toasts with no product still count carts and orders by type."
+msgstr "Fenêtre après un clic sur la notification."
+
+#: includes/class-settings.php:2863
+msgid "WooCommerce"
+msgstr "WooCommerce"
+
+#: includes/class-settings.php:3024
+msgid "WooCommerce is not active — demo toasts still work (catalog products when available, otherwise a generic label). Edit simulated names and times under %s → Purchases."
+msgstr "WooCommerce n'est pas actif — les notifications démo fonctionnent toujours."
+
+#: includes/class-settings.php:2822
+msgid "WooCommerce social proof"
+msgstr "Preuve sociale WooCommerce"
+
+#: includes/class-settings.php:5292
+msgid "WordPress account details used for support communication."
+msgstr "Détails du compte WordPress utilisés pour le support."
+
+#: includes/class-settings.php:2108
+msgid "Override %s with manual copy here"
+msgstr "Surcharger %s avec du texte manuel ici"
+
+#: includes/class-settings.php:4822
+msgid "Yes. Under %s → Toast types, enable Viewing now, Reviews, and/or CTA / coupon alongside (or instead of) Purchases. They rotate in the same loop. Viewing can be simulated or live unique visitors on the product page — live mode stores no IPs, only a short-lived session token. Simulated can pin specific products; live follows Include / Exclude products on the General tab. Reviews use approved WooCommerce product reviews (min stars). The coupon chip copies the code; the button can copy or open a URL."
+msgstr "Oui. Sous %s → Types de notifications, activez Consultation, Avis et/ou CTA / coupon."
+
+#: includes/class-settings.php:4892
+msgid "Yes. Under %s → Triggers, choose Page load, Scroll, Exit intent, Add to cart, Inactivity, and/or Click. The first match starts the toast loop; duration and gap still apply after that. Uncheck Page load if you only want a behavioral trigger."
+msgstr "Oui. Sous %s → Déclencheurs, choisissez Chargement de page, Défilement, Intention de sortie, Ajout au panier, Inactivité et/ou Clic. Le premier résultat démarre la boucle de notification."
+
+#: includes/class-settings.php:2134
+msgid "When this is off, edit those translations in Languages → Translations, group “%s”."
+msgstr "Lorsque désactivé, modifiez ces traductions dans Langues → Traductions."
+
+#: includes/class-settings.php:2141
+msgid "When this is off, edit those translations in WPML → String Translation, context “%s”."
+msgstr "Lorsque désactivé, modifiez ces traductions dans WPML → Traduction de chaînes."
+
+#: includes/class-settings.php:2300
+msgid "When this is off, open TranslatePress → Translate Site on any page, then translate “Merchant Whisper toast copy” in the string list."
+msgstr "Lorsque désactivé, ouvrez TranslatePress → Traduire le site."
+
+#: includes/class-settings.php:5027 includes/class-language.php:701
+msgid "Merchant Whisper toast copy"
+msgstr "Texte des notifications Merchant Whisper"
+
+#: includes/class-settings.php:5024
+msgid "TranslatePress → Translate Site"
+msgstr "TranslatePress → Traduire le site"
+
+#: includes/class-rest.php:75
+msgid "Shop language slug from the storefront page."
+msgstr "Identifiant de langue de boutique depuis la page du site."
+
+#: includes/class-settings.php:4697
+msgid "You can turn collection off or reset totals from this tab. Export is a CSV of aggregates only."
+msgstr "Vous pouvez désactiver la collecte ou réinitialiser les totaux depuis cet onglet."
+
+#: includes/class-analytics.php:251 includes/class-analytics.php:272
+msgid "You do not have permission to change this setting."
+msgstr "Vous n'avez pas la permission de modifier ce réglage."
+
+#: includes/class-transfer.php:135
+msgid "You do not have permission to export Merchant Whisper settings."
+msgstr "Vous n'avez pas la permission d'exporter les réglages Merchant Whisper."
+
+#: includes/class-transfer.php:167
+msgid "You do not have permission to import Merchant Whisper settings."
+msgstr "Vous n'avez pas la permission d'importer les réglages Merchant Whisper."
+
+#: includes/class-cache.php:49
+msgid "You do not have permission to rebuild the cache."
+msgstr "Vous n'avez pas la permission de reconstruire le cache."
+
+#: includes/class-analytics.php:235
+msgid "You do not have permission to reset statistics."
+msgstr "Vous n'avez pas la permission de réinitialiser les statistiques."
+
+#: includes/class-support.php:63
+msgid "You do not have permission to send this request."
+msgstr "Vous n'avez pas la permission d'envoyer cette requête."
+
+#: includes/class-slack.php:338
+msgid "You do not have permission to test the webhook."
+msgstr "Vous n'avez pas la permission de tester le webhook."
+
+#: includes/class-settings.php:2909
+msgid "Your Merchant Whisper settings were updated. The sales cache was cleared and will rebuild with the new options."
+msgstr "Vos réglages Merchant Whisper ont été mis à jour. Le cache a été effacé."
+
+#: includes/class-settings.php:5342
+msgid "Your choice is stored on this site only. When newsletters go live, we will use %s from your WordPress profile. No message is sent today."
+msgstr "Votre choix est stocké uniquement sur ce site. Nous utiliserons l'adresse %s de votre profil WordPress."
+
+#: includes/class-cache.php:447 includes/class-frontend.php:608
+msgid "a couple of hours ago"
+msgstr "il y a deux heures"
+
+#: includes/class-cache.php:453 includes/class-frontend.php:611
+msgid "a few days ago"
+msgstr "il y a quelques jours"
+
+#: includes/class-cache.php:445 includes/class-cache.php:539 includes/class-frontend.php:607
+msgid "a few minutes ago"
+msgstr "il y a quelques minutes"
+
+#: includes/class-cache.php:711
+msgid "a product"
+msgstr "un produit"
+
+#: includes/class-frontend.php:617
+msgid "day"
+msgstr "jour"
+
+#: includes/class-frontend.php:618 includes/class-settings.php:4150
+msgid "days"
+msgstr "jours"
+
+#: includes/class-settings.php:5265
+msgid "e.g. Toast not showing on product pages"
+msgstr "ex. La notification ne s'affiche pas sur les pages produits"
+
+#: includes/class-cache.php:449 includes/class-frontend.php:609
+msgid "earlier today"
+msgstr "plus tôt aujourd'hui"
+
+#: includes/class-frontend.php:615
+msgid "hour"
+msgstr "heure"
+
+#: includes/class-frontend.php:616 includes/class-settings.php:3624
+msgid "hours"
+msgstr "heures"
+
+#: includes/class-cache.php:443 includes/class-frontend.php:606 includes/class-settings.php:1980
+msgid "just now"
+msgstr "à l'instant"
+
+#: includes/class-slack.php:261
+msgid "last %d day"
+msgid_plural "last %d days"
+msgstr[0] "dernier %d jour"
+msgstr[1] "derniers %d jours"
+
+#: includes/class-cache.php:386
+msgid "last one left"
+msgstr "dernier restant"
+
+#: includes/class-cache.php:390
+msgid "low stock"
+msgstr "stock faible"
+
+#: includes/class-frontend.php:613
+msgid "minute"
+msgstr "minute"
+
+#: includes/class-frontend.php:614 includes/class-settings.php:1996 includes/class-settings.php:4111 includes/class-settings.php:4127 includes/class-settings.php:4579
+msgid "minutes"
+msgstr "minutes"
+
+#: includes/class-frontend.php:621
+msgid "month"
+msgstr "mois"
+
+#: includes/class-frontend.php:622
+msgid "months"
+msgstr "mois"
+
+#: includes/class-cache.php:306 includes/class-cache.php:513
+msgid "nearby"
+msgstr "à proximité"
+
+#: includes/class-slack.php:101
+msgid "no HTTP status"
+msgstr "aucun statut HTTP"
+
+#: includes/class-frontend.php:625 includes/class-settings.php:1984 includes/class-types.php:309
+msgid "now"
+msgstr "maintenant"
+
+#: includes/class-cache.php:395
+msgid "only %d left"
+msgid_plural "only %d left"
+msgstr[0] "plus que %d restant"
+msgstr[1] "plus que %d restants"
+
+#: includes/class-settings.php:1981
+msgid "only 3 left"
+msgstr "plus que 3 restants"
+
+#: includes/class-cache.php:388 includes/class-settings.php:1982
+msgid "only a few left"
+msgstr "plus que quelques-uns"
+
+#: includes/class-frontend.php:627 includes/class-settings.php:1986 includes/class-types.php:296
+msgid "people"
+msgstr "personnes"
+
+#: includes/class-frontend.php:626 includes/class-settings.php:1985 includes/class-types.php:295
+msgid "person"
+msgstr "personne"
+
+#: includes/class-cache.php:455 includes/class-frontend.php:612 includes/class-types.php:608
+msgid "recently"
+msgstr "récemment"
+
+#: includes/class-settings.php:3980
+msgid "seconds"
+msgstr "secondes"
+
+#: includes/class-settings.php:3379
+msgid "units"
+msgstr "unités"
+
+#: includes/class-analytics.php:1160 includes/class-settings.php:4264 includes/class-settings.php:4269 includes/class-settings.php:4274 includes/class-settings.php:4279 includes/class-settings.php:4284 includes/class-settings.php:4289 includes/class-settings.php:4295
+msgid "vs prior"
+msgstr "vs précédent"
+
+#: includes/class-frontend.php:619
+msgid "week"
+msgstr "semaine"
+
+#: includes/class-frontend.php:620
+msgid "weeks"
+msgstr "semaines"
+
+#: includes/class-settings.php:5190
+msgid "with an X-MW-ST-Nonce header. Bare requests get 403. Supports background refetch."
+msgstr "avec un en-tête X-MW-ST-Nonce."
+
+#: includes/class-cache.php:451 includes/class-frontend.php:610
+msgid "yesterday"
+msgstr "hier"
+
+#: includes/class-settings.php:5320
+msgid "your profile"
+msgstr "votre profil"
+
+#: includes/class-settings.php:893
+msgid "“X people are viewing this”"
+msgstr "« X personnes consultent ce produit »"
+
+#: includes/class-slack.php:291
+msgid "• Attributed carts: *%s*"
+msgstr "• Paniers attribués : *%s*"
+
+#: includes/class-slack.php:296
+msgid "• Attributed orders: *%s*"
+msgstr "• Commandes attribuées : *%s*"
+
+#: includes/class-slack.php:301
+msgid "• Attributed revenue: *%s*"
+msgstr "• Chiffre d'affaires attribué : *%s*"
+
+#: includes/class-slack.php:286
+msgid "• CTR: *%s%%*"
+msgstr "• CTR : *%s%%*"
+
+#: includes/class-slack.php:281
+msgid "• Clicks: *%s*"
+msgstr "• Clics : *%s*"
+
+#: includes/class-slack.php:276
+msgid "• Impressions: *%s*"
+msgstr "• Impressions : *%s*"
+

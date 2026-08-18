@@ -407,6 +407,7 @@ class MW_Sales_Toast_Language {
 			'en' => 'en_US',
 			'ro' => 'ro_RO',
 			'de' => 'de_DE',
+			'fr' => 'fr_FR',
 		);
 		if ( isset( $map[ $short ] ) ) {
 			return $map[ $short ];

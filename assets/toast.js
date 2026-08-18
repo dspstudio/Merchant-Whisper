@@ -97,6 +97,37 @@
     return;
   }
 
+  if (cfg.firstVisitOnly) {
+    try {
+      var isVisited = !!localStorage.getItem('mw_st_visited');
+      var isSess = /(?:^|;\s*)mw_st_sess=1/.test(document.cookie);
+      if (isVisited && !isSess) {
+        track('skipped', { reason: 'first_visit' });
+        return;
+      }
+      var secure = location.protocol === 'https:' ? '; Secure' : '';
+      document.cookie = 'mw_st_sess=1; path=/; SameSite=Lax' + secure;
+      localStorage.setItem('mw_st_visited', '1');
+    } catch (e) {
+      /* ignore */
+    }
+  }
+
+  function isCartNotEmpty() {
+    if (!cfg.cartEmptyOnly) return false;
+    try {
+      if (/(?:^|;\s*)woocommerce_items_in_cart=([1-9]\d*)/.test(document.cookie)) {
+        return true;
+      }
+    } catch (e) {}
+    return false;
+  }
+
+  if (isCartNotEmpty()) {
+    track('skipped', { reason: 'cart_not_empty' });
+    return;
+  }
+
   var MUTE_KEY = 'mw_st_mute_until';
   var COUNT_KEY = 'mw_st_toast_count';
   var SHOWN_KEY = 'mw_st_shown_ids';
@@ -374,7 +405,9 @@
       .replace(/\{rating\}/g, escapeHtml(rating))
       .replace(/\{stars\}/g, starsHtml(rating))
       .replace(/\{excerpt\}/g, escapeHtml(event.excerpt || ''))
-      .replace(/\{coupon\}/g, escapeHtml(coupon));
+      .replace(/\{coupon\}/g, escapeHtml(coupon))
+      .replace(/\{code\}/g, escapeHtml(coupon))
+      .replace(/\{discount\}/g, '');
 
     out = out
       .replace(/\s*[—–\-|·]\s*(<\/?strong>)?\s*$/g, '')
@@ -390,23 +423,7 @@
   function formatLine(event) {
     var type = eventType(event);
     if (type === 'viewing') {
-      var tpl = viewingTemplate || '{count} {people} are viewing {product}';
-      var peopleVal = event.people;
-      if (tpl.indexOf('are viewing') !== -1 || tpl.indexOf('viewing this') !== -1) {
-        peopleVal = (Number(event.count) === 1) ? 'person' : 'people';
-      } else if (tpl.indexOf('vizualizează') !== -1 || tpl.indexOf('persoane') !== -1) {
-        peopleVal = (Number(event.count) === 1) ? 'persoană' : 'persoane';
-      } else if (tpl.indexOf('sehen sich') !== -1 || tpl.indexOf('Personen') !== -1) {
-        peopleVal = (Number(event.count) === 1) ? 'Person' : 'Personen';
-      }
-      var evtCopy = {};
-      for (var k in event) {
-        if (Object.prototype.hasOwnProperty.call(event, k)) {
-          evtCopy[k] = event[k];
-        }
-      }
-      evtCopy.people = peopleVal;
-      return applyTemplate(tpl, evtCopy);
+      return applyTemplate(viewingTemplate, event);
     }
     if (type === 'review') {
       return applyTemplate(reviewTemplate, event);
@@ -421,16 +438,6 @@
   function formatMetaLine(event) {
     var type = eventType(event);
     if (type === 'viewing') {
-      var tpl = viewingTemplate || '';
-      if (tpl.indexOf('are viewing') !== -1 || tpl.indexOf('viewing this') !== -1) {
-        return 'now';
-      }
-      if (tpl.indexOf('vizualizează') !== -1 || tpl.indexOf('persoane') !== -1) {
-        return 'acum';
-      }
-      if (tpl.indexOf('sehen sich') !== -1 || tpl.indexOf('Personen') !== -1) {
-        return 'jetzt';
-      }
       return i18n.now || 'now';
     }
     if (type === 'cta') {
@@ -594,7 +601,7 @@
   }
 
   function scheduleGap(ms) {
-    if (stopped || sessionCapReached() || isMuted() || !events.length) {
+    if (stopped || sessionCapReached() || isMuted() || !events.length || isCartNotEmpty()) {
       return;
     }
     clearGapTimer();
@@ -810,7 +817,7 @@
   }
 
   function show(event) {
-    if (stopped || !event || sessionCapReached()) return;
+    if (stopped || !event || sessionCapReached() || isCartNotEmpty()) return;
 
     var root = ensureEl();
     var media = root.querySelector('.mw-sales-toast__media');

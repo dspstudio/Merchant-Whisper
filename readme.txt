@@ -4,7 +4,7 @@ Tags: woocommerce, ecommerce, notifications, social-proof, popup
 Requires at least: 5.8
 Tested up to: 7.0
 Requires PHP: 7.2
-Stable tag: 0.9.1
+Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -25,7 +25,7 @@ Merchant Whisper shows discreet sale and activity toasts on your storefront. Rea
 
 * Optional checkout consent (off by default on the checkbox; recommended setting is on)
 * First name and city only — never email or full address
-* Hide names and use a fallback such as “Someone”
+* Hide names and use a fallback such as "Someone"
 * First-party statistics (counts and product IDs in a table on your site). Off is available under Statistics → Collection
 * No third-party tracking pixels for toast delivery
 * Multisite-ready: each subsite has its own settings, cache, statistics, and toasts (no cross-site data sharing)
@@ -68,45 +68,21 @@ Yes. Activate per subsite or network-activate the plugin. Each site keeps its ow
 
 == Changelog ==
 
-= 0.9.1 =
-* Settings tabs are also WordPress admin submenu items under Merchant Whisper
-* Coupon copy starts the same attribution window as a product-link click
-* By source statistics include carts, orders, and revenue
-* Account webhook is a general HTTPS JSON digest (Slack Incoming Webhooks remain the example)
-* Multisite-ready: per-site data, network activation, and full uninstall cleanup on every subsite
-
-= 2.2.3 =
-* Weekly digest webhook accepts any public HTTPS JSON URL; Slack Incoming Webhooks remain the example
-
-= 2.2.2 =
-* WordPress.org packaging: GPL license header, readme.txt, Chart.js source attribution
-* Newsletter opt-in is a local placeholder — nothing is emailed until the feature ships
-
-= 2.2.1 =
-* Multilingual toast copy for Polylang, WPML, and TranslatePress
-
-= 2.2.0 =
-* Extra toast types: viewing now, product reviews, and CTA/coupon
-
-= 2.1.0 =
-* Triggers: page load, scroll, exit intent, add to cart, inactivity, click selector
-
-= 2.0.0 =
-* Cached orders, REST delivery, privacy consent, session mute/cap
-
-= 1.1.0 =
-* Admin settings; hover-pause; product image/title links
-
 = 1.0.0 =
-* Initial toast UI and real/demo mix
+* Social proof toasts: recent purchases, viewing now, product reviews, and CTA/coupon
+* Cached real orders via WP-Cron and order hooks (HPOS-safe); REST delivery
+* Privacy: checkout consent (classic + block), hide names, first-name-and-city only
+* Six triggers: page load, scroll, exit intent, add to cart, inactivity, click selector
+* Multilingual toast copy for Polylang, WPML, and TranslatePress
+* Statistics dashboard with impressions, clicks, CTR, attributed carts/orders/revenue, and CSV export
+* Design controls: colors, radius, width, shadow, image-fit, custom CSS, theme JSON import/export
+* Targeting: URL include/exclude, product/category filters, product page match, role hide
+* Demo mode with configurable people, times, and catalog products
+* Settings import/export, optional HTTPS webhook digest
+* Multisite-ready: per-site settings, cache, statistics, and crons
+* Full uninstall cleanup across all subsites
 
 == Upgrade Notice ==
 
-= 0.9.1 =
-Public version is now 0.9.1. Coupon copy attributes carts and orders; settings tabs appear under Merchant Whisper in the admin menu.
-
-= 2.2.3 =
-The Account webhook field is a general HTTPS JSON hook. Slack Incoming Webhooks still work as before.
-
-= 2.2.2 =
-Adds GPL metadata and directory readme. Newsletter preference stays local until mail is implemented.
+= 1.0.0 =
+First public release on WordPress.org. All features included — no premium tier.

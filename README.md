@@ -1,6 +1,6 @@
 # Merchant Whisper
 
-**Version 0.9.1** — Social proof for WooCommerce: cached real orders, privacy controls, and optional demo fill.
+**Version 1.0.0** — Social proof for WooCommerce: cached real orders, privacy controls, and optional demo fill.
 
 Requires WordPress 5.8+, PHP 7.2+. WooCommerce is required for real orders; demo mode can run without it.
 
@@ -33,7 +33,6 @@ Requires WordPress 5.8+, PHP 7.2+. WooCommerce is required for real orders; demo
 - Only first name and city are shown — never email or full address
 - Toast delivery and statistics stay on this site (no tracking pixels)
 - Admin Support form may POST to Webformatic when you send a message; optional HTTPS webhook (off by default) may send weekly aggregate stats (Slack Incoming Webhooks are the example)
-- New installs default consent **on**; upgraded 1.x installs keep it **off** until settings are saved
 
 ### Message & session controls
 - Message template with `{name}`, `{city}`, `{product}`
@@ -158,7 +157,7 @@ Each subsite is independent: settings, sales cache, statistics table, crons, and
 ## Installation
 
 1. Place this folder in `wp-content/plugins/mw-sales-toast`.
-2. Activate **Merchant Whisper** (re-activate after upgrading to 2.0 so cron is scheduled).
+2. Activate **Merchant Whisper**.
 3. Configure **WooCommerce → Merchant Whisper**.
 4. Confirm toasts appear after the configured delay when the REST endpoint returns events.
 
@@ -235,35 +234,16 @@ Terms people may use in **WordPress Admin → Plugins → Add New** or Google:
 
 ## Changelog
 
-### 0.9.1
-- Settings tabs are also admin submenu items under Merchant Whisper
-- Coupon copy starts the same attribution window as a product-link click
-- By source statistics include carts, orders, and revenue
-- Account webhook accepts any public HTTPS JSON URL (Slack Incoming Webhooks remain the example)
-
-### 2.2.3
-- Account webhook accepts any public HTTPS JSON URL (Slack Incoming Webhooks remain the example)
-
-### 2.2.2
-- WordPress.org packaging: GPL header, `readme.txt`, Chart.js source attribution
-- Newsletter toggle kept as a local placeholder (no email is sent yet)
-
-### 2.2.1
-- Multilingual toast copy for Polylang, WPML, and TranslatePress; product/category ID mapping for Polylang & WPML
-
-### 2.2.0
-- Extra toast types: viewing now, product reviews, and CTA/coupon
-
-### 2.1.0
-- Triggers: page load, scroll depth, exit intent, add to cart, inactivity, and click selector
-
-### 2.0.0
-- Modular structure; cached orders; cron + order hooks; REST delivery
-- Privacy consent, hide names, message template, session mute/cap, mobile gate
-- Expanded settings; version bump from 1.x MVP
-
-### 1.1.0
-- Admin settings; hover-pause; product image/title links
-
 ### 1.0.0
-- Initial toast UI and real/demo mix
+- Social proof toasts: recent purchases, viewing now, product reviews, and CTA/coupon
+- Cached real orders via WP-Cron and order hooks (HPOS-safe); REST delivery
+- Privacy: checkout consent (classic + block), hide names, first-name-and-city only
+- Six triggers: page load, scroll, exit intent, add to cart, inactivity, click selector
+- Multilingual toast copy for Polylang, WPML, and TranslatePress
+- Statistics dashboard: impressions, clicks, CTR, attributed carts/orders/revenue, Chart.js chart, CSV export
+- Design controls: colors, radius, width, shadow, image-fit, custom CSS, theme JSON import/export
+- Targeting: URL include/exclude, product/category filters, product page match, role hide
+- Demo mode with configurable people, times, and catalog products
+- Settings import/export, optional HTTPS webhook digest
+- Multisite-ready: per-site settings, cache, statistics, and crons
+- Full uninstall cleanup across all subsites
