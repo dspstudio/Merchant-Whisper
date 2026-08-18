@@ -390,7 +390,23 @@
   function formatLine(event) {
     var type = eventType(event);
     if (type === 'viewing') {
-      return applyTemplate(viewingTemplate, event);
+      var tpl = viewingTemplate || '{count} {people} are viewing {product}';
+      var peopleVal = event.people;
+      if (tpl.indexOf('are viewing') !== -1 || tpl.indexOf('viewing this') !== -1) {
+        peopleVal = (Number(event.count) === 1) ? 'person' : 'people';
+      } else if (tpl.indexOf('vizualizează') !== -1 || tpl.indexOf('persoane') !== -1) {
+        peopleVal = (Number(event.count) === 1) ? 'persoană' : 'persoane';
+      } else if (tpl.indexOf('sehen sich') !== -1 || tpl.indexOf('Personen') !== -1) {
+        peopleVal = (Number(event.count) === 1) ? 'Person' : 'Personen';
+      }
+      var evtCopy = {};
+      for (var k in event) {
+        if (Object.prototype.hasOwnProperty.call(event, k)) {
+          evtCopy[k] = event[k];
+        }
+      }
+      evtCopy.people = peopleVal;
+      return applyTemplate(tpl, evtCopy);
     }
     if (type === 'review') {
       return applyTemplate(reviewTemplate, event);
@@ -405,6 +421,16 @@
   function formatMetaLine(event) {
     var type = eventType(event);
     if (type === 'viewing') {
+      var tpl = viewingTemplate || '';
+      if (tpl.indexOf('are viewing') !== -1 || tpl.indexOf('viewing this') !== -1) {
+        return 'now';
+      }
+      if (tpl.indexOf('vizualizează') !== -1 || tpl.indexOf('persoane') !== -1) {
+        return 'acum';
+      }
+      if (tpl.indexOf('sehen sich') !== -1 || tpl.indexOf('Personen') !== -1) {
+        return 'jetzt';
+      }
       return i18n.now || 'now';
     }
     if (type === 'cta') {
