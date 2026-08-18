@@ -101,11 +101,18 @@ Requires WordPress 5.8+, PHP 7.2+. WooCommerce is required for real orders; demo
 
 ## Architecture
 
-```text
-WooCommerce order ──► status / new_order hooks ──┐
-WP-Cron (5 min) ───────────────────────────────►├─► rebuild ──► transient mw_st_sales_cache
-                                                 │
-Visitor JS ──► GET mw-st/v1/notifications ──────┘──► toast UI
+```mermaid
+flowchart LR
+    subgraph Data Sources & Cron
+        A[WooCommerce Order Hooks] --> C[Rebuild Events]
+        B[WP-Cron 5 min] --> C
+        C --> D[Transient Cache: mw_st_sales_cache]
+    end
+
+    subgraph Storefront Delivery
+        E[Visitor JS] -->|GET /mw-st/v1/notifications| D
+        D --> F[Toast Display]
+    end
 ```
 
 ## Settings
