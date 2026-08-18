@@ -2114,30 +2114,20 @@ class MW_Sales_Toast_Settings {
 			);
 			return isset( $defaults[ $key ] ) ? $defaults[ $key ] : '';
 		}
-		if ( 'de' === $lang_short ) {
+		if ( 'en' === $lang_short ) {
 			$defaults = array(
-				'message_template' => '{name} aus {city} hat gerade {product} gekauft',
-				'fallback_name'    => 'Jemand',
-				'demo_people'      => "Anna, Berlin\nMarco, München\nSofia, Hamburg\nJonas, Köln\nLéa, Frankfurt\nNoah, Wien\nElena, Zürich\nOmar, Stuttgart",
-				'demo_whens'       => "gerade eben\nvor einigen Minuten\nvor zwei Stunden\nheute früher\ngestern\nkürzlich",
-				'viewing_template' => '{count} Personen sehen sich dieses Produkt gerade an',
-				'review_template'  => '{rating}★ „{excerpt}“ von {name}',
-				'cta_message'      => 'Verwende den Code {code} für {discount} Rabatt auf deine Bestellung!',
-				'cta_button'       => 'Rabatt sichern',
+				'message_template' => '{name} from {city} just bought {product}',
+				'fallback_name'    => 'Someone',
+				'demo_people'      => "Ana, Bucharest\nMarco, Milan\nSofia, Lisbon\nJonas, Berlin\nLéa, Paris\nNoah, Amsterdam\nElena, Madrid\nOmar, Cairo",
+				'demo_whens'       => "just now\na few minutes ago\na couple of hours ago\nearlier today\nyesterday\nrecently",
+				'viewing_template' => '{count} people are viewing this right now',
+				'review_template'  => '{rating}★ "{excerpt}" by {name}',
+				'cta_message'      => 'Use code {code} for {discount} off your order!',
+				'cta_button'       => 'Get discount',
 			);
 			return isset( $defaults[ $key ] ) ? $defaults[ $key ] : '';
 		}
-		$defaults = array(
-			'message_template' => '{name} from {city} just bought {product}',
-			'fallback_name'    => 'Someone',
-			'demo_people'      => "Ana, Bucharest\nMarco, Milan\nSofia, Lisbon\nJonas, Berlin\nLéa, Paris\nNoah, Amsterdam\nElena, Madrid\nOmar, Cairo",
-			'demo_whens'       => "just now\na few minutes ago\na couple of hours ago\nearlier today\nyesterday\nrecently",
-			'viewing_template' => '{count} people are viewing this right now',
-			'review_template'  => '{rating}★ "{excerpt}" by {name}',
-			'cta_message'      => 'Use code {code} for {discount} off your order!',
-			'cta_button'       => 'Get discount',
-		);
-		return isset( $defaults[ $key ] ) ? $defaults[ $key ] : '';
+		return '';
 	}
 
 	/**
