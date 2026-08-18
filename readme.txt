@@ -1,5 +1,5 @@
 === Merchant Whisper ===
-Contributors: mwv3
+Contributors: dspstudio
 Tags: woocommerce, ecommerce, notifications, social-proof, popup
 Requires at least: 5.8
 Tested up to: 7.0

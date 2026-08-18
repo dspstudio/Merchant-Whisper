@@ -24,7 +24,7 @@ Short description (max 150 characters; already in readme.txt):
   Social proof toasts for WooCommerce: recent purchases, viewing counts, reviews, and promos, with checkout consent and cached orders.
 
 Contributors (must match your .org username):
-  mwv3
+  dspstudio
 
 Tags (max 12):
   woocommerce, ecommerce, notifications, social-proof, popup
@@ -120,7 +120,7 @@ banner-772x250.jpg / banner-1544x500.jpg
 --------------------------------------------------
 
 • GPL header + license
-• readme.txt Contributors = your .org username (mwv3)
+• readme.txt Contributors = your .org username (dspstudio)
 • Chart.js source note in assets/vendor/README.txt
 • Support and webhook documented as admin-initiated HTTP
 • Newsletter checkbox is local only (no email yet)
